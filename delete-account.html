@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Delete Account — Phuzzles</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:        #0e0f13;
+      --surface:   #16181f;
+      --surface2:  #1e2029;
+      --border:    rgba(255,255,255,0.07);
+      --text:      #e8e9ef;
+      --muted:     #7c7f94;
+      --accent:    #ff6b35;
+      --accent2:   #ffb347;
+      --danger:    #e84545;
+      --danger-bg: rgba(232,69,69,0.08);
+      --success:   #3ecf8e;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ── Noise texture overlay ── */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* ── Ambient gradient blob ── */
+    body::after {
+      content: '';
+      position: fixed;
+      top: -30vh;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 80vw;
+      height: 60vh;
+      background: radial-gradient(ellipse at center, rgba(255,107,53,0.12) 0%, transparent 70%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .page {
+      position: relative;
+      z-index: 1;
+      max-width: 680px;
+      margin: 0 auto;
+      padding: 0 24px 80px;
+    }
+
+    /* ── Nav ── */
+    nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 28px 0 0;
+      margin-bottom: 72px;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+    }
+
+    .logo-mark {
+      width: 36px;
+      height: 36px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      grid-template-rows: 1fr 1fr;
+      gap: 3px;
+      border-radius: 10px;
+      overflow: hidden;
+    }
+
+    .logo-mark span {
+      display: block;
+      border-radius: 2px;
+    }
+    .logo-mark span:nth-child(1) { background: var(--accent); }
+    .logo-mark span:nth-child(2) { background: var(--accent2); opacity: 0.7; }
+    .logo-mark span:nth-child(3) { background: var(--accent2); opacity: 0.5; }
+    .logo-mark span:nth-child(4) { background: var(--accent); opacity: 0.85; }
+
+    .logo-text {
+      font-family: 'DM Serif Display', serif;
+      font-size: 1.3rem;
+      color: var(--text);
+      letter-spacing: -0.01em;
+    }
+
+    .nav-badge {
+      font-size: 0.72rem;
+      font-weight: 500;
+      color: var(--muted);
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      padding: 4px 10px;
+      border-radius: 20px;
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+    }
+
+    /* ── Hero ── */
+    .hero {
+      margin-bottom: 56px;
+      animation: fadeUp 0.6s ease both;
+    }
+
+    .hero-eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: var(--danger);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 20px;
+    }
+
+    .hero-eyebrow::before {
+      content: '';
+      display: block;
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--danger);
+    }
+
+    h1 {
+      font-family: 'DM Serif Display', serif;
+      font-size: clamp(2.2rem, 5vw, 3rem);
+      line-height: 1.12;
+      letter-spacing: -0.03em;
+      color: var(--text);
+      margin-bottom: 20px;
+    }
+
+    h1 em {
+      font-style: italic;
+      color: var(--accent);
+    }
+
+    .hero p {
+      font-size: 1.05rem;
+      color: var(--muted);
+      max-width: 520px;
+      line-height: 1.7;
+    }
+
+    /* ── Cards ── */
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 28px 32px;
+      margin-bottom: 20px;
+      animation: fadeUp 0.6s ease both;
+    }
+
+    .card:nth-child(1) { animation-delay: 0.05s; }
+    .card:nth-child(2) { animation-delay: 0.1s; }
+    .card:nth-child(3) { animation-delay: 0.15s; }
+
+    .card-label {
+      font-size: 0.72rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--muted);
+      margin-bottom: 16px;
+    }
+
+    .card h2 {
+      font-family: 'DM Serif Display', serif;
+      font-size: 1.25rem;
+      letter-spacing: -0.02em;
+      margin-bottom: 12px;
+      color: var(--text);
+    }
+
+    .card p {
+      color: var(--muted);
+      font-size: 0.93rem;
+      line-height: 1.7;
+    }
+
+    /* ── Steps ── */
+    .steps {
+      list-style: none;
+      margin-top: 8px;
+    }
+
+    .steps li {
+      display: flex;
+      gap: 16px;
+      align-items: flex-start;
+      padding: 14px 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .steps li:last-child { border-bottom: none; }
+
+    .step-num {
+      flex-shrink: 0;
+      width: 28px;
+      height: 28px;
+      border-radius: 8px;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: #fff;
+      margin-top: 1px;
+    }
+
+    .step-content strong {
+      display: block;
+      font-size: 0.93rem;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 3px;
+    }
+
+    .step-content span {
+      font-size: 0.85rem;
+      color: var(--muted);
+    }
+
+    /* ── Data table ── */
+    .data-grid {
+      display: grid;
+      gap: 10px;
+      margin-top: 8px;
+    }
+
+    .data-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 14px;
+      background: var(--surface2);
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      font-size: 0.88rem;
+    }
+
+    .data-icon {
+      width: 22px;
+      height: 22px;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      flex-shrink: 0;
+    }
+
+    .data-icon.deleted { background: var(--danger-bg); }
+    .data-icon.retained { background: rgba(62,207,142,0.1); }
+
+    .data-name { flex: 1; color: var(--text); }
+
+    .data-tag {
+      font-size: 0.7rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      padding: 2px 8px;
+      border-radius: 4px;
+    }
+
+    .data-tag.deleted {
+      background: var(--danger-bg);
+      color: var(--danger);
+    }
+
+    .data-tag.retained {
+      background: rgba(62,207,142,0.1);
+      color: var(--success);
+    }
+
+    /* ── Warning banner ── */
+    .warning-banner {
+      display: flex;
+      gap: 14px;
+      align-items: flex-start;
+      padding: 18px 20px;
+      background: var(--danger-bg);
+      border: 1px solid rgba(232,69,69,0.2);
+      border-radius: 12px;
+      margin-top: 20px;
+    }
+
+    .warning-icon {
+      font-size: 20px;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+
+    .warning-text {
+      font-size: 0.88rem;
+      color: #f07070;
+      line-height: 1.6;
+    }
+
+    .warning-text strong { color: var(--danger); }
+
+    /* ── Contact card ── */
+    .contact-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 28px 32px;
+      margin-bottom: 20px;
+      animation: fadeUp 0.6s 0.2s ease both;
+    }
+
+    .contact-card h2 {
+      font-family: 'DM Serif Display', serif;
+      font-size: 1.25rem;
+      letter-spacing: -0.02em;
+      margin-bottom: 10px;
+      color: var(--text);
+    }
+
+    .contact-card p {
+      font-size: 0.93rem;
+      color: var(--muted);
+      margin-bottom: 20px;
+      line-height: 1.7;
+    }
+
+    .email-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 20px;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      color: var(--text);
+      text-decoration: none;
+      font-size: 0.9rem;
+      font-weight: 500;
+      transition: border-color 0.2s, background 0.2s;
+    }
+
+    .email-link:hover {
+      border-color: var(--accent);
+      background: rgba(255,107,53,0.06);
+    }
+
+    .email-link svg { opacity: 0.6; }
+
+    /* ── App store badge section ── */
+    .store-section {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 28px 32px;
+      margin-bottom: 20px;
+      animation: fadeUp 0.6s 0.25s ease both;
+    }
+
+    .store-section h2 {
+      font-family: 'DM Serif Display', serif;
+      font-size: 1.25rem;
+      letter-spacing: -0.02em;
+      margin-bottom: 10px;
+      color: var(--text);
+    }
+
+    .store-section p {
+      font-size: 0.93rem;
+      color: var(--muted);
+      margin-bottom: 20px;
+      line-height: 1.7;
+    }
+
+    .store-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 18px;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      color: var(--text);
+      text-decoration: none;
+      font-size: 0.88rem;
+      font-weight: 500;
+      transition: border-color 0.2s, background 0.2s;
+    }
+
+    .store-badge:hover {
+      border-color: var(--accent);
+      background: rgba(255,107,53,0.06);
+    }
+
+    /* ── Footer ── */
+    footer {
+      border-top: 1px solid var(--border);
+      padding-top: 32px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+      animation: fadeUp 0.6s 0.3s ease both;
+    }
+
+    footer p {
+      font-size: 0.82rem;
+      color: var(--muted);
+    }
+
+    footer a {
+      font-size: 0.82rem;
+      color: var(--muted);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+
+    footer a:hover { color: var(--text); }
+
+    .footer-links { display: flex; gap: 20px; }
+
+    /* ── Animations ── */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(18px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ── Responsive ── */
+    @media (max-width: 480px) {
+      .card, .contact-card, .store-section { padding: 22px 20px; }
+      nav { margin-bottom: 48px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+
+    <nav>
+      <a href="/" class="logo">
+        <div class="logo-mark">
+          <span></span><span></span>
+          <span></span><span></span>
+        </div>
+        <span class="logo-text">Phuzzles</span>
+      </a>
+      <span class="nav-badge">Account Deletion</span>
+    </nav>
+
+    <section class="hero">
+      <div class="hero-eyebrow">Data &amp; Privacy</div>
+      <h1>Delete your <em>account</em></h1>
+      <p>
+        You can delete your Phuzzles account at any time. This page explains how,
+        and exactly what data is removed when you do.
+      </p>
+    </section>
+
+    <!-- How to delete -->
+    <div class="card">
+      <div class="card-label">In-App Instructions</div>
+      <h2>How to delete your account</h2>
+      <p>Account deletion is done from within the Phuzzles app in a few steps.</p>
+
+      <ol class="steps">
+        <li>
+          <div class="step-num">1</div>
+          <div class="step-content">
+            <strong>Open the app and go to Profile</strong>
+            <span>Tap the Profile tab in the bottom navigation bar.</span>
+          </div>
+        </li>
+        <li>
+          <div class="step-num">2</div>
+          <div class="step-content">
+            <strong>Scroll to the bottom of the page</strong>
+            <span>Find the "Delete Account" option in the actions list.</span>
+          </div>
+        </li>
+        <li>
+          <div class="step-num">3</div>
+          <div class="step-content">
+            <strong>Type DELETE to confirm</strong>
+            <span>You'll be prompted to type the word DELETE to confirm your intent.</span>
+          </div>
+        </li>
+        <li>
+          <div class="step-num">4</div>
+          <div class="step-content">
+            <strong>Re-enter your password if prompted</strong>
+            <span>For security, Firebase may ask you to re-authenticate before deletion completes.</span>
+          </div>
+        </li>
+        <li>
+          <div class="step-num">5</div>
+          <div class="step-content">
+            <strong>Your account is permanently deleted</strong>
+            <span>All data listed below is removed immediately and cannot be recovered.</span>
+          </div>
+        </li>
+      </ol>
+
+      <div class="warning-banner">
+        <div class="warning-icon">⚠️</div>
+        <div class="warning-text">
+          <strong>This action is irreversible.</strong> Once deleted, your account,
+          puzzles, and all associated data cannot be restored. There is no grace period.
+        </div>
+      </div>
+    </div>
+
+    <!-- What gets deleted -->
+    <div class="card">
+      <div class="card-label">Data Removal</div>
+      <h2>What gets deleted</h2>
+      <p>When you delete your account, the following data is permanently removed from our systems.</p>
+
+      <div class="data-grid" style="margin-top: 20px;">
+        <div class="data-row">
+          <div class="data-icon deleted">🗑</div>
+          <span class="data-name">Account credentials &amp; profile</span>
+          <span class="data-tag deleted">Deleted</span>
+        </div>
+        <div class="data-row">
+          <div class="data-icon deleted">🗑</div>
+          <span class="data-name">Display name, username, email address</span>
+          <span class="data-tag deleted">Deleted</span>
+        </div>
+        <div class="data-row">
+          <div class="data-icon deleted">🗑</div>
+          <span class="data-name">Profile picture</span>
+          <span class="data-tag deleted">Deleted</span>
+        </div>
+        <div class="data-row">
+          <div class="data-icon deleted">🗑</div>
+          <span class="data-name">All sent and received puzzles</span>
+          <span class="data-tag deleted">Deleted</span>
+        </div>
+        <div class="data-row">
+          <div class="data-icon deleted">🗑</div>
+          <span class="data-name">Puzzle photos &amp; images</span>
+          <span class="data-tag deleted">Deleted</span>
+        </div>
+        <div class="data-row">
+          <div class="data-icon deleted">🗑</div>
+          <span class="data-name">Contacts list</span>
+          <span class="data-tag deleted">Deleted</span>
+        </div>
+        <div class="data-row">
+          <div class="data-icon deleted">🗑</div>
+          <span class="data-name">Block list &amp; reports filed</span>
+          <span class="data-tag deleted">Deleted</span>
+        </div>
+        <div class="data-row">
+          <div class="data-icon deleted">🗑</div>
+          <span class="data-name">FCM notification token</span>
+          <span class="data-tag deleted">Deleted</span>
+        </div>
+        <div class="data-row">
+          <div class="data-icon retained">🔒</div>
+          <span class="data-name">Anonymised abuse reports you submitted</span>
+          <span class="data-tag retained">Retained</span>
+        </div>
+      </div>
+
+      <p style="margin-top: 16px; font-size: 0.82rem; color: var(--muted);">
+        Retained data consists only of anonymised safety records required to
+        maintain platform integrity. No personally identifiable information is kept.
+      </p>
+    </div>
+
+    <!-- Can't access the app -->
+    <div class="contact-card">
+      <h2>Can't access the app?</h2>
+      <p>
+        If you're unable to log in or access the app to delete your account,
+        email us and we'll process the deletion manually within 30 days.
+        Please include the email address associated with your account.
+      </p>
+      <a href="mailto:support@phuzzles.app" class="email-link">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="2" y="4" width="20" height="16" rx="2"/>
+          <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/>
+        </svg>
+        support@phuzzles.app
+      </a>
+    </div>
+
+    <!-- Download app -->
+    <div class="store-section">
+      <h2>Get the app</h2>
+      <p>Phuzzles is available on Android. Download it to manage your account directly from the app.</p>
+      <a href="https://play.google.com/store/apps/details?id=rebelstudios.phuzzles.app" class="store-badge" target="_blank" rel="noopener">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M3.18 23.76a2 2 0 0 0 2.84.24L17.5 12 6.02.02A2 2 0 0 0 3 2v20a2 2 0 0 0 .18 1.76zM20.5 10.5l-2.96-1.7L14.5 12l3.04 3.2 3-.17a2 2 0 0 0 0-4.03l.96-.5z"/>
+        </svg>
+        Download on Google Play
+      </a>
+    </div>
+
+    <footer>
+      <p>© 2025 Rebel Studios. All rights reserved.</p>
+      <div class="footer-links">
+        <a href="/privacy">Privacy Policy</a>
+        <a href="/terms">Terms of Service</a>
+        <a href="/">Home</a>
+      </div>
+    </footer>
+
+  </div>
+</body>
+</html>
