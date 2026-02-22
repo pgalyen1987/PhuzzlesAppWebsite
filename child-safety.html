@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Child Safety Standards — Phuzzles</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:        #0e0f13;
+      --surface:   #16181f;
+      --surface2:  #1e2029;
+      --border:    rgba(255,255,255,0.07);
+      --text:      #e8e9ef;
+      --muted:     #7c7f94;
+      --accent:    #ff6b35;
+      --accent2:   #ffb347;
+      --safe:      #3ecf8e;
+      --safe-bg:   rgba(62,207,142,0.08);
+      --warn:      #e84545;
+      --warn-bg:   rgba(232,69,69,0.08);
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    body::after {
+      content: '';
+      position: fixed;
+      top: -30vh;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 80vw;
+      height: 60vh;
+      background: radial-gradient(ellipse at center, rgba(62,207,142,0.08) 0%, transparent 70%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .page {
+      position: relative;
+      z-index: 1;
+      max-width: 680px;
+      margin: 0 auto;
+      padding: 0 24px 80px;
+    }
+
+    nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 28px 0 0;
+      margin-bottom: 72px;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+    }
+
+    .logo-mark {
+      width: 36px;
+      height: 36px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      grid-template-rows: 1fr 1fr;
+      gap: 3px;
+      border-radius: 10px;
+      overflow: hidden;
+    }
+
+    .logo-mark span { display: block; border-radius: 2px; }
+    .logo-mark span:nth-child(1) { background: var(--accent); }
+    .logo-mark span:nth-child(2) { background: var(--accent2); opacity: 0.7; }
+    .logo-mark span:nth-child(3) { background: var(--accent2); opacity: 0.5; }
+    .logo-mark span:nth-child(4) { background: var(--accent); opacity: 0.85; }
+
+    .logo-text {
+      font-family: 'DM Serif Display', serif;
+      font-size: 1.3rem;
+      color: var(--text);
+      letter-spacing: -0.01em;
+    }
+
+    .nav-badge {
+      font-size: 0.72rem;
+      font-weight: 500;
+      color: var(--muted);
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      padding: 4px 10px;
+      border-radius: 20px;
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+    }
+
+    /* ── Hero ── */
+    .hero {
+      margin-bottom: 56px;
+      animation: fadeUp 0.6s ease both;
+    }
+
+    .hero-eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: var(--safe);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 20px;
+    }
+
+    .hero-eyebrow::before {
+      content: '';
+      display: block;
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--safe);
+    }
+
+    h1 {
+      font-family: 'DM Serif Display', serif;
+      font-size: clamp(2.2rem, 5vw, 3rem);
+      line-height: 1.12;
+      letter-spacing: -0.03em;
+      color: var(--text);
+      margin-bottom: 20px;
+    }
+
+    h1 em {
+      font-style: italic;
+      color: var(--safe);
+    }
+
+    .hero p {
+      font-size: 1.05rem;
+      color: var(--muted);
+      max-width: 520px;
+      line-height: 1.7;
+    }
+
+    .effective-date {
+      display: inline-block;
+      margin-top: 16px;
+      font-size: 0.8rem;
+      color: var(--muted);
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      padding: 4px 12px;
+      border-radius: 6px;
+    }
+
+    /* ── Cards ── */
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 28px 32px;
+      margin-bottom: 20px;
+    }
+
+    .card:nth-child(1) { animation: fadeUp 0.6s 0.05s ease both; }
+    .card:nth-child(2) { animation: fadeUp 0.6s 0.10s ease both; }
+    .card:nth-child(3) { animation: fadeUp 0.6s 0.15s ease both; }
+    .card:nth-child(4) { animation: fadeUp 0.6s 0.20s ease both; }
+    .card:nth-child(5) { animation: fadeUp 0.6s 0.25s ease both; }
+
+    .card-label {
+      font-size: 0.72rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--muted);
+      margin-bottom: 16px;
+    }
+
+    .card h2 {
+      font-family: 'DM Serif Display', serif;
+      font-size: 1.25rem;
+      letter-spacing: -0.02em;
+      margin-bottom: 12px;
+      color: var(--text);
+    }
+
+    .card p {
+      color: var(--muted);
+      font-size: 0.93rem;
+      line-height: 1.75;
+      margin-bottom: 12px;
+    }
+
+    .card p:last-child { margin-bottom: 0; }
+
+    /* ── Policy list ── */
+    .policy-list {
+      list-style: none;
+      margin-top: 8px;
+      display: grid;
+      gap: 8px;
+    }
+
+    .policy-list li {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 12px 14px;
+      background: var(--surface2);
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      font-size: 0.88rem;
+      color: var(--text);
+      line-height: 1.5;
+    }
+
+    .policy-list li::before {
+      content: '✓';
+      flex-shrink: 0;
+      width: 20px;
+      height: 20px;
+      background: var(--safe-bg);
+      color: var(--safe);
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      font-weight: 700;
+      margin-top: 1px;
+    }
+
+    /* ── Prohibited list ── */
+    .prohibited-list {
+      list-style: none;
+      margin-top: 8px;
+      display: grid;
+      gap: 8px;
+    }
+
+    .prohibited-list li {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 12px 14px;
+      background: var(--warn-bg);
+      border-radius: 10px;
+      border: 1px solid rgba(232,69,69,0.15);
+      font-size: 0.88rem;
+      color: #f07070;
+      line-height: 1.5;
+    }
+
+    .prohibited-list li::before {
+      content: '✕';
+      flex-shrink: 0;
+      width: 20px;
+      height: 20px;
+      background: rgba(232,69,69,0.15);
+      color: var(--warn);
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      font-weight: 700;
+      margin-top: 1px;
+    }
+
+    /* ── Reporting box ── */
+    .report-box {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 20px;
+      margin-top: 16px;
+    }
+
+    .report-box p {
+      font-size: 0.88rem;
+      color: var(--muted);
+      margin-bottom: 12px;
+    }
+
+    .report-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 16px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text);
+      text-decoration: none;
+      font-size: 0.88rem;
+      font-weight: 500;
+      transition: border-color 0.2s, background 0.2s;
+    }
+
+    .report-link:hover {
+      border-color: var(--safe);
+      background: var(--safe-bg);
+      color: var(--safe);
+    }
+
+    /* ── NCMEC highlight ── */
+    .ncmec-banner {
+      display: flex;
+      gap: 14px;
+      align-items: flex-start;
+      padding: 16px 18px;
+      background: rgba(62,207,142,0.06);
+      border: 1px solid rgba(62,207,142,0.15);
+      border-radius: 12px;
+      margin-top: 16px;
+    }
+
+    .ncmec-banner p {
+      font-size: 0.86rem;
+      color: #7ddcb0;
+      line-height: 1.6;
+      margin: 0;
+    }
+
+    .ncmec-banner p a {
+      color: var(--safe);
+      text-decoration: underline;
+      text-underline-offset: 2px;
+    }
+
+    /* ── Contact ── */
+    .contact-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-top: 4px;
+    }
+
+    .email-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 16px;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text);
+      text-decoration: none;
+      font-size: 0.88rem;
+      font-weight: 500;
+      transition: border-color 0.2s, background 0.2s;
+    }
+
+    .email-link:hover {
+      border-color: var(--accent);
+      background: rgba(255,107,53,0.06);
+    }
+
+    /* ── Footer ── */
+    footer {
+      border-top: 1px solid var(--border);
+      padding-top: 32px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+      animation: fadeUp 0.6s 0.35s ease both;
+    }
+
+    footer p { font-size: 0.82rem; color: var(--muted); }
+
+    footer a {
+      font-size: 0.82rem;
+      color: var(--muted);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+
+    footer a:hover { color: var(--text); }
+    .footer-links { display: flex; gap: 20px; }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(18px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    @media (max-width: 480px) {
+      .card { padding: 22px 20px; }
+      nav { margin-bottom: 48px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+
+    <nav>
+      <a href="/" class="logo">
+        <div class="logo-mark">
+          <span></span><span></span>
+          <span></span><span></span>
+        </div>
+        <span class="logo-text">Phuzzles</span>
+      </a>
+      <span class="nav-badge">Child Safety</span>
+    </nav>
+
+    <section class="hero">
+      <div class="hero-eyebrow">Child Safety Standards</div>
+      <h1>Protecting <em>every</em> user</h1>
+      <p>
+        Phuzzles has a zero-tolerance policy for child sexual abuse and exploitation (CSAE).
+        This page describes our standards, prohibited content, and how to report violations.
+      </p>
+      <span class="effective-date">Effective: January 1, 2025</span>
+    </section>
+
+    <!-- Zero tolerance -->
+    <div class="card">
+      <div class="card-label">Our Commitment</div>
+      <h2>Zero-tolerance policy</h2>
+      <p>
+        Rebel Studios, the developer of Phuzzles, is unequivocally opposed to child sexual
+        abuse and exploitation in any form. We do not allow, facilitate, or tolerate content,
+        behaviour, or communication that sexualises, exploits, or endangers minors anywhere
+        on our platform.
+      </p>
+      <p>
+        Any account found to have engaged in CSAE will be permanently banned immediately,
+        reported to the appropriate authorities, and reported to the
+        National Center for Missing &amp; Exploited Children (NCMEC) as required by US law.
+      </p>
+    </div>
+
+    <!-- Prohibited content -->
+    <div class="card">
+      <div class="card-label">Prohibited Content &amp; Behaviour</div>
+      <h2>What is strictly prohibited</h2>
+      <p>The following are absolutely forbidden on Phuzzles under all circumstances:</p>
+
+      <ul class="prohibited-list">
+        <li>Child sexual abuse material (CSAM) of any kind, including images, video, or illustrated content</li>
+        <li>Sending, receiving, or storing sexually explicit content involving a minor</li>
+        <li>Grooming behaviour — using the app to build trust with a minor for the purpose of exploitation</li>
+        <li>Soliciting sexual content or contact from anyone under the age of 18</li>
+        <li>Sharing personal information (address, school, location) of a minor without parental consent</li>
+        <li>Any communication intended to facilitate physical access to a child for exploitative purposes</li>
+      </ul>
+    </div>
+
+    <!-- Platform safeguards -->
+    <div class="card">
+      <div class="card-label">Platform Safeguards</div>
+      <h2>How we protect users</h2>
+      <p>Phuzzles is a photo puzzle messaging app. We take the following steps to keep all users safe:</p>
+
+      <ul class="policy-list">
+        <li>Users can block any contact at any time, immediately preventing further communication</li>
+        <li>Users can report any contact or received puzzle directly within the app</li>
+        <li>All reports are reviewed and accounts engaging in prohibited behaviour are permanently banned</li>
+        <li>Puzzle images are stored in Firebase Storage with access controlled by authenticated user rules — content is not publicly browsable</li>
+        <li>We do not knowingly permit children under 13 to create accounts, consistent with COPPA requirements</li>
+        <li>Account deletion permanently removes all associated content from our systems</li>
+      </ul>
+    </div>
+
+    <!-- How to report -->
+    <div class="card">
+      <div class="card-label">Reporting</div>
+      <h2>How to report a violation</h2>
+      <p>
+        If you encounter content or behaviour on Phuzzles that you believe involves the
+        sexual exploitation of a child, report it immediately using one of the methods below.
+      </p>
+
+      <div class="report-box">
+        <p><strong style="color: var(--text);">Report within the app</strong></p>
+        <p>Open the app → go to the relevant contact or puzzle → tap the ⋮ menu → select "Report User". Your report will be reviewed promptly.</p>
+      </div>
+
+      <div class="report-box" style="margin-top: 12px;">
+        <p><strong style="color: var(--text);">Email our safety team</strong></p>
+        <p>For urgent or sensitive reports, contact us directly:</p>
+        <a href="mailto:safety@phuzzles.app" class="report-link">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="2" y="4" width="20" height="16" rx="2"/>
+            <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/>
+          </svg>
+          safety@phuzzles.app
+        </a>
+      </div>
+
+      <div class="ncmec-banner">
+        <p>
+          🔒 <strong>Required reporting:</strong> Rebel Studios is legally required under 18 U.S.C. § 2258A
+          to report any apparent CSAM to the
+          <a href="https://www.missingkids.org/gethelpnow/cybertipline" target="_blank" rel="noopener">
+            NCMEC CyberTipline
+          </a>. We comply fully with this obligation. You can also file a report directly at
+          <a href="https://www.missingkids.org/gethelpnow/cybertipline" target="_blank" rel="noopener">
+            missingkids.org/cybertipline
+          </a>
+          or contact the
+          <a href="https://www.fbi.gov/investigate/violent-crime/cac" target="_blank" rel="noopener">FBI</a>
+          or your local law enforcement.
+        </p>
+      </div>
+    </div>
+
+    <!-- Contact -->
+    <div class="card">
+      <div class="card-label">Contact</div>
+      <h2>Questions about this policy</h2>
+      <p>
+        If you have questions about our child safety standards or want to understand
+        how we handle a specific situation, you can reach our team at:
+      </p>
+      <a href="mailto:safety@phuzzles.app" class="email-link">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="2" y="4" width="20" height="16" rx="2"/>
+          <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/>
+        </svg>
+        safety@phuzzles.app
+      </a>
+    </div>
+
+    <footer>
+      <p>© 2025 Rebel Studios. All rights reserved.</p>
+      <div class="footer-links">
+        <a href="/delete-account">Delete Account</a>
+        <a href="/privacy">Privacy Policy</a>
+        <a href="/">Home</a>
+      </div>
+    </footer>
+
+  </div>
+</body>
+</html>
