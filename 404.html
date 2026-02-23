@@ -1,89 +1,262 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="utf-8">
-    <title>Phuzzles</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <style>
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            margin: 0;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            text-align: center;
-        }
-        .container { padding: 2rem; max-width: 400px; }
-        .logo { font-size: 72px; margin-bottom: 1rem; }
-        h2 { margin: 0.5rem 0; }
-        p { opacity: 0.9; line-height: 1.5; }
-        .btn {
-            display: inline-block;
-            padding: 16px 32px;
-            background: white;
-            color: #764ba2;
-            border-radius: 28px;
-            text-decoration: none;
-            font-weight: bold;
-            font-size: 18px;
-            margin-top: 1.5rem;
-            transition: transform 0.2s;
-        }
-        .btn:hover { transform: scale(1.05); }
-        .secondary-link {
-            display: block;
-            margin-top: 1rem;
-            color: rgba(255,255,255,0.8);
-            text-decoration: underline;
-            font-size: 14px;
-        }
-    </style>
-    <script>
-        (function() {
-            var path = window.location.pathname;
-            var playStoreBase = 'https://play.google.com/store/apps/details?id=rebelstudios.phuzzles.app';
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Phuzzles</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-            // Check if this is a puzzle deep link
-            var puzzleMatch = path.match(/^\/puzzle\/([a-zA-Z0-9_-]+)/);
+    :root {
+      --bg:       #0e0f13;
+      --surface:  #16181f;
+      --surface2: #1e2029;
+      --border:   rgba(255,255,255,0.07);
+      --text:     #e8e9ef;
+      --muted:    #7c7f94;
+      --accent:   #ff6b35;
+      --accent2:  #ffb347;
+    }
 
-            if (puzzleMatch) {
-                var puzzleId = puzzleMatch[1];
-                var androidIntent = 'intent://puzzle/' + puzzleId
-                    + '#Intent;scheme=phuzzles;package=rebelstudios.phuzzles.app;'
-                    + 'S.puzzleId=' + puzzleId + ';end';
-                var playStoreUrl = playStoreBase + '&referrer=puzzle_' + puzzleId;
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      -webkit-font-smoothing: antialiased;
+    }
 
-                // On Android, try to open the app
-                if (/Android/i.test(navigator.userAgent)) {
-                    window.location = androidIntent;
-                    setTimeout(function() {
-                        window.location = playStoreUrl;
-                    }, 1500);
-                }
-            }
-        })();
-    </script>
+    /* Noise texture */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* Ambient glow */
+    body::after {
+      content: '';
+      position: fixed;
+      top: -20vh;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 80vw;
+      height: 60vh;
+      background: radial-gradient(ellipse at center, rgba(255,107,53,0.12) 0%, transparent 70%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .container {
+      position: relative;
+      z-index: 1;
+      max-width: 480px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 40px 24px;
+      text-align: center;
+      animation: fadeUp 0.6s ease both;
+    }
+
+    /* Logo mark */
+    .logo-mark {
+      width: 56px;
+      height: 56px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      grid-template-rows: 1fr 1fr;
+      gap: 4px;
+      border-radius: 16px;
+      overflow: hidden;
+      margin: 0 auto 24px;
+    }
+
+    .logo-mark span { display: block; border-radius: 3px; }
+    .logo-mark span:nth-child(1) { background: var(--accent); }
+    .logo-mark span:nth-child(2) { background: var(--accent2); opacity: 0.7; }
+    .logo-mark span:nth-child(3) { background: var(--accent2); opacity: 0.5; }
+    .logo-mark span:nth-child(4) { background: var(--accent); opacity: 0.85; }
+
+    h2 {
+      font-family: 'DM Serif Display', serif;
+      font-size: clamp(1.8rem, 5vw, 2.4rem);
+      letter-spacing: -0.03em;
+      line-height: 1.15;
+      color: var(--text);
+      margin-bottom: 12px;
+    }
+
+    h2 em { font-style: italic; color: var(--accent); }
+
+    .subtitle {
+      font-size: 0.97rem;
+      color: var(--muted);
+      line-height: 1.7;
+      max-width: 340px;
+      margin: 0 auto 32px;
+    }
+
+    /* Puzzle piece animation — only shown for puzzle deep links */
+    .puzzle-hint {
+      display: none;
+      gap: 4px;
+      justify-content: center;
+      margin-bottom: 28px;
+    }
+
+    .puzzle-hint.visible { display: flex; }
+
+    .puzzle-hint span {
+      width: 28px;
+      height: 28px;
+      border-radius: 6px;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      animation: shimmer 1.4s ease infinite;
+    }
+
+    .puzzle-hint span:nth-child(2) { animation-delay: 0.15s; }
+    .puzzle-hint span:nth-child(3) { animation-delay: 0.30s; }
+    .puzzle-hint span:nth-child(4) { animation-delay: 0.45s; }
+
+    @keyframes shimmer {
+      0%, 100% { background: var(--surface2); }
+      50%       { background: rgba(255,107,53,0.2); border-color: rgba(255,107,53,0.3); }
+    }
+
+    /* Download button */
+    .download-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 14px 26px;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      border-radius: 12px;
+      color: #fff;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.95rem;
+      font-weight: 600;
+      text-decoration: none;
+      transition: opacity 0.2s, transform 0.15s;
+      margin-bottom: 16px;
+    }
+
+    .download-btn:hover { opacity: 0.92; transform: translateY(-2px); }
+    .download-btn:active { transform: translateY(0); }
+
+    /* Redirect notice */
+    .redirect-notice {
+      display: none;
+      font-size: 0.82rem;
+      color: var(--muted);
+      margin-bottom: 16px;
+    }
+
+    .redirect-notice.visible { display: block; }
+
+    /* Back link */
+    .back-link {
+      display: block;
+      font-size: 0.83rem;
+      color: var(--muted);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+
+    .back-link:hover { color: var(--text); }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(18px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+
+  <script>
+    (function () {
+      var path = window.location.pathname;
+      var playStoreBase = 'https://play.google.com/store/apps/details?id=rebelstudios.phuzzles.app';
+      var puzzleMatch = path.match(/^\/puzzle\/([a-zA-Z0-9_-]+)/);
+
+      if (puzzleMatch) {
+        var puzzleId = puzzleMatch[1];
+        var androidIntent = 'intent://puzzle/' + puzzleId
+          + '#Intent;scheme=phuzzles;package=rebelstudios.phuzzles.app;'
+          + 'S.puzzleId=' + puzzleId + ';end';
+        var playStoreUrl = playStoreBase + '&referrer=puzzle_' + puzzleId;
+
+        if (/Android/i.test(navigator.userAgent)) {
+          window.location = androidIntent;
+          setTimeout(function () {
+            window.location = playStoreUrl;
+          }, 1500);
+        }
+      }
+    })();
+  </script>
 </head>
 <body>
-    <div class="container">
-        <div class="logo">🧩</div>
-        <script>
-            var puzzleMatch = window.location.pathname.match(/^\/puzzle\/([a-zA-Z0-9_-]+)/);
-            if (puzzleMatch) {
-                document.write('<h2>Someone sent you a Phuzzle!</h2>');
-                document.write('<p>Download Phuzzles to unscramble the photo puzzle and see the hidden image.</p>');
-            } else {
-                document.write('<h2>Phuzzles</h2>');
-                document.write('<p>Turn your photos into puzzles and send them to friends!</p>');
-            }
-        </script>
-        <a class="btn" href="https://play.google.com/store/apps/details?id=rebelstudios.phuzzles.app">
-            Get Phuzzles on Google Play
-        </a>
-        <a class="secondary-link" href="/">Back to phuzzles.app</a>
+  <div class="container">
+
+    <div class="logo-mark">
+      <span></span><span></span>
+      <span></span><span></span>
     </div>
+
+    <!-- Shimmer pieces — visible only for puzzle links -->
+    <div class="puzzle-hint" id="puzzleHint">
+      <span></span><span></span><span></span><span></span>
+    </div>
+
+    <h2 id="headline">Phuzzles</h2>
+    <p class="subtitle" id="subtitle">Turn your photos into puzzles and send them to friends.</p>
+
+    <p class="redirect-notice" id="redirectNotice">
+      Opening Phuzzles… if the app doesn't launch, download it below.
+    </p>
+
+    <a
+      id="playBtn"
+      class="download-btn"
+      href="https://play.google.com/store/apps/details?id=rebelstudios.phuzzles.app"
+    >
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M3.18 23.76a2 2 0 0 0 2.84.24L17.5 12 6.02.02A2 2 0 0 0 3 2v20a2 2 0 0 0 .18 1.76zM20.5 10.5l-2.96-1.7L14.5 12l3.04 3.2 3-.17a2 2 0 0 0 0-4.03l.96-.5z"/>
+      </svg>
+      Get Phuzzles on Google Play
+    </a>
+
+    <a class="back-link" href="/">← Back to phuzzles.app</a>
+  </div>
+
+  <script>
+    (function () {
+      var path = window.location.pathname;
+      var puzzleMatch = path.match(/^\/puzzle\/([a-zA-Z0-9_-]+)/);
+
+      if (puzzleMatch) {
+        var puzzleId = puzzleMatch[1];
+
+        document.getElementById('headline').innerHTML = 'Someone sent you a <em>Phuzzle!</em>';
+        document.getElementById('subtitle').textContent =
+          'Download Phuzzles to unscramble the photo puzzle and reveal the hidden image.';
+        document.getElementById('puzzleHint').classList.add('visible');
+
+        if (/Android/i.test(navigator.userAgent)) {
+          document.getElementById('redirectNotice').classList.add('visible');
+          document.getElementById('playBtn').href =
+            'https://play.google.com/store/apps/details?id=rebelstudios.phuzzles.app&referrer=puzzle_' + puzzleId;
+        }
+      }
+    })();
+  </script>
 </body>
 </html>
