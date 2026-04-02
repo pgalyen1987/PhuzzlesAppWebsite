@@ -1,10 +1,15 @@
-[{
-  "relation": ["delegate_permission/common.handle_all_urls"],
-  "target": {
-    "namespace": "android_app",
-    "package_name": "rebelstudios.phuzzles.app",
-    "sha256_cert_fingerprints": [
-      "F5:EF:1D:8C:D4:94:A9:78:16:1C:E3:70:68:A1:61:6D:37:E9:E2:E9:12:90:6E:57:34:2E:39:4F:6D:E4:90:F0"
-    ]
+[
+  {
+    "relation": [
+      "delegate_permission/common.handle_all_urls",
+      "delegate_permission/common.get_login_creds"
+    ],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "rebelstudios.phuzzles.app",
+      "sha256_cert_fingerprints": [
+        "0D:69:01:02:63:20:87:E5:B7:BD:A0:18:28:97:E7:D5:BC:9F:EC:C3:43:93:1E:BE:5B:BA:35:0F:7C:E9:E7:7F"
+      ]
+    }
   }
-}]
+]
