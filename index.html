@@ -79,14 +79,14 @@
     .logo {
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 14px;
       text-decoration: none;
     }
 
     .logo-mark {
-      width: 36px;
-      height: 36px;
-      border-radius: 10px;
+      width: 52px;
+      height: 52px;
+      border-radius: 14px;
       overflow: hidden;
       flex-shrink: 0;
     }
@@ -100,9 +100,10 @@
 
     .logo-text {
       font-family: 'DM Serif Display', serif;
-      font-size: 1.3rem;
+      font-size: clamp(1.85rem, 5.5vw, 2.65rem);
       color: var(--text);
-      letter-spacing: -0.01em;
+      letter-spacing: -0.02em;
+      line-height: 1;
     }
 
     .nav-badge {
@@ -350,7 +351,7 @@
     <nav>
       <a href="/" class="logo">
         <div class="logo-mark">
-          <img src="logo2.png" alt="Phuzzles logo" />
+          <img src="/pictures/phuzzles/icon3.png" alt="Phuzzles logo" width="52" height="52" />
         </div>
         <span class="logo-text">Phuzzles</span>
       </a>
