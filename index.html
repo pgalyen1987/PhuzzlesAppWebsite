@@ -12,14 +12,14 @@
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      --bg:       #0e0f13;
-      --surface:  #16181f;
-      --surface2: #1e2029;
-      --border:   rgba(255,255,255,0.07);
-      --text:     #e8e9ef;
-      --muted:    #7c7f94;
-      --accent:   #ff6b35;
-      --accent2:  #ffb347;
+      --bg:       #1A1A2E;
+      --surface:  #252542;
+      --surface2: #1e1e3a;
+      --border:   rgba(78,205,196,0.12);
+      --text:     #FAFAFA;
+      --muted:    #8888aa;
+      --accent:   #FF6B6B;
+      --accent2:  #4ECDC4;
     }
 
     html { scroll-behavior: smooth; }
@@ -43,7 +43,7 @@
       z-index: 0;
     }
 
-    /* Ambient glow */
+    /* Ambient glow - coral left, teal right */
     body::after {
       content: '';
       position: fixed;
@@ -52,7 +52,9 @@
       transform: translateX(-50%);
       width: 80vw;
       height: 60vh;
-      background: radial-gradient(ellipse at center, rgba(255,107,53,0.13) 0%, transparent 70%);
+      background:
+        radial-gradient(ellipse at 30% center, rgba(255,107,107,0.14) 0%, transparent 60%),
+        radial-gradient(ellipse at 70% center, rgba(78,205,196,0.12) 0%, transparent 60%);
       pointer-events: none;
       z-index: 0;
     }
@@ -84,19 +86,17 @@
     .logo-mark {
       width: 36px;
       height: 36px;
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      grid-template-rows: 1fr 1fr;
-      gap: 3px;
       border-radius: 10px;
       overflow: hidden;
+      flex-shrink: 0;
     }
 
-    .logo-mark span { display: block; border-radius: 2px; }
-    .logo-mark span:nth-child(1) { background: var(--accent); }
-    .logo-mark span:nth-child(2) { background: var(--accent2); opacity: 0.7; }
-    .logo-mark span:nth-child(3) { background: var(--accent2); opacity: 0.5; }
-    .logo-mark span:nth-child(4) { background: var(--accent); opacity: 0.85; }
+    .logo-mark img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
 
     .logo-text {
       font-family: 'DM Serif Display', serif;
@@ -171,25 +171,19 @@
 
     /* ── Download button ── */
     .download-btn {
-      display: inline-flex;
-      align-items: center;
-      gap: 10px;
-      padding: 15px 28px;
-      background: linear-gradient(135deg, var(--accent), var(--accent2));
-      border-radius: 14px;
-      color: #fff;
-      font-family: 'DM Sans', sans-serif;
-      font-size: 0.97rem;
-      font-weight: 600;
+      display: inline-block;
       text-decoration: none;
       transition: opacity 0.2s, transform 0.15s;
-      letter-spacing: 0.01em;
     }
 
-    .download-btn:hover { opacity: 0.92; transform: translateY(-2px); }
-    .download-btn:active { transform: translateY(0); }
+    .download-btn img {
+      height: 60px;
+      width: auto;
+      display: block;
+    }
 
-    .download-btn svg { flex-shrink: 0; }
+    .download-btn:hover { opacity: 0.88; transform: translateY(-2px); }
+    .download-btn:active { transform: translateY(0); }
 
     /* ── Features ── */
     .features {
@@ -212,7 +206,7 @@
       transition: border-color 0.2s;
     }
 
-    .feature-row:hover { border-color: rgba(255,107,53,0.25); }
+    .feature-row:hover { border-color: rgba(78,205,196,0.3); }
 
     .feature-emoji {
       font-size: 22px;
@@ -284,15 +278,15 @@
       border-radius: 2px;
     }
 
-    .mini-puzzle span:nth-child(1)  { background: #ff6b35; }
-    .mini-puzzle span:nth-child(2)  { background: #ffb347; opacity: 0.8; }
-    .mini-puzzle span:nth-child(3)  { background: #ff6b35; opacity: 0.6; }
-    .mini-puzzle span:nth-child(4)  { background: #ffb347; opacity: 0.5; }
-    .mini-puzzle span:nth-child(5)  { background: #ff6b35; opacity: 0.9; }
-    .mini-puzzle span:nth-child(6)  { background: #ffb347; opacity: 0.7; }
-    .mini-puzzle span:nth-child(7)  { background: #ff6b35; opacity: 0.7; }
-    .mini-puzzle span:nth-child(8)  { background: #ffb347; opacity: 0.6; }
-    .mini-puzzle span:nth-child(9)  { background: #ff6b35; opacity: 0.85; }
+    .mini-puzzle span:nth-child(1)  { background: #FF6B6B; }
+    .mini-puzzle span:nth-child(2)  { background: #4ECDC4; opacity: 0.8; }
+    .mini-puzzle span:nth-child(3)  { background: #FF6B6B; opacity: 0.6; }
+    .mini-puzzle span:nth-child(4)  { background: #4ECDC4; opacity: 0.5; }
+    .mini-puzzle span:nth-child(5)  { background: #FF6B6B; opacity: 0.9; }
+    .mini-puzzle span:nth-child(6)  { background: #4ECDC4; opacity: 0.7; }
+    .mini-puzzle span:nth-child(7)  { background: #4ECDC4; opacity: 0.7; }
+    .mini-puzzle span:nth-child(8)  { background: #FF6B6B; opacity: 0.6; }
+    .mini-puzzle span:nth-child(9)  { background: #4ECDC4; opacity: 0.85; }
 
     /* ── Footer ── */
     footer {
@@ -337,8 +331,7 @@
     <nav>
       <a href="/" class="logo">
         <div class="logo-mark">
-          <span></span><span></span>
-          <span></span><span></span>
+          <img src="logo2.png" alt="Phuzzles logo" />
         </div>
         <span class="logo-text">Phuzzles</span>
       </a>
@@ -358,10 +351,7 @@
         target="_blank"
         rel="noopener"
       >
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
-          <path d="M3.18 23.76a2 2 0 0 0 2.84.24L17.5 12 6.02.02A2 2 0 0 0 3 2v20a2 2 0 0 0 .18 1.76zM20.5 10.5l-2.96-1.7L14.5 12l3.04 3.2 3-.17a2 2 0 0 0 0-4.03l.96-.5z"/>
-        </svg>
-        Download on Google Play
+        <img src="google-play-badge.png" alt="Get it on Google Play" />
       </a>
     </section>
 
@@ -398,16 +388,15 @@
 
     <div class="preview-card">
       <div class="preview-card-text">
-        <h2>Free to download</h2>
+        <h2>Free with ads</h2>
         <p>Available now on Android. Add friends by username and start sending puzzles right away.</p>
         <a
           href="https://play.google.com/store/apps/details?id=rebelstudios.phuzzles.app"
           class="download-btn"
           target="_blank"
           rel="noopener"
-          style="font-size: 0.88rem; padding: 12px 20px;"
         >
-          Get Phuzzles
+          <img src="google-play-badge.png" alt="Get it on Google Play" style="height:50px;" />
         </a>
       </div>
       <div class="mini-puzzle">
