@@ -444,5 +444,23 @@
     </footer>
 
   </div>
+  <script>
+    // Forward campaign source (from tracking QRs/links) to the Play Store as install-referrer,
+    // so the app's Install Referrer API can attribute the install to where the scan came from.
+    (function () {
+      try {
+        var q = new URLSearchParams(location.search);
+        var parts = [];
+        ['utm_source','utm_medium','utm_campaign','utm_content'].forEach(function (k) {
+          var v = q.get(k); if (v) parts.push(k + '=' + v);
+        });
+        if (!parts.length) return;
+        var referrer = encodeURIComponent(parts.join('&'));
+        document.querySelectorAll('a[href*="play.google.com"]').forEach(function (a) {
+          a.href += (a.href.indexOf('?') > -1 ? '&' : '?') + 'referrer=' + referrer;
+        });
+      } catch (e) {}
+    })();
+  </script>
 </body>
 </html>
