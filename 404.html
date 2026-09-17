@@ -89,7 +89,7 @@ var s=document.createElement('script');s.async=true;s.src='https://www.googletag
         <div class="msg" id="won-msg"></div>
       </div>
       <a class="btn" id="cta-make" href="#">Made you look 👀 — send your own</a>
-      <div class="foot">Free on Android · iOS coming soon</div>
+      <div class="foot">Free on iPhone and Android</div>
     </div>
 
     <!-- INSTALL FALLBACK (private puzzle / not readable) -->
@@ -114,6 +114,10 @@ var s=document.createElement('script');s.async=true;s.src='https://www.googletag
 <script>
 (function () {
   var PLAY = "https://play.google.com/store/apps/details?id=rebelstudios.phuzzles.app";
+  var APPSTORE = "https://apps.apple.com/app/id6766833614";
+  // iPadOS reports itself as a Mac; the touch-point check tells them apart.
+  var IOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+  var STORE = IOS ? APPSTORE : PLAY;
   var GRID = { EASY:3, MEDIUM:4, HARD:5, EXPERT:6 };
 
   function show(id){ ["loading","game","won","install","notfound"].forEach(function(x){
@@ -127,7 +131,9 @@ var s=document.createElement('script');s.async=true;s.src='https://www.googletag
   function toInstall(sender){
     document.getElementById("inst-title").innerHTML =
       (sender ? escapeHtml(sender) + " sent you a <em>Phuzzle</em>!" : "You've got a <em>Phuzzle</em>!");
-    document.getElementById("inst-play").href = PLAY;
+    var inst = document.getElementById("inst-play");
+    inst.href = STORE;
+    if (IOS) inst.textContent = "Download on the App Store";
     show("install");
   }
   function escapeHtml(s){ return String(s||"").replace(/[&<>"']/g,function(c){
@@ -222,7 +228,7 @@ var s=document.createElement('script');s.async=true;s.src='https://www.googletag
     var rev = document.getElementById("won-reveal");
     if (msg){ document.getElementById("won-msg").textContent = msg; rev.classList.remove("hidden"); }
     else { rev.classList.add("hidden"); }
-    document.getElementById("cta-make").href = PLAY;
+    document.getElementById("cta-make").href = STORE;
     show("won");
     burst();
   }

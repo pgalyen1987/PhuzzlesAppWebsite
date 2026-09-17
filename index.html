@@ -183,6 +183,11 @@
       display: block;
     }
 
+    .store-badges { display: flex; flex-wrap: wrap; align-items: center; gap: 4px; }
+    /* Google's badge PNG carries ~16% transparent padding; Apple's SVG has none. Match the visible sizes. */
+    .download-btn img.as-badge { height: 40px; margin: 10px; }
+    .download-btn img.as-badge.sm { height: 34px; margin: 8px; }
+
     .download-btn:hover { opacity: 0.88; transform: translateY(-2px); }
     .download-btn:active { transform: translateY(0); }
 
@@ -376,14 +381,19 @@ var s=document.createElement('script');s.async=true;s.src='https://www.googletag
         Turn any photo into a scrambled puzzle and send it to a friend.
         They piece it back together to reveal the image — and your message.
       </p>
-      <a
-        href="https://play.google.com/store/apps/details?id=rebelstudios.phuzzles.app"
-        class="download-btn"
-        target="_blank"
-        rel="noopener"
-      >
-        <img src="google-play-badge.png" alt="Get it on Google Play" />
-      </a>
+      <div class="store-badges">
+        <a href="https://apps.apple.com/app/id6766833614" class="download-btn" target="_blank" rel="noopener">
+          <img class="as-badge" src="app-store-badge.svg" alt="Download on the App Store" />
+        </a>
+        <a
+          href="https://play.google.com/store/apps/details?id=rebelstudios.phuzzles.app"
+          class="download-btn"
+          target="_blank"
+          rel="noopener"
+        >
+          <img src="google-play-badge.png" alt="Get it on Google Play" />
+        </a>
+      </div>
     </section>
 
     <div class="features">
@@ -427,15 +437,20 @@ var s=document.createElement('script');s.async=true;s.src='https://www.googletag
     <div class="preview-card">
       <div class="preview-card-text">
         <h2>Free with ads</h2>
-        <p>Available now on Android. Add friends by username and start sending puzzles right away.</p>
-        <a
-          href="https://play.google.com/store/apps/details?id=rebelstudios.phuzzles.app"
-          class="download-btn"
-          target="_blank"
-          rel="noopener"
-        >
-          <img src="google-play-badge.png" alt="Get it on Google Play" style="height:50px;" />
-        </a>
+        <p>Available now on iPhone and Android. Add friends by username and start sending puzzles right away.</p>
+        <div class="store-badges">
+          <a href="https://apps.apple.com/app/id6766833614" class="download-btn" target="_blank" rel="noopener">
+            <img class="as-badge sm" src="app-store-badge.svg" alt="Download on the App Store" />
+          </a>
+          <a
+            href="https://play.google.com/store/apps/details?id=rebelstudios.phuzzles.app"
+            class="download-btn"
+            target="_blank"
+            rel="noopener"
+          >
+            <img src="google-play-badge.png" alt="Get it on Google Play" style="height:50px;" />
+          </a>
+        </div>
       </div>
       <div class="mini-puzzle">
         <span></span><span></span><span></span>
