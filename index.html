@@ -5,9 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="description" content="Turn your photos into scrambled puzzles and send them to friends. Download Phuzzles on Google Play." />
   <title>Phuzzles — Photo Puzzles with Friends</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" href="/fonts/dm-sans-300-latin.woff2" crossorigin />
+  <link rel="preload" as="font" type="font/woff2" href="/fonts/dm-serif-display-400-latin.woff2" crossorigin />
+  <link rel="stylesheet" href="/fonts/fonts.css" />
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -17,7 +17,7 @@
       --surface2: #1e1e3a;
       --border:   rgba(78,205,196,0.12);
       --text:     #FAFAFA;
-      --muted:    #8888aa;
+      --muted:    #9090b2; /* 4.8:1 on --surface (was 4.3) */
       --accent:   #FF6B6B;
       --accent2:  #4ECDC4;
     }
@@ -363,7 +363,7 @@ var s=document.createElement('script');s.async=true;s.src='https://www.googletag
     <nav>
       <a href="/" class="logo">
         <div class="logo-mark">
-          <img src="/logo2.png" alt="Phuzzles logo" width="64" height="64" />
+          <img src="/logo-128.png" alt="Phuzzles logo" width="64" height="64" />
         </div>
         <span class="logo-text">Phuzzles</span>
       </a>
