@@ -1,0 +1,6 @@
+User-agent: *
+# poster tools are internal; shared puzzles are people's messages, not search content
+Disallow: /tools/
+Disallow: /puzzle/
+
+Sitemap: https://www.phuzzles.app/sitemap.xml
