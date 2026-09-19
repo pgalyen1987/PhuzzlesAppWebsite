@@ -1,6 +1,5 @@
 User-agent: *
-# poster tools are internal; shared puzzles are people's messages, not search content
+# the poster generators are internal tools
 Disallow: /tools/
-Disallow: /puzzle/
 
 Sitemap: https://www.phuzzles.app/sitemap.xml
