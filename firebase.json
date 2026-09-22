@@ -1,0 +1,35 @@
+{
+  "hosting": {
+    "public": ".",
+    "site": "phuzzles",
+    "ignore": [
+      "firebase.json",
+      ".firebaserc",
+      ".git/**",
+      ".github/**",
+      "**/node_modules/**",
+      "tools/**",
+      "*.md"
+    ],
+    "cleanUrls": true,
+    "trailingSlash": false,
+    "rewrites": [
+      {
+        "//": "GitHub Pages has no rewrites, so /puzzle/<id> was served as the 404 page WITH a 404 status. Every puzzle the app shares is one of these links, and link previews in Messages, WhatsApp and Slack skip a 404. Here the same file is served with a 200.",
+        "source": "/puzzle/**",
+        "destination": "/404.html"
+      }
+    ],
+    "headers": [
+      {
+        "//": "Both files are extensionless, so the type has to be stated or the OS rejects the deep-link proof.",
+        "source": "/.well-known/apple-app-site-association",
+        "headers": [{ "key": "Content-Type", "value": "application/json" }]
+      },
+      {
+        "source": "/.well-known/assetlinks.json",
+        "headers": [{ "key": "Content-Type", "value": "application/json" }]
+      }
+    ]
+  }
+}
