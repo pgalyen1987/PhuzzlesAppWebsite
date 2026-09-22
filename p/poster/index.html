@@ -12,7 +12,7 @@
   this page forwards to whichever puzzle is current. When the one below expires, change the single
   line marked PUZZLE and the posters already printed keep working.
 -->
-<meta http-equiv="refresh" content="0; url=/puzzle/OVSjHWR0soePRAALlSW8" />
+<meta http-equiv="refresh" content="1; url=/puzzle/OVSjHWR0soePRAALlSW8" />
 <link rel="stylesheet" href="/fonts/fonts.css" />
 <link rel="icon" href="/logo-128.png" />
 <style>
@@ -20,6 +20,15 @@
   body { min-height:100dvh; display:grid; place-items:center; padding:24px; text-align:center; }
   a { color:#3FC1C9; }
 </style>
+<script>
+window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}
+if(!/^(localhost|127\.|0\.0\.0\.0)/.test(location.hostname)){
+gtag('consent','default',{ad_storage:'denied',ad_user_data:'denied',ad_personalization:'denied',analytics_storage:'denied',region:['AT','BE','BG','HR','CY','CZ','DK','EE','FI','FR','DE','GR','HU','IE','IT','LV','LT','LU','MT','NL','PL','PT','RO','SK','SI','ES','SE','IS','LI','NO','GB','CH']});
+gtag('consent','default',{ad_storage:'denied',ad_user_data:'denied',ad_personalization:'denied',analytics_storage:'granted'});
+gtag('js',new Date());gtag('config','G-00TNDVMQNM');
+var s=document.createElement('script');s.async=true;s.src='https://www.googletagmanager.com/gtag/js?id=G-00TNDVMQNM';document.head.appendChild(s);
+}
+</script>
 </head>
 <body>
   <p>Opening the puzzle… <a id="go" href="/puzzle/OVSjHWR0soePRAALlSW8">tap here if nothing happens</a>.</p>
@@ -27,7 +36,7 @@
   // PUZZLE: the one the poster points at today.
   var PUZZLE = "/puzzle/OVSjHWR0soePRAALlSW8";
   document.getElementById("go").setAttribute("href", PUZZLE);
-  location.replace(PUZZLE);
+  setTimeout(function () { location.replace(PUZZLE); }, 250);   // a beat, so the scan is counted
 </script>
 </body>
 </html>
