@@ -1,0 +1,17 @@
+{
+  "applinks": {
+    "details": [
+      {
+        "appIDs": [
+          "X9353JY6SD.rebelstudios.phuzzles.ios"
+        ],
+        "components": [
+          {
+            "/": "/puzzle/*",
+            "comment": "Open a shared puzzle in the app"
+          }
+        ]
+      }
+    ]
+  }
+}
