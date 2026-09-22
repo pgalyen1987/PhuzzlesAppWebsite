@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Someone left you a puzzle</title>
+<meta name="robots" content="noindex" />
+<!--
+  THE ADDRESS ON THE PRINTED POSTER.
+
+  A puzzle link dies after 30 days; a poster on a wall does not. So the poster's QR points here, and
+  this page forwards to whichever puzzle is current. When the one below expires, change the single
+  line marked PUZZLE and the posters already printed keep working.
+-->
+<meta http-equiv="refresh" content="0; url=/puzzle/OVSjHWR0soePRAALlSW8" />
+<link rel="stylesheet" href="/fonts/fonts.css" />
+<link rel="icon" href="/logo-128.png" />
+<style>
+  html, body { margin:0; background:#1A1A2E; color:#FAFAFA; font-family:'DM Sans', system-ui, sans-serif; }
+  body { min-height:100dvh; display:grid; place-items:center; padding:24px; text-align:center; }
+  a { color:#3FC1C9; }
+</style>
+</head>
+<body>
+  <p>Opening the puzzle… <a id="go" href="/puzzle/OVSjHWR0soePRAALlSW8">tap here if nothing happens</a>.</p>
+<script>
+  // PUZZLE: the one the poster points at today.
+  var PUZZLE = "/puzzle/OVSjHWR0soePRAALlSW8";
+  document.getElementById("go").setAttribute("href", PUZZLE);
+  location.replace(PUZZLE);
+</script>
+</body>
+</html>

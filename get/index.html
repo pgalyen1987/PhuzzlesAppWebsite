@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Get Phuzzles</title>
+<meta name="description" content="Get Phuzzles for your phone: send a photo puzzle with a message hidden inside." />
+<meta name="robots" content="noindex" />
+<link rel="stylesheet" href="/fonts/fonts.css" />
+<link rel="icon" href="/logo-128.png" />
+<style>
+  :root { --accent:#FF6B6B; --bg:#1A1A2E; --muted:#9090b2; --surface:#252542; --text:#FAFAFA; --teal:#3FC1C9; }
+  * { box-sizing: border-box; }
+  html, body { margin:0; background:var(--bg); color:var(--text); font-family:'DM Sans', system-ui, sans-serif; }
+  body { min-height:100dvh; display:grid; place-items:center; padding:24px 16px calc(24px + env(safe-area-inset-bottom)); }
+  main { width:100%; max-width:26rem; display:grid; gap:20px; justify-items:center; text-align:center; }
+  img.logo { width:76px; height:76px; }
+  h1 { font-family:'DM Serif Display', Georgia, serif; font-size:2rem; line-height:1.15; margin:0; }
+  p { margin:0; color:var(--muted); line-height:1.5; }
+  .row { display:grid; gap:10px; width:100%; }
+  a.btn { display:block; padding:15px 18px; border-radius:14px; text-decoration:none; font-weight:700; background:var(--accent); color:#1A1A2E; }
+  a.btn.alt { background:var(--surface); color:var(--text); border:1px solid #37375c; }
+  .note { font-size:0.875rem; }
+  .hidden { display:none !important; }
+</style>
+</head>
+<body>
+<main>
+  <img class="logo" src="/logo-128.png" alt="" width="76" height="76" />
+  <h1>Phuzzles</h1>
+  <p>Send a photo puzzle with a message hidden inside. Your friend only sees it once they solve it.</p>
+
+  <div class="row" id="android">
+    <a class="btn" id="play" href="https://play.google.com/store/apps/details?id=rebelstudios.phuzzles.app">Get it on Google Play</a>
+  </div>
+
+  <!-- The iPhone build is with Apple. Until it is approved this says so, and offers the browser instead:
+       an honest answer beats a dead end, and the puzzle itself is the best pitch we have. -->
+  <div class="row hidden" id="ios">
+    <a class="btn" href="/p/poster">Solve one in your browser</a>
+    <p class="note">The iPhone app is with Apple for review. This page will hand you the App Store link the day it is out.</p>
+  </div>
+
+  <div class="row hidden" id="both">
+    <a class="btn" href="/p/poster">Solve one in your browser</a>
+    <a class="btn alt" href="https://play.google.com/store/apps/details?id=rebelstudios.phuzzles.app">Get it on Google Play</a>
+    <p class="note">On iPhone, the app is with Apple for review.</p>
+  </div>
+</main>
+<script>
+  // Set this the day the App Store listing goes live; iPhones then go straight there.
+  var IOS_URL = "";
+  var ua = navigator.userAgent || "";
+  var isAndroid = /Android/i.test(ua);
+  var isIOS = /iPhone|iPad|iPod/i.test(ua) || (/Macintosh/.test(ua) && navigator.maxTouchPoints > 1);
+  var show = function (id) { document.getElementById(id).classList.remove("hidden"); };
+  var hide = function (id) { document.getElementById(id).classList.add("hidden"); };
+  if (isAndroid) {
+    location.replace("https://play.google.com/store/apps/details?id=rebelstudios.phuzzles.app");
+  } else if (isIOS) {
+    if (IOS_URL) { location.replace(IOS_URL); }
+    else { hide("android"); show("ios"); }
+  } else {
+    hide("android"); show("both");
+  }
+</script>
+</body>
+</html>
