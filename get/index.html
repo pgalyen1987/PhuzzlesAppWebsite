@@ -43,22 +43,22 @@ var s=document.createElement('script');s.async=true;s.src='https://www.googletag
     <a class="btn" id="play" href="https://play.google.com/store/apps/details?id=rebelstudios.phuzzles.app">Get it on Google Play</a>
   </div>
 
-  <!-- The iPhone build is with Apple. Until it is approved this says so, and offers the browser instead:
-       an honest answer beats a dead end, and the puzzle itself is the best pitch we have. -->
+  <!-- Only shown if IOS_URL below is ever emptied again: an iPhone visitor then gets the browser puzzle
+       rather than a dead end. Phuzzles has been on the App Store since 2026-09-30. -->
   <div class="row hidden" id="ios">
     <a class="btn" href="/p/poster">Solve one in your browser</a>
-    <p class="note">The iPhone app is with Apple for review. This page will hand you the App Store link the day it is out.</p>
+    <a class="btn alt" href="https://apps.apple.com/app/id6766833614">Get it on the App Store</a>
   </div>
 
   <div class="row hidden" id="both">
     <a class="btn" href="/p/poster">Solve one in your browser</a>
     <a class="btn alt" href="https://play.google.com/store/apps/details?id=rebelstudios.phuzzles.app">Get it on Google Play</a>
-    <p class="note">On iPhone, the app is with Apple for review.</p>
+    <a class="btn alt" href="https://apps.apple.com/app/id6766833614">Get it on the App Store</a>
   </div>
 </main>
 <script>
-  // Set this the day the App Store listing goes live; iPhones then go straight there.
-  var IOS_URL = "";
+  // iPhones go straight to the App Store listing (live since 2026-09-30).
+  var IOS_URL = "https://apps.apple.com/app/id6766833614";
   var ua = navigator.userAgent || "";
   var isAndroid = /Android/i.test(ua);
   var isIOS = /iPhone|iPad|iPod/i.test(ua) || (/Macintosh/.test(ua) && navigator.maxTouchPoints > 1);
