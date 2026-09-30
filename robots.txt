@@ -2,4 +2,4 @@ User-agent: *
 # the poster generators are internal tools
 Disallow: /tools/
 
-Sitemap: https://www.phuzzles.app/sitemap.xml
+Sitemap: https://phuzzles.app/sitemap.xml
