@@ -123,8 +123,11 @@ var s=document.createElement('script');s.async=true;s.src='https://www.googletag
   function show(id){ ["loading","game","won","install","notfound"].forEach(function(x){
       document.getElementById(x).classList.toggle("hidden", x!==id); }); }
 
-  // Route: only /puzzle/<id> runs the solver; everything else is a real 404.
-  var m = location.pathname.match(/\/puzzle\/([^\/?#]+)/i);
+  // Route: /puzzle/<id> and /solve/<id> run the solver; everything else is a real 404.
+  // /solve/ exists because the apps claim /puzzle/ links: a poster that forwards to /puzzle/ opens the
+  // app for anyone who has it, and the Android app (through 1.3.1) then drops the puzzle and shows
+  // its home feed. /solve/ is never claimed by an app, so it always opens here in the browser.
+  var m = location.pathname.match(/\/(?:puzzle|solve)\/([^\/?#]+)/i);
   if (!m) { show("notfound"); return; }
   var puzzleId = decodeURIComponent(m[1]);
 
