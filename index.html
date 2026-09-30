@@ -57,7 +57,7 @@
       -webkit-font-smoothing: antialiased;
     }
     a { color: inherit; }
-    img { max-width: 100%; display: block; }
+    img { max-width: 100%; height: auto; display: block; }
 
     .wrap { max-width: var(--wide); margin: 0 auto; padding-inline: 20px; }
 
@@ -91,7 +91,7 @@
     .copy p b { color: var(--text); font-weight: 600; }
     .stores { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
     .stores a { display: block; border-radius: 8px; }
-    .stores img { height: 44px; width: auto; }
+    .stores img { height: 44px; width: auto; max-width: none; }
     /* Google's badge PNG carries transparent padding that Apple's SVG does not */
     .stores .gp { height: 64px; margin: -10px -8px; }
     .stores a:focus-visible { outline: 2px solid var(--teal); outline-offset: 3px; }
