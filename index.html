@@ -3,352 +3,208 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="Turn your photos into scrambled puzzles and send them to friends. Download Phuzzles on Google Play." />
-  <title>Phuzzles — Photo Puzzles with Friends</title>
-  <link rel="preload" as="font" type="font/woff2" href="/fonts/dm-sans-300-latin.woff2" crossorigin />
-  <link rel="preload" as="font" type="font/woff2" href="/fonts/dm-serif-display-400-latin.woff2" crossorigin />
-  <link rel="stylesheet" href="/fonts/fonts.css" />
-  <link rel="canonical" href="https://www.phuzzles.app/" />
+  <title>Phuzzles: photos your friends have to solve</title>
+  <meta name="description" content="Phuzzles turns a photo into a puzzle with your message hidden inside. Your friend sees both once they solve it. Free on iPhone and Android." />
+  <link rel="canonical" href="https://phuzzles.app/" />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://phuzzles.app/" />
+  <meta property="og:title" content="Phuzzles: send a photo they have to solve" />
+  <meta property="og:description" content="Your photo arrives scrambled, with a message that only shows up once it's solved. Free on iPhone and Android." />
+  <meta property="og:image" content="https://phuzzles.app/img/og-card.jpg" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <link rel="icon" href="/logo-128.png" />
+  <link rel="preload" as="image" href="/img/puffin-960.jpg" />
+  <link rel="preload" as="font" type="font/woff2" href="/fonts/archivo-var-latin.woff2" crossorigin />
+  <link rel="preload" as="font" type="font/woff2" href="/fonts/dm-sans-var-latin.woff2" crossorigin />
   <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    /* Fonts are self-hosted: no request leaves for a font CDN. */
+    @font-face { font-family: 'Archivo'; src: url('/fonts/archivo-var-latin.woff2') format('woff2');
+      font-weight: 700 900; font-stretch: 62% 125%; font-display: swap; }
+    @font-face { font-family: 'DM Sans'; src: url('/fonts/dm-sans-var-latin.woff2') format('woff2');
+      font-weight: 400 600; font-display: swap; }
+    @font-face { font-family: 'Gochi Hand'; src: url('/fonts/gochi-hand-400-latin.woff2') format('woff2');
+      font-weight: 400; font-display: swap; }
 
+    /* The app's own colours: its navy ground, coral buttons and teal selection. The paper is the note. */
     :root {
-      --bg:       #1A1A2E;
-      --surface:  #252542;
-      --surface2: #1e1e3a;
-      --border:   rgba(78,205,196,0.12);
-      --text:     #FAFAFA;
-      --muted:    #9090b2; /* 4.8:1 on --surface (was 4.3) */
-      --accent:   #FF6B6B;
-      --accent2:  #4ECDC4;
+      --ink: #1A1A2E;
+      --panel: #23233E;
+      --line: rgba(245, 243, 239, 0.12);
+      --text: #F5F3EF;
+      --muted: #A9A9C6;
+      --coral: #FF6B6B;
+      --teal: #4ECDC4;
+      --paper: #FFF3E4;
+      --paper-ink: #2A2238;
+      /* type steps by the square root of phi (1.272) from 16px */
+      --t-sm: 0.786rem;
+      --t-body: 1.0625rem;
+      --t-lg: 1.272rem;
+      --t-h2: 2.06rem;
+      --t-h1: clamp(2.62rem, 5.6vw, 4.24rem);
+      --wide: 1080px;
     }
 
-    html { scroll-behavior: smooth; }
-
+    *, *::before, *::after { box-sizing: border-box; }
+    html { -webkit-text-size-adjust: 100%; }
     body {
-      font-family: 'DM Sans', sans-serif;
-      background: var(--bg);
+      margin: 0;
+      background: var(--ink);
       color: var(--text);
-      min-height: 100vh;
-      line-height: 1.6;
+      font: 400 var(--t-body)/1.6 'DM Sans', system-ui, sans-serif;
       -webkit-font-smoothing: antialiased;
     }
+    a { color: inherit; }
+    img { max-width: 100%; display: block; }
 
-    /* Noise texture */
-    body::before {
-      content: '';
-      position: fixed;
-      inset: 0;
-      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
-      pointer-events: none;
-      z-index: 0;
+    .wrap { max-width: var(--wide); margin: 0 auto; padding-inline: 20px; }
+
+    /* ── Top bar ── */
+    .bar { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding-block: 22px 0; }
+    .brand { display: flex; align-items: center; gap: 12px; text-decoration: none; }
+    .brand img { width: 40px; height: 40px; border-radius: 10px; }
+    .brand span {
+      font-family: 'Archivo', sans-serif; font-weight: 800; font-stretch: 112%;
+      font-size: 1.45rem; letter-spacing: -0.01em; line-height: 1;
     }
+    .bar .by { font-size: var(--t-sm); color: var(--muted); }
 
-    /* Ambient glow - coral left, teal right */
-    body::after {
-      content: '';
-      position: fixed;
-      top: -20vh;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 80vw;
-      height: 60vh;
-      background:
-        radial-gradient(ellipse at 30% center, rgba(255,107,107,0.14) 0%, transparent 60%),
-        radial-gradient(ellipse at 70% center, rgba(78,205,196,0.12) 0%, transparent 60%);
-      pointer-events: none;
-      z-index: 0;
-    }
-
-    .page {
-      position: relative;
-      z-index: 1;
-      max-width: 680px;
-      margin: 0 auto;
-      padding: 0 24px 80px;
-    }
-
-    /* ── Nav ── */
-    nav {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 28px 0 0;
-      margin-bottom: 80px;
-    }
-
-    .logo {
-      display: flex;
-      align-items: center;
-      gap: 18px;
-      text-decoration: none;
-    }
-
-    .logo-mark {
-      width: 64px;
-      height: 64px;
-      border-radius: 16px;
-      overflow: hidden;
-      flex-shrink: 0;
-    }
-
-    .logo-mark img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      display: block;
-    }
-
-    .logo-text {
-      font-family: 'DM Serif Display', serif;
-      font-size: clamp(2.15rem, 6.5vw, 3.2rem);
-      color: var(--text);
-      letter-spacing: -0.02em;
-      line-height: 1;
-    }
-
-    .nav-badge {
-      font-size: 0.72rem;
-      font-weight: 500;
-      color: var(--muted);
-      background: var(--surface2);
-      border: 1px solid var(--border);
-      padding: 4px 10px;
-      border-radius: 20px;
-      letter-spacing: 0.03em;
-      text-transform: uppercase;
-    }
-
-    /* ── Hero ── */
+    /* ── Hero: words against the puzzle at 1 : 1.618 ── */
     .hero {
-      margin-bottom: 56px;
-      animation: fadeUp 0.6s ease both;
-    }
-
-    .hero-eyebrow {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      font-size: 0.78rem;
-      font-weight: 600;
-      color: var(--accent);
-      text-transform: uppercase;
-      letter-spacing: 0.1em;
-      margin-bottom: 20px;
-    }
-
-    .hero-eyebrow::before {
-      content: '';
-      display: block;
-      width: 6px;
-      height: 6px;
-      border-radius: 50%;
-      background: var(--accent);
-      animation: pulse 2s ease infinite;
-    }
-
-    @keyframes pulse {
-      0%, 100% { opacity: 1; transform: scale(1); }
-      50%       { opacity: 0.5; transform: scale(0.75); }
-    }
-
-    h1 {
-      font-family: 'DM Serif Display', serif;
-      font-size: clamp(2.6rem, 7vw, 3.8rem);
-      line-height: 1.08;
-      letter-spacing: -0.03em;
-      color: var(--text);
-      margin-bottom: 20px;
-    }
-
-    h1 em { font-style: italic; color: var(--accent); }
-
-    .hero-sub {
-      font-size: 1.1rem;
-      color: var(--muted);
-      line-height: 1.75;
-      max-width: 480px;
-      margin-bottom: 36px;
-    }
-
-    /* ── Download button ── */
-    .download-btn {
-      display: inline-block;
-      text-decoration: none;
-      transition: opacity 0.2s, transform 0.15s;
-    }
-
-    .download-btn img {
-      height: 60px;
-      width: auto;
-      display: block;
-    }
-
-    .store-badges { display: flex; flex-wrap: wrap; align-items: center; gap: 4px; }
-    /* Google's badge PNG carries ~16% transparent padding; Apple's SVG has none. Match the visible sizes. */
-    .download-btn img.as-badge { height: 40px; margin: 10px; }
-    .download-btn img.as-badge.sm { height: 34px; margin: 8px; }
-
-    .download-btn:hover { opacity: 0.88; transform: translateY(-2px); }
-    .download-btn:active { transform: translateY(0); }
-
-    /* ── Features ── */
-    .features {
       display: grid;
-      gap: 12px;
-      margin-bottom: 48px;
-      animation: fadeUp 0.6s 0.08s ease both;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1.618fr);
+      grid-template-areas: "title demo" "copy demo";
+      grid-template-rows: auto 1fr;
+      column-gap: 56px;
+      padding-block: 64px 40px;
     }
-
-    .feature-row {
-      display: flex;
-      align-items: center;
-      gap: 14px;
-      padding: 16px 20px;
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      font-size: 0.93rem;
-      color: var(--text);
-      transition: border-color 0.2s;
+    .hero h1 {
+      grid-area: title; align-self: end;
+      margin: 0 0 20px;
+      font-family: 'Archivo', sans-serif; font-weight: 800; font-stretch: 108%;
+      font-size: var(--t-h1); line-height: 1.02; letter-spacing: -0.025em;
+      text-wrap: balance;
     }
+    .copy { grid-area: copy; }
+    .copy p { margin: 0 0 28px; color: var(--muted); max-width: 34ch; }
+    .copy p b { color: var(--text); font-weight: 600; }
+    .stores { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
+    .stores a { display: block; border-radius: 8px; }
+    .stores img { height: 44px; width: auto; }
+    /* Google's badge PNG carries transparent padding that Apple's SVG does not */
+    .stores .gp { height: 64px; margin: -10px -8px; }
+    .stores a:focus-visible { outline: 2px solid var(--teal); outline-offset: 3px; }
+    .price { margin-top: 16px; font-size: var(--t-sm); color: var(--muted); }
 
-    .feature-row:hover { border-color: rgba(78,205,196,0.3); }
-
-    .feature-emoji {
-      font-size: 22px;
-      flex-shrink: 0;
-      width: 40px;
-      height: 40px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: var(--surface2);
-      border-radius: 10px;
+    /* ── The puzzle ── */
+    .demo { grid-area: demo; margin: 0; width: 100%; max-width: 520px; justify-self: end; }
+    .demo-top {
+      display: flex; justify-content: space-between; align-items: baseline;
+      font-size: var(--t-sm); color: var(--muted); margin-bottom: 10px;
+      font-variant-numeric: tabular-nums;
     }
-
-    .feature-text strong {
-      display: block;
-      font-weight: 600;
-      margin-bottom: 1px;
+    .demo-top b { color: var(--text); font-weight: 600; }
+    .stage { position: relative; padding-bottom: 34px; }
+    .board {
+      position: relative; z-index: 2;
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 3px;
+      aspect-ratio: 1; background: var(--ink); border-radius: 12px; overflow: hidden;
+      box-shadow: 0 1px 0 rgba(255,255,255,0.06) inset, 0 24px 48px -24px rgba(0,0,0,0.6);
+      transition: gap 0.35s ease;
     }
-
-    .feature-text span {
-      font-size: 0.82rem;
-      color: var(--muted);
+    .tile {
+      appearance: none; border: 0; padding: 0; margin: 0; cursor: pointer;
+      background-image: url('/img/puffin-960.jpg'); background-size: 300% 300%;
+      border-radius: 3px; transition: transform 0.14s ease, border-radius 0.35s ease, filter 0.14s ease;
     }
+    .tile:hover { filter: brightness(1.08); }
+    .tile:focus-visible { outline: 3px solid var(--teal); outline-offset: -3px; }
+    .tile[aria-pressed="true"] { outline: 3px solid var(--coral); outline-offset: -3px; transform: scale(0.95); }
+    .tile.pop { animation: pop 0.2s ease; }
+    @keyframes pop { 40% { transform: scale(0.93); } }
+    .board.solved { gap: 0; }
+    .board.solved .tile { border-radius: 0; cursor: default; filter: none; }
 
-    /* ── Screenshots ── */
-    .screenshots {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 16px;
-      margin-bottom: 48px;
-      animation: fadeUp 0.6s 0.12s ease both;
+    /* The note tucked under the board: its edge shows, the words don't until the puzzle is solved. */
+    .note {
+      position: absolute; z-index: 1; left: 7%; right: 7%; bottom: 0;
+      background: var(--paper); color: var(--paper-ink);
+      border-radius: 3px; padding: 44px 22px 16px;
+      box-shadow: 0 10px 24px -12px rgba(0,0,0,0.7);
+      transform: rotate(-1.2deg);
     }
-
-    .screenshots img {
-      width: 100%;
-      height: auto;
-      border-radius: 16px;
-      display: block;
+    .note .edge {
+      position: absolute; left: 22px; right: 22px; bottom: 9px;
+      font-size: var(--t-sm); letter-spacing: 0.04em; color: #8A7F92;
     }
-
-    @media (max-width: 520px) {
-      .screenshots { grid-template-columns: repeat(2, 1fr); gap: 12px; }
+    .note .msg {
+      margin: 0; font-family: 'Gochi Hand', 'Comic Sans MS', cursive;
+      font-size: 1.618rem; line-height: 1.25; visibility: hidden;
     }
-
-    /* ── App preview card ── */
-    .preview-card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      padding: 28px 32px;
-      margin-bottom: 20px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 24px;
-      animation: fadeUp 0.6s 0.14s ease both;
+    /* Solved: the note slides out and takes real space, so a long message never covers what follows. */
+    .stage.open { padding-bottom: 0; }
+    .stage.open .note {
+      position: relative; left: auto; right: auto; bottom: auto; margin: -24px 7% 0;
+      animation: slide-out 0.5s cubic-bezier(.2,.8,.2,1);
     }
+    @keyframes slide-out { from { transform: translateY(-70%) rotate(-1.2deg); } to { transform: rotate(-1.2deg); } }
+    .stage.open .note .msg { visibility: visible; }
+    .stage.open .note .edge { display: none; }
 
-    .preview-card-text h2 {
-      font-family: 'DM Serif Display', serif;
-      font-size: 1.3rem;
-      letter-spacing: -0.02em;
-      margin-bottom: 8px;
-      color: var(--text);
+    .demo-foot { display: flex; justify-content: space-between; gap: 12px; margin-top: 12px; font-size: var(--t-sm); color: var(--muted); }
+    .again {
+      appearance: none; background: none; border: 0; padding: 0; font: inherit; color: var(--teal);
+      text-decoration: underline; text-underline-offset: 3px; cursor: pointer;
     }
+    .again[hidden] { display: none; }
 
-    .preview-card-text p {
-      font-size: 0.88rem;
-      color: var(--muted);
-      line-height: 1.65;
-      margin-bottom: 20px;
+    /* ── On the box ── */
+    .box {
+      display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.618fr);
+      column-gap: 56px; align-items: start;
+      border-top: 1px solid var(--line);
+      padding-block: 64px 40px;
     }
-
-    /* Mini puzzle grid for visual flair */
-    .mini-puzzle {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      grid-template-rows: repeat(3, 1fr);
-      gap: 3px;
-      width: 88px;
-      height: 88px;
-      flex-shrink: 0;
-      border-radius: 12px;
-      overflow: hidden;
+    .box h2 {
+      margin: 0 0 8px; font-family: 'Archivo', sans-serif; font-weight: 800; font-stretch: 108%;
+      font-size: var(--t-h2); letter-spacing: -0.015em; line-height: 1.1;
     }
-
-    .mini-puzzle span {
-      display: block;
-      border-radius: 2px;
+    .box .lede { margin: 0 0 28px; color: var(--muted); }
+    .shot { max-width: 300px; justify-self: center; }
+    .shot img { border-radius: 18px; }
+    .shot figcaption { margin-top: 10px; font-size: var(--t-sm); color: var(--muted); text-align: center; }
+    dl { margin: 0; }
+    dl div {
+      display: grid; grid-template-columns: 7.5em minmax(0, 1fr); gap: 16px;
+      padding-block: 14px; border-top: 1px solid var(--line);
     }
-
-    .mini-puzzle span:nth-child(1)  { background: #FF6B6B; }
-    .mini-puzzle span:nth-child(2)  { background: #4ECDC4; opacity: 0.8; }
-    .mini-puzzle span:nth-child(3)  { background: #FF6B6B; opacity: 0.6; }
-    .mini-puzzle span:nth-child(4)  { background: #4ECDC4; opacity: 0.5; }
-    .mini-puzzle span:nth-child(5)  { background: #FF6B6B; opacity: 0.9; }
-    .mini-puzzle span:nth-child(6)  { background: #4ECDC4; opacity: 0.7; }
-    .mini-puzzle span:nth-child(7)  { background: #4ECDC4; opacity: 0.7; }
-    .mini-puzzle span:nth-child(8)  { background: #FF6B6B; opacity: 0.6; }
-    .mini-puzzle span:nth-child(9)  { background: #4ECDC4; opacity: 0.85; }
+    dl div:last-child { border-bottom: 1px solid var(--line); }
+    dt { font-weight: 600; }
+    dd { margin: 0; color: var(--muted); }
 
     /* ── Footer ── */
-    footer {
-      border-top: 1px solid var(--border);
-      padding-top: 32px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      flex-wrap: wrap;
-      gap: 12px;
-      animation: fadeUp 0.6s 0.2s ease both;
-    }
-
-    footer p { font-size: 0.82rem; color: var(--muted); }
-
-    .footer-links { display: flex; gap: 20px; flex-wrap: wrap; }
-
-    footer a {
-      font-size: 0.82rem;
-      color: var(--muted);
-      text-decoration: none;
-      transition: color 0.2s;
-    }
-
+    footer { border-top: 1px solid var(--line); padding-block: 28px 44px; font-size: var(--t-sm); color: var(--muted); }
+    footer p { margin: 0 0 12px; max-width: 62ch; }
+    footer nav { display: flex; flex-wrap: wrap; gap: 8px 20px; margin-bottom: 18px; }
+    footer a { text-underline-offset: 3px; }
     footer a:hover { color: var(--text); }
 
-    @keyframes fadeUp {
-      from { opacity: 0; transform: translateY(18px); }
-      to   { opacity: 1; transform: translateY(0); }
+    @media (max-width: 860px) {
+      .hero { grid-template-columns: minmax(0, 1fr); grid-template-areas: "title" "demo" "copy"; grid-template-rows: auto; padding-block: 36px 24px; }
+      .hero h1 { margin-bottom: 20px; }
+      .demo { justify-self: stretch; max-width: none; margin-bottom: 32px; }
+      .box { grid-template-columns: minmax(0, 1fr); row-gap: 32px; padding-block: 44px 28px; }
+      .shot { order: 2; max-width: 240px; }
     }
-
-    @media (max-width: 520px) {
-      .preview-card { flex-direction: column; align-items: flex-start; }
-      .mini-puzzle { display: none; }
-      nav { margin-bottom: 52px; }
+    @media (max-width: 420px) {
+      .bar .by { display: none; }
+      dl div { grid-template-columns: minmax(0, 1fr); gap: 2px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .board, .tile { transition: none; }
+      .tile.pop, .stage.open .note { animation: none; }
     }
   </style>
 <!-- Google Analytics: the property shared by Rebel Studios sites (reports split by hostname). Visitors in the
@@ -364,115 +220,134 @@ var s=document.createElement('script');s.async=true;s.src='https://www.googletag
 </script>
 </head>
 <body>
-  <div class="page">
+  <div class="wrap">
+    <header class="bar">
+      <a class="brand" href="/"><img src="/logo-128.png" alt="" width="40" height="40" /><span>Phuzzles</span></a>
+      <span class="by">A Rebel Studios app</span>
+    </header>
 
-    <nav>
-      <a href="/" class="logo">
-        <div class="logo-mark">
-          <img src="/logo-128.png" alt="Phuzzles logo" width="64" height="64" />
-        </div>
-        <span class="logo-text">Phuzzles</span>
-      </a>
-      <span class="nav-badge">Now on iPhone and Android</span>
-    </nav>
+    <main>
+      <section class="hero">
+        <h1>Send a photo they have to solve.</h1>
 
-    <section class="hero">
-      <div class="hero-eyebrow">Photo Puzzle Messaging</div>
-      <h1>Send photos as <em>puzzles</em></h1>
-      <p class="hero-sub">
-        Turn any photo into a scrambled puzzle and send it to a friend.
-        They piece it back together to reveal the image — and your message.
-      </p>
-      <div class="store-badges">
-        <a href="https://apps.apple.com/app/id6766833614" class="download-btn" target="_blank" rel="noopener">
-          <img class="as-badge" src="app-store-badge.svg" alt="Download on the App Store" />
-        </a>
-        <a
-          href="https://play.google.com/store/apps/details?id=rebelstudios.phuzzles.app"
-          class="download-btn"
-          target="_blank"
-          rel="noopener"
-        >
-          <img src="google-play-badge.png" alt="Get it on Google Play" />
-        </a>
-      </div>
-    </section>
+        <figure class="demo" aria-labelledby="demo-hint">
+          <div class="demo-top"><span><b>9 pieces</b> &middot; Easy</span><span id="count" aria-live="polite">0 swaps</span></div>
+          <div class="stage" id="stage">
+            <div class="board" id="board" role="group" aria-label="A 3 by 3 photo puzzle"></div>
+            <div class="note" id="note">
+              <p class="msg" id="msg" aria-live="polite">This one lives on an island off the coast of Maine. Your turn to send one.</p>
+              <span class="edge">A message is folded under this puzzle</span>
+            </div>
+          </div>
+          <div class="demo-foot">
+            <span id="demo-hint">Tap two pieces to swap them.</span>
+            <button class="again" id="again" type="button" hidden>Scramble it again</button>
+          </div>
+        </figure>
 
-    <div class="features">
-      <div class="feature-row">
-        <div class="feature-emoji">📸</div>
-        <div class="feature-text">
-          <strong>Pick any photo</strong>
-          <span>Choose from your gallery or take one in the moment.</span>
+        <div class="copy">
+          <p>Phuzzles cuts your photo into pieces and shuffles them. Your friend swaps them back, and <b>the message you wrote only shows up when the last piece lands.</b></p>
+          <div class="stores">
+            <a href="https://apps.apple.com/app/id6766833614" target="_blank" rel="noopener"><img src="/app-store-badge.svg" alt="Download on the App Store" /></a>
+            <a href="https://play.google.com/store/apps/details?id=rebelstudios.phuzzles.app" target="_blank" rel="noopener"><img class="gp" src="/google-play-badge.png" alt="Get it on Google Play" /></a>
+          </div>
+          <p class="price">Free, with ads.</p>
         </div>
-      </div>
-      <div class="feature-row">
-        <div class="feature-emoji">🔀</div>
-        <div class="feature-text">
-          <strong>It gets scrambled</strong>
-          <span>Phuzzles cuts it into pieces and shuffles them automatically.</span>
-        </div>
-      </div>
-      <div class="feature-row">
-        <div class="feature-emoji">📨</div>
-        <div class="feature-text">
-          <strong>Send it to a friend</strong>
-          <span>Add a hidden message that's revealed only after they solve it.</span>
-        </div>
-      </div>
-      <div class="feature-row">
-        <div class="feature-emoji">🧩</div>
-        <div class="feature-text">
-          <strong>They solve it</strong>
-          <span>Swap pieces until the image snaps into place — then the message appears.</span>
-        </div>
-      </div>
-    </div>
+      </section>
 
-    <div class="screenshots">
-      <img src="screen-1.jpg" width="480" height="961" decoding="async" alt="Phuzzles inbox screen" />
-      <img src="screen-2.jpg" width="480" height="961" decoding="async" alt="Phuzzles puzzle game screen" />
-      <img src="screen-3.jpg" width="480" height="961" decoding="async" alt="Phuzzles send puzzle screen" />
-      <img src="screen-4.jpg" width="480" height="961" decoding="async" alt="Phuzzles profile screen" />
-    </div>
-
-    <div class="preview-card">
-      <div class="preview-card-text">
-        <h2>Free with ads</h2>
-        <p>Available now on iPhone and Android. Add friends by username and start sending puzzles right away.</p>
-        <div class="store-badges">
-          <a href="https://apps.apple.com/app/id6766833614" class="download-btn" target="_blank" rel="noopener">
-            <img class="as-badge sm" src="app-store-badge.svg" alt="Download on the App Store" />
-          </a>
-          <a
-            href="https://play.google.com/store/apps/details?id=rebelstudios.phuzzles.app"
-            class="download-btn"
-            target="_blank"
-            rel="noopener"
-          >
-            <img src="google-play-badge.png" alt="Get it on Google Play" style="height:50px;" />
-          </a>
+      <section class="box" aria-labelledby="box-h">
+        <figure class="shot">
+          <img src="/screen-2.jpg" width="480" height="961" loading="lazy" decoding="async" alt="The solve screen in the Phuzzles app: a 5 by 5 puzzle of cherry blossoms, with moves, pieces remaining and pieces correct counted along the top" />
+          <figcaption>Solving a 5&times;5 in the app</figcaption>
+        </figure>
+        <div>
+          <h2 id="box-h">On the box</h2>
+          <p class="lede">What you get, and what happens to your photo.</p>
+          <dl>
+            <div><dt>Pieces</dt><dd>9, 16, 25 or 36. Easy is 3&times;3, Expert is 6&times;6.</dd></div>
+            <div><dt>Message</dt><dd>Up to 200 characters. It stays hidden until the puzzle is solved.</dd></div>
+            <div><dt>Solving</dt><dd>In the app. A link to a public puzzle also opens in any browser, no install needed.</dd></div>
+            <div><dt>Kept for</dt><dd>30 days. After that the puzzle and its photo are deleted from our servers.</dd></div>
+            <div><dt>Price</dt><dd>Free, with ads. There's no paid version yet.</dd></div>
+          </dl>
         </div>
-      </div>
-      <div class="mini-puzzle">
-        <span></span><span></span><span></span>
-        <span></span><span></span><span></span>
-        <span></span><span></span><span></span>
-      </div>
-    </div>
+      </section>
+    </main>
 
     <footer>
-      <p>© 2026 Rebel Studios. All rights reserved.</p>
-      <div class="footer-links">
-        <a href="/privacy.html">Privacy Policy</a>
-        <a href="/terms.html">Terms of Service</a>
-        <a href="/delete-account">Delete Account</a>
-        <a href="/child-safety">Child Safety</a>
-      </div>
+      <p>Phuzzles is made by Rebel Studios. Questions, bugs or a puzzle that won't open: <a href="mailto:rebelstudiossoftware@gmail.com">rebelstudiossoftware@gmail.com</a></p>
+      <nav aria-label="Legal">
+        <a href="/privacy.html">Privacy</a>
+        <a href="/terms.html">Terms</a>
+        <a href="/delete-account">Delete your account</a>
+        <a href="/child-safety">Child safety</a>
+      </nav>
+      <p>Puffin photo by Fred Yost, U.S. Fish and Wildlife Service (public domain).</p>
     </footer>
-
   </div>
+
   <script>
+    // The demo puzzle. order[slot] = which piece sits in that slot; solved when order[i] === i.
+    // It opens on a fixed scramble (six swaps from solved, the eye left in place as a foothold)
+    // so the first look is the same for everyone and never already solved.
+    (function () {
+      var N = 3, START = [1, 0, 3, 5, 4, 6, 7, 8, 2];
+      var board = document.getElementById('board'), stage = document.getElementById('stage');
+      var count = document.getElementById('count'), hint = document.getElementById('demo-hint');
+      var again = document.getElementById('again');
+      var order = START.slice(), swaps = 0, picked = -1, done = false, tiles = [];
+
+      function place(slot) {
+        var p = order[slot], t = tiles[slot];
+        t.style.backgroundPosition = (p % N) * 50 + '% ' + Math.floor(p / N) * 50 + '%';
+        t.setAttribute('aria-label', 'Piece in row ' + (Math.floor(slot / N) + 1) + ', column ' + (slot % N + 1));
+      }
+      function inPlace() { var n = 0; for (var i = 0; i < order.length; i++) if (order[i] === i) n++; return n; }
+      function status() {
+        count.textContent = done ? 'Solved in ' + swaps + (swaps === 1 ? ' swap' : ' swaps')
+          : swaps + (swaps === 1 ? ' swap' : ' swaps') + ' · ' + inPlace() + ' of 9 in place';
+      }
+      function tap(slot) {
+        if (done) return;
+        if (picked === -1) { picked = slot; tiles[slot].setAttribute('aria-pressed', 'true'); return; }
+        var a = picked; picked = -1; tiles[a].setAttribute('aria-pressed', 'false');
+        if (a === slot) return;
+        var tmp = order[a]; order[a] = order[slot]; order[slot] = tmp; swaps++;
+        place(a); place(slot);
+        [a, slot].forEach(function (s) { tiles[s].classList.remove('pop'); void tiles[s].offsetWidth; tiles[s].classList.add('pop'); });
+        if (inPlace() === order.length) finish();
+        status();
+      }
+      function finish() {
+        done = true; board.classList.add('solved'); stage.classList.add('open');
+        tiles.forEach(function (t) { t.disabled = true; t.removeAttribute('aria-pressed'); });
+        hint.textContent = 'That note was folded under it the whole time.';
+        again.hidden = false;
+        if (window.gtag) gtag('event', 'demo_solved', { swaps: swaps });
+      }
+      function reset() {
+        // A fresh scramble: shuffle until nothing but the eye is home, so it never opens half-solved.
+        do {
+          order = [0, 1, 2, 3, 5, 6, 7, 8];
+          for (var i = order.length - 1; i > 0; i--) { var j = Math.floor(Math.random() * (i + 1)); var x = order[i]; order[i] = order[j]; order[j] = x; }
+          order.splice(4, 0, 4);
+        } while (order.some(function (p, s) { return s !== 4 && p === s; }));
+        swaps = 0; picked = -1; done = false;
+        board.classList.remove('solved'); stage.classList.remove('open');
+        tiles.forEach(function (t, s) { t.disabled = false; t.setAttribute('aria-pressed', 'false'); place(s); });
+        hint.textContent = 'Tap two pieces to swap them.'; again.hidden = true; status();
+      }
+      for (var s = 0; s < N * N; s++) {
+        var b = document.createElement('button');
+        b.type = 'button'; b.className = 'tile'; b.setAttribute('aria-pressed', 'false');
+        b.addEventListener('click', tap.bind(null, s));
+        board.appendChild(b); tiles.push(b);
+      }
+      tiles.forEach(function (_, i) { place(i); });
+      again.addEventListener('click', reset);
+      status();
+    })();
+
     // Forward campaign source (from tracking QRs/links) to the Play Store as install-referrer,
     // so the app's Install Referrer API can attribute the install to where the scan came from.
     (function () {
