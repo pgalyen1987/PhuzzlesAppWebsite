@@ -1,2 +1,5 @@
 
 tools/node_modules/
+
+# Firebase CLI local state
+.firebase/

@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Phuzzles poster — curiosity variant (US Letter)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@400;500;700&display=block" rel="stylesheet">
+<!--
+  Variant B: one line of hook, a big code, no explanation. Prints on US Letter like poster.html.
+  QR -> ?utm_source=poster-mystery, so scans are counted separately from poster.html's.
+-->
+<style>
+  @page { size: letter; margin: 0; }
+  :root { --navy: #1A1A2E; --coral: #FF6B6B; --teal: #4ECDC4; --teal-deep: #2a9d95; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { background: #fff; }
+  body {
+    width: 8.5in; height: 11in; overflow: hidden; position: relative; color: var(--navy);
+    font-family: 'DM Sans', Arial, sans-serif; -webkit-print-color-adjust: exact; print-color-adjust: exact;
+  }
+  .sheet { position: absolute; inset: 0.45in; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
+  h1 {
+    font-family: 'DM Serif Display', serif; font-weight: 400; font-size: 82px; line-height: 0.98;
+    letter-spacing: -0.02em; white-space: nowrap;
+  }
+  h1 em { font-style: italic; color: var(--coral); }
+  .qrwrap { position: relative; margin-top: 0.62in; }
+  /* QR needs a clear white margin (quiet zone) or scanners fail; decoration stays outside it. */
+  .qrwrap img { display: block; width: 4.35in; height: 4.35in; padding: 0.3in; background: #fff; }
+  .tile { position: absolute; border-radius: 14px; }
+  .t1 { width: 0.86in; height: 0.86in; background: var(--teal); top: -0.5in; left: -0.62in; transform: rotate(-13deg); }
+  .t2 { width: 0.66in; height: 0.66in; background: var(--coral); bottom: -0.42in; right: -0.54in; transform: rotate(12deg); }
+  .scan { font-size: 27px; font-weight: 700; margin-top: 0.42in; letter-spacing: -0.01em; }
+  .foot { margin-top: 0.8in; display: flex; align-items: center; gap: 0.16in; }
+  .foot .mark { width: 0.54in; height: 0.54in; border-radius: 50%; overflow: hidden; }
+  .foot .mark img { width: 112%; height: 112%; margin: -6%; display: block; }
+  .foot .who { text-align: left; }
+  .foot .who b { font-family: 'DM Serif Display', serif; font-weight: 400; font-size: 27px; display: block; line-height: 1.05; }
+  .foot .who span { font-size: 15px; font-weight: 500; letter-spacing: 0.06em; text-transform: uppercase; color: var(--teal-deep); }
+</style>
+</head>
+<body>
+  <div class="sheet">
+    <h1>Someone left you<br>a <em>puzzle.</em></h1>
+    <div class="qrwrap">
+      <div class="tile t1"></div>
+      <img src="poster-mystery-qr.svg" alt="QR code for phuzzles.app">
+      <div class="tile t2"></div>
+    </div>
+    <div class="scan">Scan it. Solve it. See what's inside.</div>
+    <div class="foot">
+      <div class="mark"><img src="../logo2.png" alt=""></div>
+      <div class="who"><b>Phuzzles</b><span>Free app · Android · iPhone soon</span></div>
+    </div>
+  </div>
+</body>
+</html>
