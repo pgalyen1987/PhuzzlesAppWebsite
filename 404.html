@@ -206,6 +206,7 @@ var s=document.createElement('script');s.async=true;s.src='https://www.googletag
     paint();
 
     var sel = -1, moves = 0, start = Date.now(), timerId;
+    window._solveStart = start;
     function paint(){
       for (var c=0;c<total;c++){
         var tileIdx = order[c];
@@ -246,6 +247,15 @@ var s=document.createElement('script');s.async=true;s.src='https://www.googletag
     cta.href = IOS ? APPSTORE : playWith("utm_source=puzzle_link&utm_medium=web_solver");
     cta.onclick = function(){ ev("store_click", { from: "solved" }); };
     ev("puzzle_solved_web");
+    // Tell the sender: a link puzzle has no receiver in the app, so without this nobody would know it
+    // was solved. The function only acts on puzzles shared by link and caps pushes per puzzle.
+    if (d.linkShared === true) {
+      try {
+        fetch("https://us-central1-phuzzles.cloudfunctions.net/linkSolved", { method: "POST", keepalive: true,
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify({ id: puzzleId, ms: window._solveStart ? Date.now() - window._solveStart : 0 }) }).catch(function(){});
+      } catch (e) {}
+    }
     show("won");
     burst();
   }
