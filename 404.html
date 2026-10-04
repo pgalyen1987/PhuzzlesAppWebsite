@@ -82,13 +82,13 @@ var s=document.createElement('script');s.async=true;s.src='https://www.googletag
 
     <!-- SOLVED -->
     <div id="won" class="hidden">
-      <h1>Solved! <em>🎉</em></h1>
+      <h1>Solved.</h1>
       <img id="won-img" class="full" alt="revealed photo" />
       <div class="reveal" id="won-reveal">
         <div class="tag">HIDDEN MESSAGE</div>
         <div class="msg" id="won-msg"></div>
       </div>
-      <a class="btn" id="cta-make" href="#">Made you look 👀 — send your own</a>
+      <a class="btn" id="cta-make" href="#">Send one back</a>
       <div class="foot">Free on iPhone and Android</div>
     </div>
 
@@ -96,7 +96,7 @@ var s=document.createElement('script');s.async=true;s.src='https://www.googletag
     <div id="install" class="hidden">
       <h1 id="inst-title">You've got a <em>Phuzzle</em>!</h1>
       <div class="sub" id="inst-sub">Get the app to solve it and reveal the hidden message.</div>
-      <a class="btn" id="inst-play" href="https://play.google.com/store/apps/details?id=rebelstudios.phuzzles.app">▶ Get it on Google Play</a>
+      <a class="btn" id="inst-play" href="https://play.google.com/store/apps/details?id=rebelstudios.phuzzles.app">Get it on Google Play</a>
       <a class="btn ghost" id="inst-home" href="https://phuzzles.app">What is Phuzzles?</a>
     </div>
 
@@ -130,13 +130,22 @@ var s=document.createElement('script');s.async=true;s.src='https://www.googletag
   var m = location.pathname.match(/\/(?:puzzle|solve)\/([^\/?#]+)/i);
   if (!m) { show("notfound"); return; }
   var puzzleId = decodeURIComponent(m[1]);
+  // The viral loop, measured: opened, solved, and which store button was tapped, split by kind
+  // (a "link" puzzle was sent with no in-app recipient, receiverId "__link__").
+  var KIND = "unknown";
+  function ev(name, extra){ try { if (window.gtag) gtag("event", name, Object.assign({ puzzle_kind: KIND }, extra || {})); } catch (e) {} }
+  // Google Play passes `referrer` to the installed app; Phuzzles reads "puzzle_<id>" and opens that
+  // puzzle on first launch (InstallReferrerRepository), so an install from here lands on it.
+  function playWith(ref){ return PLAY + "&referrer=" + encodeURIComponent(ref); }
 
   function toInstall(sender){
     document.getElementById("inst-title").innerHTML =
       (sender ? escapeHtml(sender) + " sent you a <em>Phuzzle</em>!" : "You've got a <em>Phuzzle</em>!");
     var inst = document.getElementById("inst-play");
-    inst.href = STORE;
+    inst.href = IOS ? APPSTORE : playWith("puzzle_" + puzzleId);
     if (IOS) inst.textContent = "Download on the App Store";
+    inst.onclick = function(){ ev("store_click", { from: "install_wall" }); };
+    ev("puzzle_install_wall");
     show("install");
   }
   function escapeHtml(s){ return String(s||"").replace(/[&<>"']/g,function(c){
@@ -174,6 +183,8 @@ var s=document.createElement('script');s.async=true;s.src='https://www.googletag
     });
 
   function startGame(img, d, sender){
+    KIND = d.receiverId === "__link__" ? "link" : d.isGroupPuzzle ? "group" : d.isPublic ? "public" : "direct";
+    ev("puzzle_open");
     var n = GRID[(d.difficulty||"MEDIUM")] || 4;
     document.getElementById("game-title").innerHTML =
       (sender ? escapeHtml(sender)+" sent you a <em>Phuzzle</em>" : "Solve the <em>Phuzzle</em>");
@@ -231,7 +242,10 @@ var s=document.createElement('script');s.async=true;s.src='https://www.googletag
     var rev = document.getElementById("won-reveal");
     if (msg){ document.getElementById("won-msg").textContent = msg; rev.classList.remove("hidden"); }
     else { rev.classList.add("hidden"); }
-    document.getElementById("cta-make").href = STORE;
+    var cta = document.getElementById("cta-make");
+    cta.href = IOS ? APPSTORE : playWith("utm_source=puzzle_link&utm_medium=web_solver");
+    cta.onclick = function(){ ev("store_click", { from: "solved" }); };
+    ev("puzzle_solved_web");
     show("won");
     burst();
   }
