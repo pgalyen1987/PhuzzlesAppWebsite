@@ -222,8 +222,12 @@ var s=document.createElement('script');s.async=true;s.src='https://www.googletag
     KIND = d.receiverId === "__link__" ? "link" : d.isGroupPuzzle ? "group" : d.isPublic ? "public" : "direct";
     ev("puzzle_open");
     var n = GRID[(d.difficulty||"MEDIUM")] || 4;
+    // The daily comes from the official account (createPuzzleOfTheDay), so "phuzzles sent you a Phuzzle"
+    // and "Send one back" would both be wrong. Yesterday's daily keeps the sender but loses isPotd.
+    var official = d.senderId === "phuzzles-official";
     document.getElementById("game-title").innerHTML =
-      (sender ? escapeHtml(sender)+" sent you a <em>Phuzzle</em>" : "Solve the <em>Phuzzle</em>");
+      (official ? (d.isPotd ? "Today's <em>Phuzzle</em>" : "Solve the <em>Phuzzle</em>")
+       : sender ? escapeHtml(sender)+" sent you a <em>Phuzzle</em>" : "Solve the <em>Phuzzle</em>");
     var board = document.getElementById("board");
     board.style.gridTemplateColumns = "repeat("+n+",1fr)";
     var total = n*n;
@@ -280,9 +284,13 @@ var s=document.createElement('script');s.async=true;s.src='https://www.googletag
     if (msg){ document.getElementById("won-msg").textContent = msg; rev.classList.remove("hidden"); }
     else { rev.classList.add("hidden"); }
     var cta = document.getElementById("cta-make");
-    cta.href = IOS ? APPSTORE : playWith("utm_source=puzzle_link&utm_medium=web_solver");
+    var official = d.senderId === "phuzzles-official";
+    // Installs from the daily get their own source, so the Play report can tell them apart.
+    var ref = (official ? "utm_source=potd" : "utm_source=puzzle_link") + "&utm_medium=web_solver";
+    if (official) cta.textContent = "Make one from your own photo";
+    cta.href = IOS ? APPSTORE : playWith(ref);
     cta.onclick = function(){ ev("store_click", { from: "solved" }); };
-    if (!PHONE) { cta.classList.add("hidden"); badges("won-stores", playWith("utm_source=puzzle_link&utm_medium=web_solver"), "solved"); }
+    if (!PHONE) { cta.classList.add("hidden"); badges("won-stores", playWith(ref), "solved"); }
     ev("puzzle_solved_web");
     // Tell the sender: a link puzzle has no receiver in the app, so without this nobody would know it
     // was solved. The function only acts on puzzles shared by link and caps pushes per puzzle.
