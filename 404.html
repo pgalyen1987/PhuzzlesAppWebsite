@@ -123,11 +123,11 @@ var s=document.createElement('script');s.async=true;s.src='https://www.googletag
       <a class="btn ghost" id="inst-home" href="https://phuzzles.app">What is Phuzzles?</a>
     </div>
 
-    <!-- GENERIC NOT FOUND (non-/puzzle paths) -->
+    <!-- GENERIC NOT FOUND (non-/puzzle paths, a mangled link); cantOpen() reuses it when a puzzle can't load -->
     <div id="notfound" class="hidden">
-      <h1>Page not found</h1>
-      <div class="sub">This link doesn't lead anywhere.</div>
-      <a class="btn" href="https://phuzzles.app">Go to Phuzzles</a>
+      <h1 id="nf-title">Page not found</h1>
+      <div class="sub" id="nf-sub">This link doesn't lead anywhere.</div>
+      <a class="btn" id="nf-btn" href="https://phuzzles.app">Go to Phuzzles</a>
     </div>
   </div>
 
@@ -154,7 +154,8 @@ var s=document.createElement('script');s.async=true;s.src='https://www.googletag
   // its home feed. /solve/ is never claimed by an app, so it always opens here in the browser.
   var m = location.pathname.match(/\/(?:puzzle|solve)\/([^\/?#]+)/i);
   if (!m) { show("notfound"); return; }
-  var puzzleId = decodeURIComponent(m[1]);
+  // A link a messenger mangled (a broken %-escape such as %FF) threw here and left the spinner going forever.
+  var puzzleId; try { puzzleId = decodeURIComponent(m[1]); } catch (e) { show("notfound"); return; }
   // The viral loop, measured: opened, solved, and which store button was tapped, split by kind
   // (a "link" puzzle was sent with no in-app recipient, receiverId "__link__").
   var KIND = "unknown";
@@ -187,6 +188,26 @@ var s=document.createElement('script');s.async=true;s.src='https://www.googletag
   function escapeHtml(s){ return String(s||"").replace(/[&<>"']/g,function(c){
     return {"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c]; }); }
 
+  // Photos come from Phuzzles' own Storage bucket, where the apps, the daily and the mini app all put them. The
+  // create rule takes any imageUrl string, so without this a hand-made link puzzle could point solvers at a server
+  // of its own (which sees everyone who opens it, and can swap the picture after anyone has looked). The same test
+  // as the mini app's OUR_PHOTOS; it also keeps quotes and brackets out of the CSS url('…') the board paints with.
+  var OUR_PHOTOS = /^https:\/\/firebasestorage\.googleapis\.com\/v0\/b\/phuzzles\.firebasestorage\.app\/o\/[^'"()\s\\]+$/;
+
+  // The puzzle may be fine; this browser just couldn't get to it. Firebase stops signing in new visitors from one
+  // address after a burst of them (auth/too-many-requests; a day of test runs tripped it on 2026-10-05 and it lifted
+  // within minutes), and an office, a campus or a phone carrier puts many people behind one address, so that is not
+  // a connection problem. Either way a store button was the wrong answer: say what happened and offer a retry.
+  function cantOpen(busy){
+    document.getElementById("nf-title").textContent = busy ? "Too many first visits from this network" : "Couldn’t reach Phuzzles";
+    document.getElementById("nf-sub").textContent = busy ? "Phuzzles can only let in so many at once from one network. Try again in a few minutes."
+      : "The puzzle didn’t load. Check your connection and try again.";
+    var again = document.getElementById("nf-btn");
+    again.textContent = "Try again"; again.href = location.href;
+    ev("puzzle_cant_open", { why: busy ? "busy" : "offline" });
+    show("notfound");
+  }
+
   var cfg = {
     apiKey: "AIzaSyDPn4eEkZhUBp7x_3mVVcDlaiopfFDJna4",
     authDomain: "phuzzles.firebaseapp.com",
@@ -204,7 +225,7 @@ var s=document.createElement('script');s.async=true;s.src='https://www.googletag
     .then(function(doc){
       if (!doc.exists) { toInstall(null); return; }
       var d = doc.data() || {};
-      var img = d.imageUrl;
+      var img = typeof d.imageUrl === "string" && OUR_PHOTOS.test(d.imageUrl) ? d.imageUrl : null;
       var sender = d.senderUsername || null;
       if (!img) { toInstall(sender); return; }
       // Preload the image; if it can't load, fall back to install.
@@ -213,9 +234,13 @@ var s=document.createElement('script');s.async=true;s.src='https://www.googletag
       probe.onerror = function(){ toInstall(sender); };
       probe.src = img;
     })
-    .catch(function(){
-      // Permission denied (private puzzle) / anon auth disabled / offline → install funnel.
-      toInstall(null);
+    .catch(function(e){
+      // Permission denied is a private puzzle (only its recipient can open it, in the app) or one that has been
+      // deleted: the install funnel. A malformed id is a broken link. Anything else isn't about this puzzle.
+      var code = (e && e.code) || "";
+      if (code === "permission-denied") { toInstall(null); return; }
+      if (code === "invalid-argument") { show("notfound"); return; }
+      cantOpen(code === "auth/too-many-requests");
     });
 
   // A daily stays isPotd until the next one goes up at 11:00 Eastern, so from midnight to 11:00 /today still

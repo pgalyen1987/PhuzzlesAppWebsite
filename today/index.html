@@ -60,10 +60,16 @@
 // It forwards to /solve/<id>, not /puzzle/<id>: the apps claim /puzzle/ links, and /solve/ always opens
 // the browser solver. The query string goes along, so analytics still credits whoever sent the visit.
 (function(){
-  function none(msg){
+  // No daily yet: say so and offer the homepage puzzle. Couldn't look (title and msg given): the daily may well be up,
+  // so the heading must not say it isn't, and the button retries.
+  function none(title, msg){
     document.getElementById("finding").classList.add("hidden");
-    if (msg) document.getElementById("why").textContent = msg;
-    document.querySelector("#none .btn").href = "/" + location.search;
+    var btn = document.querySelector("#none .btn");
+    if (title) {
+      document.querySelector("#none h1").textContent = title;
+      document.getElementById("why").textContent = msg;
+      btn.textContent = "Try again"; btn.href = location.href;
+    } else btn.href = "/" + location.search;
     document.getElementById("none").classList.remove("hidden");
   }
   try {
@@ -85,7 +91,15 @@
       if (!docs.length) { none(); return; }
       location.replace("/solve/" + encodeURIComponent(docs[0].id) + location.search);
     })
-    .catch(function(){ none("We couldn't reach the puzzle server just now. Try again in a minute, or solve the one on our homepage."); });
+    // Firebase stops signing in new visitors from one address after a burst of them (auth/too-many-requests; a day
+    // of test runs tripped it on 2026-10-05 for a few minutes). An office, a campus or a phone carrier puts many
+    // people behind one address, so it isn't their connection. The same words as the 404 solver and the mini app.
+    .catch(function(e){
+      if (e && e.code === "auth/too-many-requests")
+        none("Too many first visits from this network", "Phuzzles can only let in so many at once from one network. Try again in a few minutes.");
+      else
+        none("Couldn’t reach Phuzzles", "Today’s puzzle didn’t load. Check your connection and try again.");
+    });
 })();
 </script>
 </body>
