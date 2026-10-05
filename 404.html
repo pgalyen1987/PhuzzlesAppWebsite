@@ -234,7 +234,11 @@ var s=document.createElement('script');s.async=true;s.src='https://www.googletag
 
     // order[cell] = which correct-tile index currently sits in that cell
     var order = []; for (var i=0;i<total;i++) order.push(i);
-    do { shuffle(order); } while (isSolved(order));
+    // The studio's puzzles scramble the same way for everyone (seeded by the puzzle id), so the board in a post
+    // is the board you get, and two people's swap counts can be compared.
+    var rnd = official ? seeded(puzzleId) : Math.random;
+    do { shuffle(order, rnd); } while (isSolved(order));
+    var fewest = fewestSwaps(order);
 
     var tiles = [];
     board.innerHTML = "";
@@ -266,7 +270,7 @@ var s=document.createElement('script');s.async=true;s.src='https://www.googletag
       tiles[sel].classList.remove("sel"); sel = -1;
       moves++; document.getElementById("moves").textContent = moves+" swap"+(moves===1?"":"s");
       paint();
-      if (isSolved(order)) win(d, img);
+      if (isSolved(order)) win(d, img, moves, fewest);
     });
     timerId = setInterval(function(){
       var s = Math.floor((Date.now()-start)/1000);
@@ -276,7 +280,7 @@ var s=document.createElement('script');s.async=true;s.src='https://www.googletag
     window._stopTimer = function(){ clearInterval(timerId); };
   }
 
-  function win(d, img){
+  function win(d, img, moves, fewest){
     if (window._stopTimer) window._stopTimer();
     document.getElementById("won-img").src = img;
     var msg = d.message && String(d.message).trim();
@@ -291,18 +295,21 @@ var s=document.createElement('script');s.async=true;s.src='https://www.googletag
       cta.textContent = "Make one from your own photo";
       // Somewhere to come back to: /today always opens the current daily.
       document.getElementById("won-foot").innerHTML = 'There\'s a new one every day at 11:00 Eastern: <a href="/today/">phuzzles.app/today</a><br>The app is free on iPhone and Android, with ads.';
+      document.querySelector("#won h1").textContent = "Solved in " + moves + " swap" + (moves === 1 ? "" : "s") + ".";
       // Today's daily is the one puzzle anyone can pass on: /today opens it in any browser and unfurls with a card.
       if (d.isPotd && !document.getElementById("share-today")) {
+        var brag = "I solved today's Phuzzle in " + moves + " swap" + (moves === 1 ? "" : "s") +
+          " (the fewest possible is " + fewest + "). Your turn.";
         var share = document.createElement("button");
         share.type = "button"; share.id = "share-today"; share.className = "btn ghost"; share.textContent = "Share today's puzzle";
         var link = "https://phuzzles.app/today/?utm_source=potd-share&utm_medium=share";
         share.onclick = function(){
           if (navigator.share) {
-            navigator.share({ text: "I solved today's Phuzzle. Your turn.", url: link })
+            navigator.share({ text: brag, url: link })
               .then(function(){ ev("potd_share", { method: "sheet" }); }, function(){});
             return;
           }
-          (navigator.clipboard ? navigator.clipboard.writeText(link) : Promise.reject())
+          (navigator.clipboard ? navigator.clipboard.writeText(brag + " " + link) : Promise.reject())
             .then(function(){ share.textContent = "Link copied"; ev("potd_share", { method: "copy" }); },
                   function(){ share.textContent = "phuzzles.app/today"; });
         };
@@ -327,7 +334,12 @@ var s=document.createElement('script');s.async=true;s.src='https://www.googletag
   }
 
   function isSolved(o){ for (var i=0;i<o.length;i++) if(o[i]!==i) return false; return true; }
-  function shuffle(a){ for (var i=a.length-1;i>0;i--){ var j=Math.floor(Math.random()*(i+1)); var t=a[i];a[i]=a[j];a[j]=t; } }
+  function shuffle(a, rnd){ for (var i=a.length-1;i>0;i--){ var j=Math.floor(rnd()*(i+1)); var t=a[i];a[i]=a[j];a[j]=t; } }
+  // FNV-1a of the id into mulberry32: the same id always gives the same sequence.
+  function seeded(s){ var a=2166136261; for (var i=0;i<s.length;i++) a=Math.imul(a^s.charCodeAt(i),16777619);
+    return function(){ a=(a+0x6D2B79F5)|0; var t=Math.imul(a^a>>>15,1|a); t=t+Math.imul(t^t>>>7,61|t)^t; return ((t^t>>>14)>>>0)/4294967296; }; }
+  // Each swap changes the number of cycles by one and a solved board has one per tile, so the floor is tiles minus cycles.
+  function fewestSwaps(o){ var seen=[], cycles=0; for (var i=0;i<o.length;i++){ if(seen[i]) continue; cycles++; for (var j=i;!seen[j];j=o[j]) seen[j]=1; } return o.length-cycles; }
 
   function burst(){
     var c=document.createElement("canvas"); c.className="confetti"; document.body.appendChild(c);
