@@ -1,0 +1,24 @@
+{
+  "accountAssociation": {
+    "header": "UNSIGNED-PLACEHOLDER: replace all three values with the output of the Farcaster manifest tool for phuzzles.app",
+    "payload": "UNSIGNED-PLACEHOLDER",
+    "signature": "UNSIGNED-PLACEHOLDER"
+  },
+  "miniapp": {
+    "version": "1",
+    "name": "Phuzzles",
+    "homeUrl": "https://phuzzles.app/mini/",
+    "iconUrl": "https://phuzzles.app/mini/icon.png",
+    "splashImageUrl": "https://phuzzles.app/mini/splash.png",
+    "splashBackgroundColor": "#1A1A2E",
+    "subtitle": "Photos you have to solve",
+    "description": "Turn a photo into a puzzle and post it. Whoever puts the pieces back sees the picture and the note you left under it. There is a new puzzle every day too.",
+    "primaryCategory": "games",
+    "tags": ["puzzle", "photo", "daily", "friends", "game"],
+    "heroImageUrl": "https://phuzzles.app/mini/hero.png",
+    "tagline": "Post a photo as a puzzle",
+    "ogTitle": "Phuzzles",
+    "ogDescription": "Post a photo as a puzzle. Whoever solves it gets to see it.",
+    "ogImageUrl": "https://phuzzles.app/mini/hero.png"
+  }
+}

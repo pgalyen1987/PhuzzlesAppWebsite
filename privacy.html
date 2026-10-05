@@ -32,6 +32,7 @@ var s=document.createElement('script');s.async=true;s.src='https://www.googletag
     <p><strong>User Content:</strong> Photos you send as puzzles, and the message with each, are uploaded to our servers and shown to the people you send them to. A puzzle you share as a link can be opened by anyone who has the link, and one you make public appears in the app&rsquo;s Feed for every user. Puzzle images are automatically deleted after 30 days.</p>
     <p><strong>Usage Data:</strong> We collect puzzle solve times, puzzle send/receive counts, and general app usage analytics to improve the app experience.</p>
     <p><strong>Device Information:</strong> We collect device tokens for push notifications and crash reports for debugging.</p>
+    <p><strong>Farcaster mini app:</strong> when you post a Phuzzle from phuzzles.app/mini inside Farcaster or the Base app, Farcaster&rsquo;s sign-in gives us your Farcaster ID, and we look up your public Farcaster username. Both are stored with the puzzle, along with the photo and the note you chose, and the puzzle shows your username as its sender. A posted puzzle is public: anyone with its link can solve it and see the photo and the note. The photo is cut to a square and saved again, so none of your camera&rsquo;s data comes with it, location included. To limit abuse we also keep, for each Farcaster ID, its username, how many puzzles it has posted, when it last posted and the times of the last day&rsquo;s posts. Solving a puzzle in the mini app does not ask for your Farcaster sign-in.</p>
 
     <h2>2. How We Use Your Information</h2>
     <ul>
@@ -54,7 +55,8 @@ var s=document.createElement('script');s.async=true;s.src='https://www.googletag
 
     <h2>4. Data Retention</h2>
     <ul>
-        <li>Puzzle images: Automatically deleted after 30 days</li>
+        <li>Puzzle images: Automatically deleted after 30 days, including those posted from the mini app</li>
+        <li>Mini app post counts per Farcaster ID: deleted 30 days after that ID&rsquo;s last post, unless the ID has been blocked for abuse</li>
         <li>Account data: Retained until you delete your account</li>
         <li>Reports: Retained for moderation purposes</li>
     </ul>
@@ -64,6 +66,7 @@ var s=document.createElement('script');s.async=true;s.src='https://www.googletag
     <p>You can:</p>
     <ul>
         <li>Delete your account and all associated data from within the app</li>
+        <li>If you posted from the mini app, which has no account to delete, email us your Farcaster username and we will delete your puzzles and your post counts</li>
         <li>Block other users from sending you puzzles</li>
         <li>Report inappropriate content</li>
     </ul>
