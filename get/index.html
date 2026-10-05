@@ -58,11 +58,6 @@ var s=document.createElement('script');s.async=true;s.src='https://www.googletag
     <a class="btn alt" href="https://apps.apple.com/app/id6766833614">Get it on the App Store</a>
   </div>
 
-  <div class="row hidden" id="both">
-    <a class="btn" href="/p/poster">Solve one in your browser</a>
-    <a class="btn alt" href="https://play.google.com/store/apps/details?id=rebelstudios.phuzzles.app">Get it on Google Play</a>
-    <a class="btn alt" href="https://apps.apple.com/app/id6766833614">Get it on the App Store</a>
-  </div>
 </main>
 <script>
   // iPhones go straight to the App Store listing (live since 2026-09-30).
@@ -74,13 +69,21 @@ var s=document.createElement('script');s.async=true;s.src='https://www.googletag
   var hide = function (id) { document.getElementById(id).classList.add("hidden"); };
   // A beat before leaving, so the scan is counted (the poster's whole point is knowing it worked).
   var leave = function (url) { setTimeout(function () { location.replace(url); }, 250); };
+  // The post's utm tags ride along to Play as the install referrer, as the homepage's badge does.
+  var q = new URLSearchParams(location.search), utm = [];
+  ["utm_source", "utm_medium", "utm_campaign", "utm_content"].forEach(function (k) { if (q.get(k)) utm.push(k + "=" + q.get(k)); });
+  var PLAY = "https://play.google.com/store/apps/details?id=rebelstudios.phuzzles.app" +
+    (utm.length ? "&referrer=" + encodeURIComponent(utm.join("&")) : "");
+  document.getElementById("play").href = PLAY;
   if (isAndroid) {
-    leave("https://play.google.com/store/apps/details?id=rebelstudios.phuzzles.app");
+    leave(PLAY);
   } else if (isIOS) {
     if (IOS_URL) { leave(IOS_URL); }
     else { hide("android"); show("ios"); }
   } else {
-    hide("android"); show("both");
+    // Laptops can't install either app, and the homepage has a puzzle with a message under it
+    // plus both badges, so that's where they go. The query string comes too, for analytics.
+    leave("/" + location.search);
   }
 </script>
 </body>
