@@ -9,11 +9,16 @@
   THE ADDRESS ON THE PRINTED POSTER.
 
   A poster on a wall outlives a puzzle. The nightly cleanup deletes any puzzle more than 30 days old
-  and its photo, so the one below is PINNED (keep: true, set through the keepPuzzle function in the
-  Phuzzles Functions - it is the only thing that writes that field). This page exists anyway: it lets
-  the poster point at a different puzzle later without reprinting - change the line marked PUZZLE.
+  and its photo, so a real puzzle used here must be PINNED (keep: true, set through the keepPuzzle function
+  in the Phuzzles Functions - it is the only thing that writes that field). This page lets the poster point
+  somewhere else without reprinting - change the line marked PUZZLE (and the two hrefs).
+
+  2026-10-05: it pointed at the pinned /solve/OVSjHWR0soePRAALlSW8, which has no message, so a scan of a
+  poster that says "See what's inside" solved to a bird with nothing under it. It now opens the homepage,
+  whose puzzle has a note. To go back to a real puzzle, send one WITH a message, pin it, and put
+  "/solve/<id>" back below.
 -->
-<meta http-equiv="refresh" content="1; url=/solve/OVSjHWR0soePRAALlSW8" />
+<meta http-equiv="refresh" content="1; url=/" />
 <link rel="stylesheet" href="/fonts/fonts.css" />
 <link rel="icon" href="/logo-128.png" />
 <style>
@@ -32,10 +37,11 @@ var s=document.createElement('script');s.async=true;s.src='https://www.googletag
 </script>
 </head>
 <body>
-  <p>Opening the puzzle… <a id="go" href="/solve/OVSjHWR0soePRAALlSW8">tap here if nothing happens</a>.</p>
+  <p>Opening the puzzle… <a id="go" href="/">tap here if nothing happens</a>.</p>
 <script>
-  // PUZZLE: the one the poster points at today.
-  var PUZZLE = "/solve/OVSjHWR0soePRAALlSW8";
+  // PUZZLE: where the poster points today. The homepage keeps the scan's utm tags, so GA counts the
+  // session as the poster's and the Play badge passes them on as the install referrer.
+  var PUZZLE = "/" + location.search;
   document.getElementById("go").setAttribute("href", PUZZLE);
   setTimeout(function () { location.replace(PUZZLE); }, 250);   // a beat, so the scan is counted
 </script>
