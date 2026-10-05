@@ -218,6 +218,16 @@ var s=document.createElement('script');s.async=true;s.src='https://www.googletag
       toInstall(null);
     });
 
+  // A daily stays isPotd until the next one goes up at 11:00 Eastern, so from midnight to 11:00 /today still
+  // opens yesterday's. It is today's only on the Eastern date it went up (potdAt; sentAt on older dailies).
+  function potdIsToday(d, now){
+    if (!d.isPotd) return false;
+    var at = d.potdAt || d.sentAt, ms = at && at.toMillis ? at.toMillis() : 0;
+    if (!ms) return true;
+    var day = function(t){ return new Intl.DateTimeFormat("en-CA", { timeZone: "America/New_York" }).format(new Date(t)); };
+    return day(ms) === day(now);
+  }
+
   function startGame(img, d, sender){
     KIND = d.receiverId === "__link__" ? "link" : d.isGroupPuzzle ? "group" : d.isPublic ? "public" : "direct";
     ev("puzzle_open");
@@ -226,7 +236,7 @@ var s=document.createElement('script');s.async=true;s.src='https://www.googletag
     // and "Send one back" would both be wrong. Yesterday's daily keeps the sender but loses isPotd.
     var official = d.senderId === "phuzzles-official";
     document.getElementById("game-title").innerHTML =
-      (official ? (d.isPotd ? "Today's <em>Phuzzle</em>" : "Solve the <em>Phuzzle</em>")
+      (official ? (potdIsToday(d, Date.now()) ? "Today's <em>Phuzzle</em>" : d.isPotd ? "Yesterday's <em>Phuzzle</em>" : "Solve the <em>Phuzzle</em>")
        : sender ? escapeHtml(sender)+" sent you a <em>Phuzzle</em>" : "Solve the <em>Phuzzle</em>");
     var board = document.getElementById("board");
     board.style.gridTemplateColumns = "repeat("+n+",1fr)";
@@ -297,7 +307,7 @@ var s=document.createElement('script');s.async=true;s.src='https://www.googletag
       document.getElementById("won-foot").innerHTML = 'There\'s a new one every day at 11:00 Eastern: <a href="/today/">phuzzles.app/today</a><br>The app is free on iPhone and Android, with ads.';
       document.querySelector("#won h1").textContent = "Solved in " + moves + " swap" + (moves === 1 ? "" : "s") + ".";
       // Today's daily is the one puzzle anyone can pass on: /today opens it in any browser and unfurls with a card.
-      if (d.isPotd && !document.getElementById("share-today")) {
+      if (potdIsToday(d, Date.now()) && !document.getElementById("share-today")) {
         var brag = "I solved today's Phuzzle in " + moves + " swap" + (moves === 1 ? "" : "s") +
           " (the fewest possible is " + fewest + "). Your turn.";
         var share = document.createElement("button");
