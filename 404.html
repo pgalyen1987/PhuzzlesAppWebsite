@@ -2,51 +2,72 @@
 <html lang="en">
 <head>
 <meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Phuzzles</title>
 <meta name="description" content="Someone sent you a photo puzzle. Solve it to reveal the picture and their hidden message." />
-<meta property="og:title" content="You've got a Phuzzle! 🧩" />
+<meta property="og:title" content="You've got a Phuzzle" />
 <meta property="og:description" content="Solve the puzzle to reveal the photo and a hidden message." />
-<meta name="theme-color" content="#0e0f13" />
+<meta property="og:image" content="https://phuzzles.app/img/og-card.jpg" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="theme-color" content="#1A1A2E" />
+<link rel="icon" href="/logo-128.png" />
 <style>
+  /* Self-hosted, the same faces as the homepage. */
+  @font-face{font-family:'Archivo';src:url('/fonts/archivo-var-latin.woff2') format('woff2');font-weight:700 900;font-stretch:62% 125%;font-display:swap}
+  @font-face{font-family:'DM Sans';src:url('/fonts/dm-sans-var-latin.woff2') format('woff2');font-weight:400 600;font-display:swap}
+  @font-face{font-family:'Gochi Hand';src:url('/fonts/gochi-hand-400-latin.woff2') format('woff2');font-weight:400;font-display:swap}
   *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-  :root{--bg:#0e0f13;--surface:#16181f;--surface2:#1e2029;--border:rgba(255,255,255,.08);
-        --text:#e8e9ef;--muted:#7c7f94;--accent:#ff6b35;--accent2:#ffb347;--good:#4ECDC4}
-  html,body{height:100%}
+  /* The homepage's colours: navy ground, coral buttons, teal selection. The paper is the note. */
+  :root{--bg:#1A1A2E;--surface:#23233E;--border:rgba(245,243,239,.12);
+        --text:#F5F3EF;--muted:#A9A9C6;--accent:#FF6B6B;--good:#4ECDC4;--paper:#FFF3E4;--paper-ink:#2A2238}
+  /* min-height, not height: a fixed-height flex body pushed a tall solved photo above the top of the
+     page, where nobody could scroll to it. margin:auto on .wrap centres without that. */
   body{font-family:'DM Sans',system-ui,-apple-system,Segoe UI,Roboto,sans-serif;background:var(--bg);
-       color:var(--text);min-height:100vh;display:flex;align-items:center;justify-content:center;
+       color:var(--text);min-height:100vh;min-height:100dvh;display:flex;flex-direction:column;
        -webkit-font-smoothing:antialiased;overflow-x:hidden;padding:20px}
-  body::after{content:'';position:fixed;top:-20vh;left:50%;transform:translateX(-50%);width:80vw;height:60vh;
-       background:radial-gradient(ellipse at center,rgba(255,107,53,.12) 0%,transparent 70%);pointer-events:none;z-index:0}
-  .wrap{position:relative;z-index:1;width:100%;max-width:460px;margin:0 auto;text-align:center}
-  .brand{font-weight:800;letter-spacing:.5px;font-size:15px;color:var(--text);margin-bottom:6px}
-  .brand em{color:var(--accent);font-style:normal}
+  .wrap{width:100%;max-width:460px;margin:auto;text-align:center}
+  .brand{display:inline-flex;align-items:center;gap:10px;color:var(--text);text-decoration:none;margin-bottom:18px}
+  .brand img{width:32px;height:32px;border-radius:8px}
+  .brand span{font-family:'Archivo',sans-serif;font-weight:800;font-stretch:112%;font-size:1.17rem;letter-spacing:-.01em;line-height:1}
   .eyebrow{color:var(--muted);font-size:13px;margin-bottom:18px}
-  h1{font-size:24px;line-height:1.2;margin-bottom:6px}
+  h1{font-family:'Archivo',sans-serif;font-weight:800;font-stretch:108%;font-size:1.618rem;line-height:1.15;
+     letter-spacing:-.02em;margin-bottom:8px}
   h1 em{color:var(--accent);font-style:normal}
   .sub{color:var(--muted);font-size:14px;margin-bottom:18px}
-  #board{width:100%;aspect-ratio:1/1;display:grid;gap:3px;background:var(--surface2);
-         border:1px solid var(--border);border-radius:16px;padding:6px;touch-action:manipulation;
-         box-shadow:0 20px 60px rgba(0,0,0,.4)}
-  .tile{background-size:cover;background-repeat:no-repeat;border-radius:6px;cursor:pointer;
-        transition:transform .12s ease,box-shadow .12s ease,outline-color .12s;outline:2px solid transparent;
-        position:relative}
-  .tile.sel{outline-color:var(--accent);transform:scale(.94);z-index:2;box-shadow:0 6px 18px rgba(255,107,53,.4)}
+  #board{width:100%;aspect-ratio:1/1;display:grid;gap:3px;background:var(--surface);
+         border:1px solid var(--border);border-radius:14px;padding:6px;touch-action:manipulation;
+         box-shadow:0 24px 48px -24px rgba(0,0,0,.6)}
+  .tile{background-size:cover;background-repeat:no-repeat;border-radius:4px;cursor:pointer;
+        transition:transform .12s ease,box-shadow .12s ease,outline-color .12s;outline:3px solid transparent;
+        outline-offset:-3px;position:relative}
+  .tile.sel{outline-color:var(--accent);transform:scale(.94);z-index:2;box-shadow:0 6px 18px rgba(255,107,107,.35)}
   .tile.solved{border-radius:0}
-  .meta{display:flex;justify-content:space-between;align-items:center;margin:14px 2px 0;color:var(--muted);font-size:13px}
+  .meta{display:flex;justify-content:space-between;align-items:center;margin:14px 2px 0;color:var(--muted);font-size:13px;
+        font-variant-numeric:tabular-nums}
   .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;background:var(--accent);
-       color:#111;font-weight:700;border:none;border-radius:12px;padding:14px 22px;font-size:15px;
-       cursor:pointer;text-decoration:none;width:100%;margin-top:10px}
-  .btn.ghost{background:transparent;color:var(--text);border:1px solid var(--border);font-weight:600}
-  .reveal{margin-top:16px;padding:18px;background:var(--surface);border:1px solid var(--border);border-radius:16px}
-  .reveal .tag{color:var(--good);font-weight:700;font-size:13px;letter-spacing:.4px}
-  .reveal .msg{font-size:19px;margin:8px 0 4px;line-height:1.35}
-  .full{width:100%;border-radius:14px;margin:6px 0 2px;border:1px solid var(--border)}
+       color:var(--bg);font-weight:700;border:none;border-radius:12px;padding:14px 22px;font-size:15px;
+       cursor:pointer;text-decoration:none;width:100%;margin-top:16px}
+  .btn.ghost{background:transparent;color:var(--text);border:1px solid var(--border);font-weight:600;margin-top:10px}
+  /* The photo keeps its shape: a tall one gets narrower rather than pushing everything off the screen. */
+  .full{position:relative;z-index:2;display:block;max-width:100%;max-height:70vh;width:auto;height:auto;
+        margin:6px auto 0;border-radius:12px;box-shadow:0 24px 48px -24px rgba(0,0,0,.7)}
+  /* Their message, on the same paper note the homepage tucks under its puzzle. */
+  .reveal{position:relative;z-index:1;margin:-10px 7% 0;padding:26px 20px 16px;background:var(--paper);
+          color:var(--paper-ink);border-radius:3px;box-shadow:0 10px 24px -12px rgba(0,0,0,.7);
+          transform:rotate(-1.2deg);text-align:left}
+  .reveal .msg{font-family:'Gochi Hand','Comic Sans MS',cursive;font-size:1.618rem;line-height:1.25;overflow-wrap:anywhere}
+  .pitch{margin:26px auto 0;max-width:34ch;color:var(--muted);font-size:15px;line-height:1.5}
+  .pitch b{color:var(--text);font-weight:600}
+  .stores{display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:12px;margin-top:18px}
+  .stores a{display:block;border-radius:8px}
+  .stores img{display:block;height:44px;width:auto}
+  /* Google's badge PNG carries transparent padding that Apple's SVG does not */
+  .stores .gp{height:64px;margin:-10px -8px}
   .spin{width:34px;height:34px;border:3px solid var(--border);border-top-color:var(--accent);
         border-radius:50%;animation:s 1s linear infinite;margin:24px auto}
   @keyframes s{to{transform:rotate(360deg)}}
   .hidden{display:none!important}
-  .foot{margin-top:22px;color:var(--muted);font-size:12px}
+  .foot{margin-top:16px;color:var(--muted);font-size:12px}
   .foot a{color:var(--muted)}
   .confetti{position:fixed;inset:0;pointer-events:none;z-index:5}
 </style>
@@ -64,7 +85,7 @@ var s=document.createElement('script');s.async=true;s.src='https://www.googletag
 </head>
 <body>
   <div class="wrap">
-    <div class="brand"><em>🧩</em> Phuzzles</div>
+    <a class="brand" href="/"><img src="/logo-128.png" alt="" width="32" height="32" /><span>Phuzzles</span></a>
 
     <!-- LOADING -->
     <div id="loading">
@@ -83,13 +104,14 @@ var s=document.createElement('script');s.async=true;s.src='https://www.googletag
     <!-- SOLVED -->
     <div id="won" class="hidden">
       <h1>Solved.</h1>
-      <img id="won-img" class="full" alt="revealed photo" />
+      <img id="won-img" class="full" alt="The photo, put back together" />
       <div class="reveal" id="won-reveal">
-        <div class="tag">HIDDEN MESSAGE</div>
-        <div class="msg" id="won-msg"></div>
+        <p class="msg" id="won-msg"></p>
       </div>
+      <p class="pitch"><b>Phuzzles</b> turns a photo into a puzzle you send. They solve it to see the picture and your message.</p>
       <a class="btn" id="cta-make" href="#">Send one back</a>
-      <div class="foot">Free on iPhone and Android</div>
+      <div class="stores hidden" id="won-stores"></div>
+      <div class="foot">Free on iPhone and Android, with ads.</div>
     </div>
 
     <!-- INSTALL FALLBACK (private puzzle / not readable) -->
@@ -97,6 +119,7 @@ var s=document.createElement('script');s.async=true;s.src='https://www.googletag
       <h1 id="inst-title">You've got a <em>Phuzzle</em>!</h1>
       <div class="sub" id="inst-sub">Get the app to solve it and reveal the hidden message.</div>
       <a class="btn" id="inst-play" href="https://play.google.com/store/apps/details?id=rebelstudios.phuzzles.app">Get it on Google Play</a>
+      <div class="stores hidden" id="inst-stores"></div>
       <a class="btn ghost" id="inst-home" href="https://phuzzles.app">What is Phuzzles?</a>
     </div>
 
@@ -117,7 +140,9 @@ var s=document.createElement('script');s.async=true;s.src='https://www.googletag
   var APPSTORE = "https://apps.apple.com/app/id6766833614";
   // iPadOS reports itself as a Mac; the touch-point check tells them apart.
   var IOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
-  var STORE = IOS ? APPSTORE : PLAY;
+  // A phone gets one button to its own store; anything else (a laptop) gets both badges, because the
+  // phone it will install on could be either.
+  var PHONE = IOS || /Android/i.test(navigator.userAgent);
   var GRID = { EASY:3, MEDIUM:4, HARD:5, EXPERT:6 };
 
   function show(id){ ["loading","game","won","install","notfound"].forEach(function(x){
@@ -137,6 +162,16 @@ var s=document.createElement('script');s.async=true;s.src='https://www.googletag
   // Google Play passes `referrer` to the installed app; Phuzzles reads "puzzle_<id>" and opens that
   // puzzle on first launch (InstallReferrerRepository), so an install from here lands on it.
   function playWith(ref){ return PLAY + "&referrer=" + encodeURIComponent(ref); }
+  function badges(boxId, playHref, from){
+    var box = document.getElementById(boxId);
+    box.innerHTML =
+      '<a href="' + APPSTORE + '" target="_blank" rel="noopener" data-store="app_store"><img src="/app-store-badge.svg" alt="Download on the App Store" /></a>' +
+      '<a href="' + playHref + '" target="_blank" rel="noopener" data-store="google_play"><img class="gp" src="/google-play-badge.png" alt="Get it on Google Play" /></a>';
+    [].forEach.call(box.querySelectorAll("a"), function(a){
+      a.onclick = function(){ ev("store_click", { from: from, store: a.getAttribute("data-store") }); };
+    });
+    box.classList.remove("hidden");
+  }
 
   function toInstall(sender){
     document.getElementById("inst-title").innerHTML =
@@ -145,6 +180,7 @@ var s=document.createElement('script');s.async=true;s.src='https://www.googletag
     inst.href = IOS ? APPSTORE : playWith("puzzle_" + puzzleId);
     if (IOS) inst.textContent = "Download on the App Store";
     inst.onclick = function(){ ev("store_click", { from: "install_wall" }); };
+    if (!PHONE) { inst.classList.add("hidden"); badges("inst-stores", playWith("puzzle_" + puzzleId), "install_wall"); }
     ev("puzzle_install_wall");
     show("install");
   }
@@ -246,6 +282,7 @@ var s=document.createElement('script');s.async=true;s.src='https://www.googletag
     var cta = document.getElementById("cta-make");
     cta.href = IOS ? APPSTORE : playWith("utm_source=puzzle_link&utm_medium=web_solver");
     cta.onclick = function(){ ev("store_click", { from: "solved" }); };
+    if (!PHONE) { cta.classList.add("hidden"); badges("won-stores", playWith("utm_source=puzzle_link&utm_medium=web_solver"), "solved"); }
     ev("puzzle_solved_web");
     // Tell the sender: a link puzzle has no receiver in the app, so without this nobody would know it
     // was solved. The function only acts on puzzles shared by link and caps pushes per puzzle.
