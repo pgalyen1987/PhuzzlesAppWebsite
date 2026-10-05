@@ -111,7 +111,7 @@ var s=document.createElement('script');s.async=true;s.src='https://www.googletag
       <p class="pitch"><b>Phuzzles</b> turns a photo into a puzzle you send. They solve it to see the picture and your message.</p>
       <a class="btn" id="cta-make" href="#">Send one back</a>
       <div class="stores hidden" id="won-stores"></div>
-      <div class="foot">Free on iPhone and Android, with ads.</div>
+      <div class="foot" id="won-foot">Free on iPhone and Android, with ads.</div>
     </div>
 
     <!-- INSTALL FALLBACK (private puzzle / not readable) -->
@@ -287,7 +287,11 @@ var s=document.createElement('script');s.async=true;s.src='https://www.googletag
     var official = d.senderId === "phuzzles-official";
     // Installs from the daily get their own source, so the Play report can tell them apart.
     var ref = (official ? "utm_source=potd" : "utm_source=puzzle_link") + "&utm_medium=web_solver";
-    if (official) cta.textContent = "Make one from your own photo";
+    if (official) {
+      cta.textContent = "Make one from your own photo";
+      // Somewhere to come back to: /today always opens the current daily.
+      document.getElementById("won-foot").innerHTML = 'There\'s a new one every day at 11:00 Eastern: <a href="/today/">phuzzles.app/today</a><br>The app is free on iPhone and Android, with ads.';
+    }
     cta.href = IOS ? APPSTORE : playWith(ref);
     cta.onclick = function(){ ev("store_click", { from: "solved" }); };
     if (!PHONE) { cta.classList.add("hidden"); badges("won-stores", playWith(ref), "solved"); }
