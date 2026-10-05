@@ -268,7 +268,7 @@ function play(p, img) {
   // Anyone can post a photo here, so anyone who sees one can flag it to a person. The studio's dailies are ours.
   if (!official) {
     const link = MINI + "?p=" + encodeURIComponent(id);
-    $("report-link").href = "mailto:rebelstudiossoftware@gmail.com?subject=" + encodeURIComponent("Report: Phuzzle " + id) +
+    $("report-link").href = "mailto:support@phuzzles.app?subject=" + encodeURIComponent("Report: Phuzzle " + id) +
       "&body=" + encodeURIComponent(`This photo shouldn't be up: ${link}\n\nWhat's wrong with it:\n`);
     $("report").hidden = false;
   }
