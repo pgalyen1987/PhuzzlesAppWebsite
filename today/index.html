@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Today's Phuzzle</title>
+<meta name="description" content="A new scrambled photo every day at 11:00 Eastern. Solve it in your browser and the note under it tells you what you're looking at." />
+<meta name="robots" content="noindex" />
+<meta property="og:type" content="website" />
+<meta property="og:url" content="https://phuzzles.app/today/" />
+<meta property="og:title" content="Today's Phuzzle" />
+<meta property="og:description" content="A new scrambled photo every day at 11:00 Eastern. Solve it in your browser and the note under it tells you what you're looking at." />
+<meta property="og:image" content="https://phuzzles.app/img/og-card.jpg" />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="theme-color" content="#1A1A2E" />
+<link rel="icon" href="/logo-128.png" />
+<style>
+  @font-face{font-family:'Archivo';src:url('/fonts/archivo-var-latin.woff2') format('woff2');font-weight:700 900;font-stretch:62% 125%;font-display:swap}
+  @font-face{font-family:'DM Sans';src:url('/fonts/dm-sans-var-latin.woff2') format('woff2');font-weight:400 600;font-display:swap}
+  *{box-sizing:border-box;margin:0;padding:0}
+  :root{--bg:#1A1A2E;--border:rgba(245,243,239,.12);--text:#F5F3EF;--muted:#A9A9C6;--accent:#FF6B6B}
+  body{font-family:'DM Sans',system-ui,-apple-system,Segoe UI,Roboto,sans-serif;background:var(--bg);color:var(--text);
+       min-height:100vh;min-height:100dvh;display:flex;padding:20px;-webkit-font-smoothing:antialiased}
+  main{width:100%;max-width:420px;margin:auto;text-align:center}
+  .brand{display:inline-flex;align-items:center;gap:10px;color:var(--text);text-decoration:none;margin-bottom:26px}
+  .brand img{width:32px;height:32px;border-radius:8px}
+  .brand span{font-family:'Archivo',sans-serif;font-weight:800;font-stretch:112%;font-size:1.17rem;line-height:1}
+  h1{font-family:'Archivo',sans-serif;font-weight:800;font-stretch:108%;font-size:1.618rem;line-height:1.15;letter-spacing:-.02em;margin-bottom:10px}
+  p{color:var(--muted);font-size:15px;line-height:1.5}
+  .btn{display:block;background:var(--accent);color:var(--bg);font-weight:700;border-radius:12px;padding:14px 22px;
+       font-size:15px;text-decoration:none;margin-top:22px}
+  .spin{width:34px;height:34px;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;
+        animation:s 1s linear infinite;margin:22px auto 0}
+  @keyframes s{to{transform:rotate(360deg)}}
+  .hidden{display:none}
+</style>
+</head>
+<body>
+<main>
+  <a class="brand" href="/"><img src="/logo-128.png" alt="" /><span>Phuzzles</span></a>
+  <div id="finding">
+    <h1>Today's Phuzzle</h1>
+    <p>Finding today's puzzle.</p>
+    <div class="spin" aria-hidden="true"></div>
+  </div>
+  <div id="none" class="hidden">
+    <h1>Today's puzzle isn't up yet</h1>
+    <p id="why">A new one goes up every day at 11:00 Eastern. The puzzle on our homepage is always there in the meantime.</p>
+    <a class="btn" href="/">Solve the homepage puzzle</a>
+  </div>
+</main>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script>
+// One link that always opens the current Puzzle of the Day (createPuzzleOfTheDay sets isPotd on one
+// puzzle at 11:00 Eastern and clears the day before's), for bios, posters and posts that outlive a day.
+// It forwards to /solve/<id>, not /puzzle/<id>: the apps claim /puzzle/ links, and /solve/ always opens
+// the browser solver. The query string goes along, so analytics still credits whoever sent the visit.
+(function(){
+  function none(msg){
+    document.getElementById("finding").classList.add("hidden");
+    if (msg) document.getElementById("why").textContent = msg;
+    document.querySelector("#none .btn").href = "/" + location.search;
+    document.getElementById("none").classList.remove("hidden");
+  }
+  try {
+    firebase.initializeApp({
+      apiKey: "AIzaSyDPn4eEkZhUBp7x_3mVVcDlaiopfFDJna4",
+      authDomain: "phuzzles.firebaseapp.com",
+      projectId: "phuzzles",
+      storageBucket: "phuzzles.firebasestorage.app",
+      messagingSenderId: "945990447779",
+      appId: "1:945990447779:android:19af9e38d335e5b5368516"
+    });
+  } catch(e) {}
+  // The rules let a signed-in visitor (anonymous is enough) list isPotd puzzles.
+  firebase.auth().signInAnonymously()
+    .then(function(){ return firebase.firestore().collection("puzzles").where("isPotd", "==", true).get(); })
+    .then(function(snap){
+      var ms = function(v){ return v && v.toMillis ? v.toMillis() : (typeof v === "number" ? v : 0); };
+      var docs = snap.docs.slice().sort(function(a, b){ return ms(b.data().sentAt) - ms(a.data().sentAt); });
+      if (!docs.length) { none(); return; }
+      location.replace("/solve/" + encodeURIComponent(docs[0].id) + location.search);
+    })
+    .catch(function(){ none("We couldn't reach the puzzle server just now. Try again in a minute, or solve the one on our homepage."); });
+})();
+</script>
+</body>
+</html>
