@@ -1,8 +1,8 @@
 {
   "accountAssociation": {
-    "header": "UNSIGNED-PLACEHOLDER: replace all three values with the output of the Farcaster manifest tool for phuzzles.app",
-    "payload": "UNSIGNED-PLACEHOLDER",
-    "signature": "UNSIGNED-PLACEHOLDER"
+    "header": "eyJmaWQiOjMzNTA5MjksInR5cGUiOiJjdXN0b2R5Iiwia2V5IjoiMHhiNzYxN0IyNjM1N2QxMTIzRWZkRTM1NjFCYzE5N0RGMjU4MEFiY2MwIn0",
+    "payload": "eyJkb21haW4iOiJwaHV6emxlcy5hcHAifQ",
+    "signature": "huVRfosc/nW5WQz/miN9a11Q0NL9ssBZul8VPtbpUKs7Q4XW27z5jkOumMit1qUo7SvQhsqq3ouOccqkLrd30Rs="
   },
   "miniapp": {
     "version": "1",
