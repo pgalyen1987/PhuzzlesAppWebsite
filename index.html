@@ -243,7 +243,7 @@ var s=document.createElement('script');s.async=true;s.src='https://www.googletag
           </div>
           <div class="demo-foot">
             <span id="demo-hint">Tap two pieces to swap them.</span>
-            <button class="again" id="again" type="button" hidden>Scramble it again</button>
+            <a class="again" id="again" href="/today" hidden>Try today's puzzle</a>
           </div>
         </figure>
 
@@ -328,18 +328,6 @@ var s=document.createElement('script');s.async=true;s.src='https://www.googletag
         again.hidden = false;
         if (window.gtag) gtag('event', 'demo_solved', { swaps: swaps });
       }
-      function reset() {
-        // A fresh scramble: shuffle until nothing but the eye is home, so it never opens half-solved.
-        do {
-          order = [0, 1, 2, 3, 5, 6, 7, 8];
-          for (var i = order.length - 1; i > 0; i--) { var j = Math.floor(Math.random() * (i + 1)); var x = order[i]; order[i] = order[j]; order[j] = x; }
-          order.splice(4, 0, 4);
-        } while (order.some(function (p, s) { return s !== 4 && p === s; }));
-        swaps = 0; picked = -1; done = false;
-        board.classList.remove('solved'); stage.classList.remove('open');
-        tiles.forEach(function (t, s) { t.disabled = false; t.setAttribute('aria-pressed', 'false'); place(s); });
-        hint.textContent = 'Tap two pieces to swap them.'; again.hidden = true; status();
-      }
       for (var s = 0; s < N * N; s++) {
         var b = document.createElement('button');
         b.type = 'button'; b.className = 'tile'; b.setAttribute('aria-pressed', 'false');
@@ -347,7 +335,7 @@ var s=document.createElement('script');s.async=true;s.src='https://www.googletag
         board.appendChild(b); tiles.push(b);
       }
       tiles.forEach(function (_, i) { place(i); });
-      again.addEventListener('click', reset);
+      again.href = '/today' + location.search; // campaign tags ride along to the daily
       status();
     })();
 
