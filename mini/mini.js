@@ -8,6 +8,9 @@ const $ = (id) => document.getElementById(id);
 const Solver = window.PhuzzleSolver;
 const MINI = "https://phuzzles.app/mini/";
 const API = "https://us-central1-phuzzles.cloudfunctions.net";
+// A cast embeds this, not the puzzle's own link: GitHub Pages gives /mini/ one card for every puzzle, and
+// miniappEmbed draws each puzzle's own (its Solve button still opens MINI + "?p=" + id). Copy the link stays MINI.
+const cardLink = (id) => API + "/miniappEmbed?p=" + encodeURIComponent(id);
 const LEVEL_NAME = { EASY: "Easy", MEDIUM: "Medium", HARD: "Hard", EXPERT: "Expert" };
 const SIDE = 1080;          // a sent photo is cut to a square this many pixels across (or its own size if smaller)
 const MIN_SIDE = 200;       // what miniappCreatePuzzle accepts; smaller and the pieces are mush
@@ -330,7 +333,7 @@ async function shareTime(p, r, ms, today) {
   const btn = $("share");
   if (sdk) {
     try {
-      const res = await sdk.actions.composeCast({ text, embeds: [url] });
+      const res = await sdk.actions.composeCast({ text, embeds: [cardLink(id)] });
       ev("mini_share_time", { method: "cast", posted: !!(res && res.cast) });
     } catch (e) { /* the composer was closed */ }
     return;
@@ -506,7 +509,7 @@ async function castIt() {
   const text = made.note ? "I made you a Phuzzle. Solve it to see the photo and my note." : "I made you a Phuzzle. Solve it to see the photo.";
   let posted = false;
   try {
-    const r = await sdk.actions.composeCast({ text, embeds: [made.url] });
+    const r = await sdk.actions.composeCast({ text, embeds: [cardLink(made.id)] });
     posted = !!(r && r.cast);
   } catch (e) { /* the composer was closed or is unavailable */ }
   ev("mini_cast", { posted });

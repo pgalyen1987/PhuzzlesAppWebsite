@@ -10,8 +10,11 @@
   THE FARCASTER EMBED. A cast with a link to this page shows card.png with a Solve button under it. The button
   has no url of its own, so it opens the exact address that was cast, ?p=<id> included: a cast of
   phuzzles.app/mini/?p=<id> opens that puzzle, and a cast of phuzzles.app/mini/ opens today's.
-  This is a static page, so every puzzle gets the same card: GitHub Pages cannot write a different image or
-  title into the head per puzzle. fc:frame is the same embed for clients that predate fc:miniapp.
+  This is a static page, so a link to it gets the same card for every puzzle: GitHub Pages cannot write a
+  different image into the head per puzzle. So the mini app's own posts embed the miniappEmbed function
+  instead (mini.js cardLink), which draws each puzzle's photo onto this card's design and whose button opens
+  this page with ?p=<id>; this card is for links to /mini/ pasted by hand. fc:frame is the same embed for
+  clients that predate fc:miniapp.
 -->
 <meta name="fc:miniapp" content='{"version":"1","imageUrl":"https://phuzzles.app/mini/card.png","button":{"title":"Solve","action":{"type":"launch_miniapp","name":"Phuzzles","splashImageUrl":"https://phuzzles.app/mini/splash.png","splashBackgroundColor":"#1A1A2E"}}}' />
 <meta name="fc:frame" content='{"version":"1","imageUrl":"https://phuzzles.app/mini/card.png","button":{"title":"Solve","action":{"type":"launch_frame","name":"Phuzzles","splashImageUrl":"https://phuzzles.app/mini/splash.png","splashBackgroundColor":"#1A1A2E"}}}' />
