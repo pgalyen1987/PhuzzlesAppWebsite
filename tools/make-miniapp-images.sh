@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
-# Renders mini/card.png (1200x800, the cast embed) and mini/hero.png (1200x630, the manifest's hero and og
-# image) from tools/miniapp-card.html with headless Chromium, then flattens them to RGB PNGs.
+# Renders mini/card.png (1200x800, the cast embed), mini/share.png (1200x630, the page's og:image) and
+# mini/hero.png (1200x630, the manifest's hero and og image) from tools/miniapp-card.html with headless
+# Chromium, then flattens them to RGB PNGs.
 # Needs: chromium, python3 with Pillow. Run from anywhere.
 set -euo pipefail
 here="$(cd "$(dirname "$0")" && pwd)"
@@ -22,4 +23,5 @@ print(dst, im.size)
 EOF
 }
 shoot card 1200 800 card
+shoot share 1200 630 share
 shoot hero 1200 630 hero

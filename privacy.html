@@ -32,7 +32,7 @@ var s=document.createElement('script');s.async=true;s.src='https://www.googletag
     <p><strong>User Content:</strong> Photos you send as puzzles are uploaded to our servers and shared with the intended recipients. Puzzle images are automatically deleted after 30 days.</p>
     <p><strong>Usage Data:</strong> We collect puzzle solve times, puzzle send/receive counts, and general app usage analytics to improve the app experience.</p>
     <p><strong>Device Information:</strong> We collect device tokens for push notifications and crash reports for debugging.</p>
-    <p><strong>Farcaster mini app:</strong> when you post a Phuzzle from phuzzles.app/mini inside Farcaster or the Base app, Farcaster&rsquo;s sign-in gives us your Farcaster ID, and we look up your public Farcaster username. Both are stored with the puzzle, along with the photo and the note you chose, and the puzzle shows your username as its sender. A posted puzzle is public: anyone with its link can solve it and see the photo and the note. The photo is cut to a square and saved again, so none of your camera&rsquo;s data comes with it, location included. To limit abuse we also keep, for each Farcaster ID, its username, how many puzzles it has posted and the times of the last day&rsquo;s posts. Solving a puzzle in the mini app does not ask for your Farcaster sign-in.</p>
+    <p><strong>Farcaster mini app:</strong> when you post a Phuzzle from phuzzles.app/mini inside Farcaster or the Base app, Farcaster&rsquo;s sign-in gives us your Farcaster ID, and we look up your public Farcaster username. Both are stored with the puzzle, along with the photo and the note you chose, and the puzzle shows your username as its sender. A posted puzzle is public: anyone with its link can solve it and see the photo and the note. The photo is cut to a square and saved again, so none of your camera&rsquo;s data comes with it, location included. To limit abuse we also keep, for each Farcaster ID, its username, how many puzzles it has posted, when it last posted and the times of the last day&rsquo;s posts. Solving a puzzle in the mini app does not ask for your Farcaster sign-in.</p>
 
     <h2>2. How We Use Your Information</h2>
     <ul>
@@ -55,7 +55,7 @@ var s=document.createElement('script');s.async=true;s.src='https://www.googletag
     <h2>4. Data Retention</h2>
     <ul>
         <li>Puzzle images: Automatically deleted after 30 days, including those posted from the mini app</li>
-        <li>Mini app post counts per Farcaster ID: kept to limit abuse until you ask us to delete them</li>
+        <li>Mini app post counts per Farcaster ID: deleted 30 days after that ID&rsquo;s last post, unless the ID has been blocked for abuse</li>
         <li>Account data: Retained until you delete your account</li>
         <li>Reports: Retained for moderation purposes</li>
     </ul>

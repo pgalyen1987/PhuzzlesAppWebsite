@@ -21,32 +21,39 @@ const FC_NAME = /^[a-z0-9][a-z0-9._-]{0,63}$/;
 const OUR_PHOTOS = /^https:\/\/firebasestorage\.googleapis\.com\/v0\/b\/phuzzles\.firebasestorage\.app\/o\/[^'"()\s\\]+$/;
 
 // ── The host ────────────────────────────────────────────────────────────────────────────────────────────
-// A Farcaster client frames the page (an iframe on the web, a WebView on phones). Unframed, it is a plain
-// browser and the SDK is never downloaded.
+// A Farcaster client frames the page (an iframe on the web, a WebView on phones) and answers the SDK with its
+// context. Unframed, it is a plain browser and the SDK is never downloaded.
 let sdk = null, ctx = null;
 const framed = window.parent !== window || !!window.ReactNativeWebView;
-const host = (framed ? import("./sdk.js").then(async (m) => ((await m.sdk.isInMiniApp()) ? m.sdk : null)) : Promise.resolve(null))
-  .catch(() => null)
-  .then(async (s) => {
-    sdk = s;
-    if (!s) return null;
-    document.documentElement.classList.add("in-app");
-    try { ctx = await s.context; } catch (e) { ctx = null; }
-    const inset = ctx && ctx.client && ctx.client.safeAreaInsets;
-    if (inset) {
-      document.documentElement.style.setProperty("--top", `max(13px, ${inset.top || 0}px)`);
-      document.documentElement.style.setProperty("--bottom", `max(21px, ${inset.bottom || 0}px)`);
-    }
-    return s;
-  });
+const lib = framed ? import("./sdk.js").then((m) => m.sdk, () => null) : Promise.resolve(null);
+// The page goes in-app whenever the context arrives. The SDK's isInMiniApp() gives up after one second, and
+// with it a host slower than that would get a page that acts as a browser and never says it's ready: an endless
+// splash screen.
+const answered = lib.then((s) => s && Promise.resolve(s.context).then((c) => (c ? adopt(s, c) : null), () => null));
+// What can't wait forever (whether Send shows the form) waits three seconds, and is redone if the host answers later.
+const host = Promise.race([answered, new Promise((r) => setTimeout(r, 3000, null))]);
 
-// The host shows its splash screen until ready(). That happens as soon as there is something to look at, or
-// after three seconds whatever happens, so a slow network shows the loading board instead of an endless splash.
+function adopt(s, c) {
+  sdk = s;
+  ctx = c;
+  document.documentElement.classList.add("in-app");
+  const inset = c.client && c.client.safeAreaInsets;
+  if (inset) {
+    document.documentElement.style.setProperty("--top", `max(13px, ${inset.top || 0}px)`);
+    document.documentElement.style.setProperty("--bottom", `max(21px, ${inset.bottom || 0}px)`);
+  }
+  route();
+  return s;
+}
+
+// The host shows its splash screen until ready(). It is said as soon as there is something to look at, or after
+// three seconds whatever happens, and whether or not the host has answered yet: a slow network shows the loading
+// board instead of an endless splash, and a page that frames this one without being a host ignores the message.
 let readied = false;
 function ready() {
   if (readied) return;
   readied = true;
-  host.then((s) => s && s.actions.ready().catch(() => {}));
+  lib.then((s) => s && s.actions.ready().catch(() => {}));
 }
 setTimeout(ready, 3000);
 
@@ -96,11 +103,17 @@ function back() {
   if (leftBase) history.back(); else location.hash = "";
 }
 function route() {
-  if (location.hash !== "#send") { show(base); return; }
-  host.then((s) => {
+  if (location.hash !== "#send") {
+    // A puzzle that went out is finished with, so the next Send your own starts a new one. One that was made but
+    // not posted stays, so it can still be posted.
+    if (made && made.posted) resetSend();
+    show(base);
+    return;
+  }
+  host.then(() => {
     if (location.hash !== "#send") return;
-    show(s ? sendStage : "elsewhere");
-    ev(s ? "mini_send_open" : "mini_send_elsewhere");
+    show(sdk ? sendStage : "elsewhere");
+    ev(sdk ? "mini_send_open" : "mini_send_elsewhere");
   });
 }
 window.addEventListener("hashchange", (e) => {
@@ -157,6 +170,14 @@ function empty(kind) {
     $("empty-text").textContent = "The puzzle didn’t load. Check your connection and try again.";
     go.textContent = "Try again";
     go.onclick = () => location.reload();
+  } else if (kind === "busy") {
+    // Firebase stops signing in new visitors from one IP address after a burst of them (TOO_MANY_ATTEMPTS_TRY_LATER;
+    // on 2026-10-05 a day of test runs tripped it and it lifted within minutes). An office, a campus or a phone
+    // carrier puts many people behind one address. Their connection is fine, so don't tell them to check it.
+    $("empty-title").textContent = "Too many first visits from this network";
+    $("empty-text").textContent = "Phuzzles can only let in so many at once from one network. Try again in a few minutes.";
+    go.textContent = "Try again";
+    go.onclick = () => location.reload();
   } else if (kind === "none") {
     $("empty-title").textContent = "Today’s puzzle isn’t up yet";
     $("empty-text").textContent = "A new one goes up every day at 11:00 Eastern.";
@@ -181,7 +202,8 @@ async function start() {
     p = await fetchPuzzle(wanted);
   } catch (e) {
     // Firestore answers permission-denied for a puzzle that no longer exists and for a private one alike.
-    empty(e && e.code === "permission-denied" ? "gone" : "offline");
+    const code = e && e.code;
+    empty(code === "permission-denied" ? "gone" : code === "auth/too-many-requests" ? "busy" : "offline");
     return;
   }
   if (!p) { empty(wanted ? "gone" : "none"); return; }
@@ -198,17 +220,25 @@ function clock(ms) {
   const ss = String(r).padStart(2, "0");
   return h ? `${h}:${String(m).padStart(2, "0")}:${ss}` : `${m}:${ss}`;
 }
+// Posted from here. Only miniappCreatePuzzle writes a senderId of "fc:<fid>" (the rules hold anyone else to their
+// own Firebase uid), so a puzzle made by hand with source "miniapp" can't borrow a Farcaster name.
+const fromMiniApp = (d) => d.source === "miniapp" && typeof d.senderId === "string" && d.senderId.startsWith("fc:");
 function kindOf(d) {
-  return d.senderId === Solver.OFFICIAL ? "daily" : d.source === "miniapp" ? "miniapp"
+  return d.senderId === Solver.OFFICIAL ? "daily" : fromMiniApp(d) ? "miniapp"
     : d.receiverId === "__link__" ? "link" : d.isPublic ? "public" : "direct";
 }
 // How to name the sender. A puzzle posted from here carries the poster's Farcaster username, which gets the
 // @ people know it by; a puzzle from the apps carries a Phuzzles username, which is not a Farcaster account.
+// The function keeps the bare name in farcasterUsername and writes senderUsername as "alice on Farcaster" for
+// the apps (its first version put the bare name in senderUsername, which still reads right here).
 function senderOf(d) {
+  if (d.senderId === Solver.OFFICIAL) return { name: null, mention: null };
+  if (fromMiniApp(d)) {
+    const fc = [d.farcasterUsername, d.senderUsername].map((u) => (typeof u === "string" ? u.trim() : "")).find((u) => FC_NAME.test(u));
+    if (fc) return { name: "@" + fc, mention: "@" + fc };
+  }
   const u = typeof d.senderUsername === "string" ? d.senderUsername.trim() : "";
-  if (!u || d.senderId === Solver.OFFICIAL) return { name: null, mention: null };
-  const fc = d.source === "miniapp" && FC_NAME.test(u);
-  return { name: fc ? "@" + u : u, mention: fc ? "@" + u : null };
+  return { name: u || null, mention: null };
 }
 
 let ticking = 0;
@@ -271,8 +301,10 @@ function solved(p, r, ms, today) {
   $("share").onclick = () => shareTime(p, r, ms, today);
   haptic("success");
   ev("mini_solved", { puzzle_kind: kindOf(d), swaps: r.moves, seconds: Math.round(ms / 1000) });
-  // A puzzle an app user shared by link has no receiver in the app, so this is how its sender hears it was
-  // solved (the same call the web solver makes; the function caps pushes per puzzle).
+  // The same call the web solver makes for a puzzle shared by link. It counts the solve on the puzzle
+  // (linkSolveCount, the only record that a posted puzzle got solved), and for one an app user shared it pushes
+  // to the sender, at most a few times per puzzle. A puzzle posted from here has nobody to push to: telling a
+  // Farcaster sender would take the mini app's own notifications, which v1 doesn't have.
   if (d.linkShared === true) {
     fetch(API + "/linkSolved", {
       method: "POST", keepalive: true, headers: { "content-type": "application/json" },
@@ -318,7 +350,8 @@ async function shareTime(p, r, ms, today) {
 
 // ── Sending ─────────────────────────────────────────────────────────────────────────────────────────────
 let photo = null;   // { blob, url } of the square JPEG
-let made = null;    // { id, url, note } once the puzzle exists
+let made = null;    // { id, url, note, n, img, posted } once the puzzle exists
+let staleToken = false;   // the function turned down the last sign-in, so the next try gets a new one
 
 const levelNow = () => document.querySelector('input[name="level"]:checked').value;
 function setCuts() {
@@ -449,18 +482,23 @@ $("post").addEventListener("click", async () => {
   const difficulty = levelNow();
   const note = $("note-in").value.trim().slice(0, NOTE_MAX);
   try {
-    const { token } = await sdk.quickAuth.getToken();
+    // The SDK hands back the token it already has for as long as that is current, so after a refusal it would
+    // send the same one again; force asks Farcaster for a new sign-in.
+    const { token } = await sdk.quickAuth.getToken({ force: staleToken });
+    staleToken = false;
     const id = await createPuzzle(token, photo.blob, difficulty, note);
-    made = { id, url: MINI + "?p=" + id, note: !!note, n: Solver.GRID[difficulty], img: photo.url };
+    made = { id, url: MINI + "?p=" + id, note: !!note, n: Solver.GRID[difficulty], img: photo.url, posted: false };
     ev("mini_puzzle_made", { pieces: made.n * made.n, note: made.note });
   } catch (e) {
+    if (e && e.status === 401) staleToken = true;
     sendError(whyNot(e));
     ev("mini_post_failed", { status: (e && e.status) || 0 });
     posting(false);
     return;
   }
-  posting(false);
+  // Busy until the composer is done with, so a second tap can't make a second puzzle.
   await castIt();
+  posting(false);
 });
 
 // The puzzle exists now; the post is the user's to check and send in the host's composer.
@@ -472,6 +510,7 @@ async function castIt() {
     posted = !!(r && r.cast);
   } catch (e) { /* the composer was closed or is unavailable */ }
   ev("mini_cast", { posted });
+  made.posted = posted;
   showSent(posted);
 }
 
@@ -504,8 +543,8 @@ $("sent-copy").addEventListener("click", async () => {
   }
   ev("mini_link_copy");
 });
-$("sent-again").addEventListener("click", (e) => {
-  e.preventDefault();
+// An empty form for the next puzzle.
+function resetSend() {
   if (photo) URL.revokeObjectURL(photo.url);
   photo = null;
   made = null;
@@ -516,6 +555,10 @@ $("sent-again").addEventListener("click", (e) => {
   posting(false);
   sendError(null);
   sendStage = "send";
+}
+$("sent-again").addEventListener("click", (e) => {
+  e.preventDefault();
+  resetSend();
   if (location.hash === "#send") show("send"); else location.hash = "send";
 });
 

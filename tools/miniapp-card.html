@@ -3,10 +3,12 @@
 <head>
 <meta charset="utf-8" />
 <!--
-  The mini app's two promo images, drawn from the site's own puffin and type. tools/make-miniapp-images.sh
+  The mini app's three promo images, drawn from the site's own puffin and type. tools/make-miniapp-images.sh
   screenshots this page:
-    ?card  1200 x 800, the 3:2 card under every cast of phuzzles.app/mini/ (the fc:miniapp embed)
-    ?hero  1200 x 630, heroImageUrl and ogImageUrl in .well-known/farcaster.json
+    ?card   1200 x 800, the 3:2 card under every cast of phuzzles.app/mini/ (the fc:miniapp embed)
+    ?share  1200 x 630, the card's words in the link-preview shape: og:image of /mini/, for a link pasted
+            outside Farcaster (X crops a 3:2 image to 2:1, which cut the board)
+    ?hero   1200 x 630, heroImageUrl and ogImageUrl in .well-known/farcaster.json, which pitch sending
   The puffin sits in the homepage demo's opening scramble, one piece picked up, with the paper note's edge
   showing under the board the way it does on the homepage.
 -->
@@ -19,7 +21,7 @@
   html, body { background: var(--ink); }
   body { width: 1200px; height: 800px; overflow: hidden; color: var(--text); font-family: 'DM Sans', sans-serif;
          -webkit-font-smoothing: antialiased; }
-  body.hero { height: 630px; }
+  body.wide { height: 630px; }
 
   .frame { position: relative; width: 100%; height: 100%; display: flex; align-items: center; gap: 56px; padding: 0 84px; }
   .words { flex: 1 1 0; min-width: 0; }
@@ -38,13 +40,15 @@
   .note { position: absolute; z-index: 1; left: 7%; right: 7%; bottom: 0; height: 120px; background: var(--paper);
           border-radius: 4px; transform: rotate(-1.6deg); box-shadow: 0 16px 30px -18px rgba(0,0,0,0.7); }
 
-  /* The hero is shorter: a smaller board, the same proportions. */
-  body.hero .frame { gap: 60px; padding: 0 80px; }
-  body.hero .stage { width: 470px; padding-bottom: 34px; }
-  body.hero .brand { margin-bottom: 34px; }
-  body.hero h1 { font-size: 66px; }
-  body.hero p { font-size: 29px; margin-top: 22px; }
-  body.hero .note { height: 100px; }
+  /* The 1200 x 630 images are shorter: a smaller board, the same proportions. */
+  body.wide .frame { gap: 60px; padding: 0 80px; }
+  body.wide .stage { width: 470px; padding-bottom: 34px; }
+  body.wide .brand { margin-bottom: 34px; }
+  body.wide h1 { font-size: 66px; }
+  body.wide p { font-size: 29px; margin-top: 22px; }
+  body.wide .note { height: 100px; }
+  /* The card's words in the wider frame would leave "you." and "photo." alone on their lines. */
+  body.share h1, body.share p { text-wrap: balance; }
 </style>
 </head>
 <body>
@@ -60,8 +64,9 @@
   </div>
 </div>
 <script>
-  var hero = location.search.indexOf("hero") > -1;
-  if (hero) document.body.classList.add("hero");
+  var hero = location.search.indexOf("hero") > -1, share = location.search.indexOf("share") > -1;
+  if (hero || share) document.body.classList.add("wide");
+  if (share) document.body.classList.add("share");
   document.getElementById("h").textContent = hero ? "Send a photo they have to solve." : "A Phuzzle for you.";
   document.getElementById("p").textContent = hero ? "Post it as a puzzle. Whoever solves it gets to see it."
                                                   : "Put the pieces back to see the photo.";

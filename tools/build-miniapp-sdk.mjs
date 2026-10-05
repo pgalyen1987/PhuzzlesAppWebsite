@@ -3,7 +3,7 @@
 // Why not the CDN line in Farcaster's docs (esm.sh)? Measured 2026-10-05: it is 124 modules and 1.08 MB, six
 // imports deep, because the SDK's root pulls in zod's locales, Solana's web3.js and bn.js for wallet features
 // Phuzzles never calls. The splash screen stays up until that has loaded. The build below keeps what the page
-// uses (ready, context, isInMiniApp, back, quickAuth, composeCast, openUrl, haptics), replaces the two wallet
+// uses (ready, context, back, quickAuth, composeCast, openUrl, haptics), replaces the two wallet
 // providers with stubs, and comes out near 21 KB (7 KB gzipped).
 //
 // Run it from a scratch folder that has the two packages, then commit the output:
