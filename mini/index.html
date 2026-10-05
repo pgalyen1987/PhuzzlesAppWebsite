@@ -1,0 +1,380 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Phuzzles</title>
+<meta name="description" content="A photo cut into pieces and shuffled. Swap them back to see it, and the note folded under it." />
+<meta name="robots" content="noindex" />
+<!--
+  THE FARCASTER EMBED. A cast with a link to this page shows card.png with a Solve button under it. The button
+  has no url of its own, so it opens the exact address that was cast, ?p=<id> included: a cast of
+  phuzzles.app/mini/?p=<id> opens that puzzle, and a cast of phuzzles.app/mini/ opens today's.
+  This is a static page, so every puzzle gets the same card: GitHub Pages cannot write a different image or
+  title into the head per puzzle. fc:frame is the same embed for clients that predate fc:miniapp.
+-->
+<meta name="fc:miniapp" content='{"version":"1","imageUrl":"https://phuzzles.app/mini/card.png","button":{"title":"Solve","action":{"type":"launch_miniapp","name":"Phuzzles","splashImageUrl":"https://phuzzles.app/mini/splash.png","splashBackgroundColor":"#1A1A2E"}}}' />
+<meta name="fc:frame" content='{"version":"1","imageUrl":"https://phuzzles.app/mini/card.png","button":{"title":"Solve","action":{"type":"launch_frame","name":"Phuzzles","splashImageUrl":"https://phuzzles.app/mini/splash.png","splashBackgroundColor":"#1A1A2E"}}}' />
+<meta property="og:type" content="website" />
+<meta property="og:title" content="A Phuzzle for you" />
+<meta property="og:description" content="A photo cut into pieces and shuffled. Swap them back to see it." />
+<meta property="og:image" content="https://phuzzles.app/mini/hero.png" />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="theme-color" content="#1A1A2E" />
+<link rel="icon" href="/logo-128.png" />
+<link rel="preconnect" href="https://auth.farcaster.xyz" />
+<link rel="preload" as="font" type="font/woff2" href="/fonts/archivo-var-latin.woff2" crossorigin />
+<link rel="preload" as="font" type="font/woff2" href="/fonts/dm-sans-var-latin.woff2" crossorigin />
+<style>
+  /* Self-hosted, the same faces as the homepage. */
+  @font-face { font-family: 'Archivo'; src: url('/fonts/archivo-var-latin.woff2') format('woff2');
+    font-weight: 700 900; font-stretch: 62% 125%; font-display: swap; }
+  @font-face { font-family: 'DM Sans'; src: url('/fonts/dm-sans-var-latin.woff2') format('woff2');
+    font-weight: 400 600; font-display: swap; }
+  @font-face { font-family: 'Gochi Hand'; src: url('/fonts/gochi-hand-400-latin.woff2') format('woff2');
+    font-weight: 400; font-display: swap; }
+
+  /* The app's own colours: its navy ground, coral buttons and teal selection. The paper is the note. */
+  :root {
+    --ink: #1A1A2E;
+    --panel: #23233E;
+    --panel-2: #2B2B4A;
+    --line: rgba(245, 243, 239, 0.12);
+    --text: #F5F3EF;
+    --muted: #A9A9C6;
+    --coral: #FF6B6B;
+    --teal: #4ECDC4;
+    --paper: #FFF3E4;
+    --paper-ink: #2A2238;
+    /* type steps by the square root of phi (1.272) from 16px */
+    --t-sm: 0.786rem;
+    --t-body: 1rem;
+    --t-lg: 1.272rem;
+    --t-h1: 1.618rem;
+    /* spacing steps by phi: 8, 13, 21, 34 */
+    --s1: 8px; --s2: 13px; --s3: 21px; --s4: 34px;
+    /* Farcaster tells us its own insets (mini.js); a browser has env(). */
+    --top: max(var(--s2), env(safe-area-inset-top));
+    --bottom: max(var(--s3), env(safe-area-inset-bottom));
+  }
+
+  *, *::before, *::after { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    margin: 0; min-height: 100vh; min-height: 100dvh;
+    background: var(--ink); color: var(--text);
+    font: 400 var(--t-body)/1.5 'DM Sans', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+    -webkit-font-smoothing: antialiased; overflow-x: hidden;
+  }
+  a { color: var(--teal); text-underline-offset: 3px; }
+  button { font: inherit; color: inherit; }
+  [hidden] { display: none !important; }
+  .vh { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+  :focus-visible { outline: 2px solid var(--teal); outline-offset: 3px; }
+
+  .app { max-width: 440px; margin: 0 auto; padding: var(--top) 16px var(--bottom); }
+
+  /* ── Top bar ── */
+  .top { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 44px; margin-bottom: var(--s2); }
+  .brand { display: inline-flex; align-items: center; gap: 10px; color: var(--text); text-decoration: none; }
+  .brand img { width: 28px; height: 28px; border-radius: 7px; }
+  .brand span { font-family: 'Archivo', sans-serif; font-weight: 800; font-stretch: 112%; font-size: 1.1rem; letter-spacing: -0.01em; line-height: 1; }
+  .toplink { font-size: 0.9375rem; font-weight: 600; color: var(--teal); text-decoration: none; padding: 10px 0 10px 12px; white-space: nowrap; }
+  .toplink:hover { text-decoration: underline; }
+  /* Inside Farcaster the host already prints "Phuzzles" over the app, so the mark stands alone. */
+  .in-app .brand span { display: none; }
+
+  /* ── Headings ── */
+  .eyebrow { margin: 0 0 4px; min-height: 1.5em; font-size: var(--t-sm); color: var(--muted); letter-spacing: 0.01em; font-variant-numeric: tabular-nums; }
+  h1 { margin: 0 0 var(--s2); font-family: 'Archivo', sans-serif; font-weight: 800; font-stretch: 108%;
+       font-size: var(--t-h1); line-height: 1.15; letter-spacing: -0.02em; overflow-wrap: anywhere; }
+  .lede { margin: 0 0 var(--s3); color: var(--muted); }
+
+  /* ── The puzzle (the homepage's board: pieces on the navy, the gaps close when it is whole) ── */
+  .board {
+    position: relative; z-index: 2;
+    display: grid; grid-template-columns: repeat(4, 1fr); grid-template-rows: repeat(4, 1fr); gap: 3px;
+    width: 100%; aspect-ratio: 1; background: var(--ink); border-radius: 12px; overflow: hidden;
+    box-shadow: 0 1px 0 rgba(255,255,255,0.06) inset, 0 24px 48px -24px rgba(0,0,0,0.6);
+    touch-action: manipulation; -webkit-user-select: none; user-select: none;
+    transition: gap 0.35s ease, border-radius 0.35s ease;
+  }
+  .board > span { background: var(--panel); border-radius: 3px; }
+  .tile {
+    -webkit-appearance: none; appearance: none; border: 0; padding: 0; margin: 0; cursor: pointer;
+    background-color: var(--panel); background-repeat: no-repeat; border-radius: 3px;
+    transition: transform 0.14s ease, border-radius 0.35s ease, filter 0.14s ease;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .tile:focus-visible { outline: 3px solid var(--teal); outline-offset: -3px; }
+  .tile.sel { outline: 3px solid var(--coral); outline-offset: -3px; transform: scale(0.94); }
+  .tile.pop { animation: pop 0.2s ease; }
+  @keyframes pop { 40% { transform: scale(0.93); } }
+  @media (hover: hover) { .tile:hover { filter: brightness(1.08); } }
+  .board.solved { gap: 0; border-radius: 4px; }
+  .board.solved .tile { border-radius: 0; cursor: default; filter: none; }
+
+  .meta { display: flex; justify-content: space-between; gap: 12px; margin-top: 10px; font-size: var(--t-sm);
+          color: var(--muted); font-variant-numeric: tabular-nums; }
+
+  /* The note folded under the board slides out once it is solved, on the homepage's paper. */
+  .note {
+    position: relative; z-index: 1; margin: -10px 6% 0; padding: 26px 20px 16px;
+    background: var(--paper); color: var(--paper-ink); border-radius: 3px;
+    box-shadow: 0 10px 24px -12px rgba(0,0,0,0.7); transform: rotate(-1.2deg);
+    animation: slide-out 0.5s cubic-bezier(.2,.8,.2,1);
+  }
+  @keyframes slide-out { from { transform: translateY(-60%) rotate(-1.2deg); opacity: 0; } to { transform: rotate(-1.2deg); opacity: 1; } }
+  .msg { margin: 0; font-family: 'Gochi Hand', 'Comic Sans MS', cursive; font-size: 1.45rem; line-height: 1.25;
+         overflow-wrap: anywhere; white-space: pre-line; }
+  .msg.long { font-size: var(--t-lg); }
+
+  /* The result sits with the buttons that share it, so a short screen scrolled down to them still shows the time. */
+  .result { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 2px 12px; margin: var(--s3) 0 0; }
+  .result strong { font-family: 'Archivo', sans-serif; font-weight: 800; font-stretch: 108%; font-size: var(--t-h1);
+                   line-height: 1.15; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; }
+  .result span { font-size: var(--t-sm); color: var(--muted); font-variant-numeric: tabular-nums; }
+  .result + .actions { margin-top: var(--s2); }
+
+  /* ── Buttons ── */
+  .actions { display: grid; gap: 10px; margin-top: var(--s3); }
+  .btn {
+    display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; min-height: 50px;
+    padding: 0 22px; border: 0; border-radius: 12px; background: var(--coral); color: var(--ink);
+    font: 700 var(--t-body)/1.2 'DM Sans', system-ui, sans-serif; text-decoration: none; cursor: pointer;
+    transition: filter 0.14s ease, transform 0.14s ease;
+  }
+  .btn:active { transform: scale(0.98); }
+  @media (hover: hover) { .btn:hover { filter: brightness(1.06); } }
+  .btn.ghost { background: transparent; color: var(--text); border: 1px solid var(--line); font-weight: 600; }
+  .btn:disabled { background: var(--panel-2); color: var(--muted); cursor: default; transform: none; filter: none; }
+  .btn[aria-busy="true"] { background: var(--coral); color: var(--ink); opacity: 0.8; }
+  .btn .spin { width: 16px; height: 16px; border-width: 2px; margin: 0; border-color: rgba(26,26,46,0.25); border-top-color: var(--ink); }
+  .foot { margin: var(--s2) 0 0; font-size: var(--t-sm); color: var(--muted); text-align: center; }
+  .report { margin: var(--s2) 0 0; font-size: var(--t-sm); }
+  .report a { color: var(--muted); }
+
+  .spin { width: 34px; height: 34px; border: 3px solid var(--line); border-top-color: var(--coral);
+          border-radius: 50%; animation: s 0.9s linear infinite; margin: var(--s3) auto; }
+  @keyframes s { to { transform: rotate(360deg); } }
+
+  /* ── Send ── */
+  /* The photo against the piece counts at 1.618 : 1. */
+  .compose { display: grid; grid-template-columns: minmax(0, 1.618fr) minmax(0, 1fr); gap: var(--s2); margin-bottom: var(--s3); }
+  .pick {
+    position: relative; display: block; aspect-ratio: 1; border-radius: 12px; overflow: hidden; cursor: pointer;
+    background: var(--panel); box-shadow: 0 1px 0 rgba(255,255,255,0.06) inset, 0 18px 36px -24px rgba(0,0,0,0.6);
+  }
+  .pick:focus-within { outline: 2px solid var(--teal); outline-offset: 3px; }
+  .pick-empty { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center;
+                gap: 10px; padding: 12px; text-align: center; color: var(--muted); font-size: var(--t-sm); line-height: 1.35; }
+  .pick-empty b { color: var(--text); font-size: var(--t-body); font-weight: 600; }
+  .pick-empty svg { width: 44px; height: 44px; }
+  .pick img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+  /* Where the cuts fall for the chosen piece count. */
+  .cuts { position: absolute; inset: 0; pointer-events: none;
+          background-image: linear-gradient(to right, var(--ink) 2px, transparent 2px), linear-gradient(to bottom, var(--ink) 2px, transparent 2px);
+          background-size: calc(100% / var(--n, 4)) calc(100% / var(--n, 4)); background-position: -1px -1px; }
+  .change { position: absolute; right: 8px; bottom: 8px; padding: 5px 10px; border-radius: 999px; background: rgba(26,26,46,0.82);
+            color: var(--text); font-size: var(--t-sm); font-weight: 600; }
+
+  .levels { margin: 0; padding: 0; border: 0; display: grid; grid-template-rows: repeat(4, 1fr); gap: 6px; min-width: 0; }
+  .level { position: relative; display: flex; align-items: center; gap: 8px; padding: 0 12px; border-radius: 10px; cursor: pointer;
+           border: 1px solid var(--line); color: var(--muted); font-size: var(--t-sm); }
+  .level input { position: absolute; opacity: 0; pointer-events: none; }
+  .level b { font-family: 'Archivo', sans-serif; font-weight: 800; font-stretch: 108%; font-size: var(--t-lg); color: var(--text);
+             min-width: 1.6em; font-variant-numeric: tabular-nums; }
+  /* .on is set from mini.js, not :has(), which older phone web views lack. */
+  .level.on { border-color: var(--coral); background: rgba(255,107,107,0.1); color: var(--text); }
+  .level:has(input:focus-visible) { outline: 2px solid var(--teal); outline-offset: 2px; }   /* keyboard only */
+
+  .label { display: flex; justify-content: space-between; align-items: baseline; margin: 0 0 var(--s1);
+           font-size: var(--t-sm); font-weight: 600; color: var(--text); }
+  .label span { font-weight: 400; color: var(--muted); }
+  /* The note box is the paper they will read it on. */
+  .paper {
+    display: block; width: 100%; resize: none; border: 0; border-radius: 3px; padding: 14px 16px;
+    background: var(--paper); color: var(--paper-ink); box-shadow: 0 10px 24px -12px rgba(0,0,0,0.7);
+    font: 400 var(--t-lg)/1.3 'Gochi Hand', 'Comic Sans MS', cursive;
+  }
+  .paper::placeholder { color: #9A8F99; }
+  .paper:focus-visible { outline: 2px solid var(--teal); outline-offset: 3px; }
+  .count { margin-top: 6px; text-align: right; font-size: var(--t-sm); color: var(--muted); font-variant-numeric: tabular-nums; }
+  .fine { margin: var(--s2) 0 0; font-size: var(--t-sm); color: var(--muted); }
+  .err { margin: var(--s2) 0 0; padding: 10px 14px; border-radius: 10px; background: rgba(255,107,107,0.12);
+         border: 1px solid rgba(255,107,107,0.4); color: var(--text); font-size: 0.9375rem; }
+
+  /* ── Sent ── */
+  .sent-photo { width: 61.8%; margin: 0 0 var(--s3); aspect-ratio: 1; border-radius: 10px; overflow: hidden; position: relative;
+                box-shadow: 0 18px 36px -24px rgba(0,0,0,0.6); background: var(--panel); }
+  .sent-photo img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .link-box { display: block; width: 100%; margin-top: 10px; padding: 12px 14px; border-radius: 10px; border: 1px solid var(--line);
+              background: var(--panel); color: var(--text); font: 400 var(--t-sm)/1.4 ui-monospace, SFMono-Regular, Menlo, monospace;
+              overflow-wrap: anywhere; user-select: all; -webkit-user-select: all; }
+
+  /* ── Stores (outside Farcaster) ── */
+  .stores { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; margin: 0 0 var(--s2); }
+  .stores a { display: block; border-radius: 8px; }
+  .stores img { display: block; height: 44px; width: auto; }
+  /* Google's badge PNG carries transparent padding that Apple's SVG does not */
+  .stores .gp { height: 64px; margin: -10px -8px; }
+
+  footer { margin-top: var(--s4); padding-top: var(--s2); border-top: 1px solid var(--line); font-size: var(--t-sm); color: var(--muted); }
+  footer p { margin: 0; }
+  footer a { color: var(--muted); }
+
+  /* ── A wide browser: the puzzle against the words at 1.618 : 1, as on the homepage. The note moves into the
+     words column, so on a laptop screen it shows up beside the photo instead of below the fold. ── */
+  @media (min-width: 900px) {
+    .app { padding-top: max(var(--top), 5vh); }
+    .on-play .app { max-width: 1040px; }
+    .on-play #play {
+      display: grid; column-gap: 56px; align-items: start;
+      grid-template-columns: minmax(0, 1.618fr) minmax(0, 1fr);
+      grid-template-rows: auto auto auto auto auto auto auto 1fr;
+      grid-template-areas: "board eyebrow" "board title" "board meta" "board note" "board after" "board foot" "board report" "board .";
+    }
+    .on-play #board { grid-area: board; }
+    .on-play #play .eyebrow { grid-area: eyebrow; margin-top: 4px; }
+    .on-play #play h1 { grid-area: title; font-size: 2.06rem; }
+    .on-play #play .meta { grid-area: meta; margin-top: 0; }
+    .on-play #note { grid-area: note; margin: var(--s1) 0 0; }
+    .on-play #after { grid-area: after; }
+    .on-play #after .result { margin-top: var(--s2); }
+    .on-play #after-foot { grid-area: foot; text-align: left; }
+    .on-play #report { grid-area: report; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .board, .tile, .btn { transition: none; }
+    .tile.pop, .note, .spin { animation: none; }
+  }
+</style>
+<!-- Google Analytics: the property shared by Rebel Studios sites (reports split by hostname). Visitors in the
+     EEA, UK and Switzerland default to consent "denied" (cookieless, no cookies); ads storage is never granted. -->
+<script>
+window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}
+if(!/^(localhost|127\.|0\.0\.0\.0)/.test(location.hostname)){
+gtag('consent','default',{ad_storage:'denied',ad_user_data:'denied',ad_personalization:'denied',analytics_storage:'denied',region:['AT','BE','BG','HR','CY','CZ','DK','EE','FI','FR','DE','GR','HU','IE','IT','LV','LT','LU','MT','NL','PL','PT','RO','SK','SI','ES','SE','IS','LI','NO','GB','CH']});
+gtag('consent','default',{ad_storage:'denied',ad_user_data:'denied',ad_personalization:'denied',analytics_storage:'granted'});
+gtag('js',new Date());gtag('config','G-00TNDVMQNM');
+var s=document.createElement('script');s.async=true;s.src='https://www.googletagmanager.com/gtag/js?id=G-00TNDVMQNM';document.head.appendChild(s);
+}
+</script>
+</head>
+<body>
+<div class="app">
+  <header class="top">
+    <a class="brand" href="./" id="home"><img src="/logo-128.png" alt="" width="28" height="28" /><span>Phuzzles</span></a>
+    <a class="toplink" id="toplink" href="#send">Send your own</a>
+  </header>
+
+  <main>
+    <!-- PLAY: today's daily, or the puzzle in ?p= -->
+    <section id="play" aria-labelledby="title">
+      <p class="eyebrow" id="eyebrow"></p>
+      <h1 id="title">Loading the puzzle</h1>
+      <div class="board" id="board" aria-busy="true">
+        <span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span>
+        <span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span>
+      </div>
+      <div class="note" id="note" hidden><p class="msg" id="msg"></p></div>
+      <div class="meta" id="meta"><span id="moves">&nbsp;</span><span id="clock"></span></div>
+      <div id="after" hidden>
+        <p class="result"><strong id="result-time"></strong><span id="result-sub"></span></p>
+        <div class="actions">
+          <button class="btn" id="share" type="button">Share my time</button>
+          <a class="btn ghost" href="#send">Send your own</a>
+        </div>
+      </div>
+      <p class="foot" id="after-foot" hidden></p>
+      <p class="report" id="report" hidden><a id="report-link" href="#">Report this photo</a></p>
+    </section>
+
+    <!-- NOTHING TO PLAY: the puzzle is gone, today's isn't up, or the network failed -->
+    <section id="empty" hidden aria-labelledby="empty-title">
+      <h1 id="empty-title"></h1>
+      <p class="lede" id="empty-text"></p>
+      <div class="actions">
+        <button class="btn" id="empty-go" type="button"></button>
+        <a class="btn ghost" href="#send" id="empty-send">Send your own</a>
+      </div>
+    </section>
+
+    <!-- SEND, inside Farcaster or the Base app -->
+    <section id="send" hidden aria-labelledby="send-title">
+      <h1 id="send-title">Send a Phuzzle</h1>
+      <p class="lede">Your photo goes out in pieces. Whoever puts it back together gets to see it, and your note.</p>
+      <div class="compose">
+        <label class="pick" id="pick">
+          <input class="vh" type="file" id="file" accept="image/*" />
+          <span class="pick-empty" id="pick-empty">
+            <svg viewBox="0 0 44 44" fill="none" aria-hidden="true">
+              <rect x="3" y="3" width="17" height="17" rx="3" stroke="#A9A9C6" stroke-width="2"/>
+              <rect x="24" y="3" width="17" height="17" rx="3" stroke="#A9A9C6" stroke-width="2"/>
+              <rect x="3" y="24" width="17" height="17" rx="3" stroke="#A9A9C6" stroke-width="2"/>
+              <rect x="27" y="27" width="17" height="17" rx="3" fill="#FF6B6B" transform="rotate(8 35.5 35.5)"/>
+            </svg>
+            <b>Choose a photo</b>
+            <span>It’s cut square from the middle</span>
+          </span>
+          <img id="pick-img" alt="Your photo, cut square" hidden />
+          <span class="cuts" id="cuts" hidden></span>
+          <span class="change" id="change" hidden>Change</span>
+        </label>
+        <fieldset class="levels" id="levels">
+          <legend class="vh">How many pieces</legend>
+          <label class="level"><input type="radio" name="level" value="EASY" /><b>9</b>Easy</label>
+          <label class="level on"><input type="radio" name="level" value="MEDIUM" checked /><b>16</b>Medium</label>
+          <label class="level"><input type="radio" name="level" value="HARD" /><b>25</b>Hard</label>
+          <label class="level"><input type="radio" name="level" value="EXPERT" /><b>36</b>Expert</label>
+        </fieldset>
+      </div>
+      <label class="label" for="note-in">A note under the puzzle <span>optional</span></label>
+      <textarea class="paper" id="note-in" maxlength="200" rows="3" placeholder="They read this when the last piece goes in."></textarea>
+      <div class="count"><span id="note-count">0</span> / 200</div>
+      <div class="actions"><button class="btn" id="post" type="button" disabled>Post it</button></div>
+      <p class="err" id="send-err" role="alert" hidden></p>
+      <p class="fine" id="send-fine">Post it saves the photo with Phuzzles, then opens your post for you to check before it goes out. Anyone who sees the post can solve it. The photo is deleted after 30 days.</p>
+    </section>
+
+    <!-- SENT -->
+    <section id="sent" hidden aria-labelledby="sent-title">
+      <h1 id="sent-title"></h1>
+      <p class="lede" id="sent-text"></p>
+      <div class="sent-photo"><img id="sent-img" alt="The photo you posted" /><span class="cuts" id="sent-cuts"></span></div>
+      <div class="actions">
+        <button class="btn" id="sent-post" type="button">Post it</button>
+        <button class="btn ghost" id="sent-copy" type="button">Copy the link</button>
+        <a class="btn ghost" id="sent-again" href="#send">Send another</a>
+      </div>
+      <code class="link-box" id="sent-link" hidden></code>
+    </section>
+
+    <!-- SEND, in a plain browser: posting needs a Farcaster account -->
+    <section id="elsewhere" hidden aria-labelledby="elsewhere-title">
+      <h1 id="elsewhere-title">Sending happens in Farcaster</h1>
+      <p class="lede">A Phuzzle goes out as a post from your Farcaster account, so sending works when you open Phuzzles inside Farcaster or the Base app.</p>
+      <p class="lede">To send one straight to a friend’s phone instead, use the app:</p>
+      <div class="stores">
+        <a href="https://apps.apple.com/app/id6766833614" target="_blank" rel="noopener" data-store="app_store"><img src="/app-store-badge.svg" alt="Download on the App Store" /></a>
+        <a href="https://play.google.com/store/apps/details?id=rebelstudios.phuzzles.app&amp;referrer=utm_source%3Dminiapp%26utm_medium%3Dweb" target="_blank" rel="noopener" data-store="google_play"><img class="gp" src="/google-play-badge.png" alt="Get it on Google Play" /></a>
+      </div>
+      <p class="fine">Free on iPhone and Android, with ads.</p>
+    </section>
+  </main>
+
+  <footer>
+    <p>Made by Rebel Studios. <a href="/privacy.html" target="_blank" rel="noopener">Privacy</a> &middot; <a href="mailto:rebelstudiossoftware@gmail.com">rebelstudiossoftware@gmail.com</a></p>
+  </footer>
+</div>
+
+<script defer src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script defer src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script defer src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script defer src="/js/solver.js"></script>
+<script type="module" src="./mini.js"></script>
+</body>
+</html>

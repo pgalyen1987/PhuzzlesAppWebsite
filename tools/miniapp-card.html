@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<!--
+  The mini app's two promo images, drawn from the site's own puffin and type. tools/make-miniapp-images.sh
+  screenshots this page:
+    ?card  1200 x 800, the 3:2 card under every cast of phuzzles.app/mini/ (the fc:miniapp embed)
+    ?hero  1200 x 630, heroImageUrl and ogImageUrl in .well-known/farcaster.json
+  The puffin sits in the homepage demo's opening scramble, one piece picked up, with the paper note's edge
+  showing under the board the way it does on the homepage.
+-->
+<style>
+  @font-face { font-family: 'Archivo'; src: url('../fonts/archivo-var-latin.woff2') format('woff2'); font-weight: 700 900; font-stretch: 62% 125%; }
+  @font-face { font-family: 'DM Sans'; src: url('../fonts/dm-sans-var-latin.woff2') format('woff2'); font-weight: 400 600; }
+  @font-face { font-family: 'Gochi Hand'; src: url('../fonts/gochi-hand-400-latin.woff2') format('woff2'); font-weight: 400; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  :root { --ink: #1A1A2E; --text: #F5F3EF; --muted: #A9A9C6; --coral: #FF6B6B; --paper: #FFF3E4; --paper-ink: #2A2238; }
+  html, body { background: var(--ink); }
+  body { width: 1200px; height: 800px; overflow: hidden; color: var(--text); font-family: 'DM Sans', sans-serif;
+         -webkit-font-smoothing: antialiased; }
+  body.hero { height: 630px; }
+
+  .frame { position: relative; width: 100%; height: 100%; display: flex; align-items: center; gap: 56px; padding: 0 84px; }
+  .words { flex: 1 1 0; min-width: 0; }
+  .brand { display: flex; align-items: center; gap: 16px; margin-bottom: 44px; }
+  .brand img { width: 60px; height: 60px; border-radius: 14px; }
+  .brand span { font-family: 'Archivo'; font-weight: 800; font-stretch: 112%; font-size: 40px; letter-spacing: -0.01em; }
+  h1 { font-family: 'Archivo'; font-weight: 800; font-stretch: 108%; font-size: 76px; line-height: 1.02; letter-spacing: -0.025em; }
+  p { margin-top: 26px; font-size: 32px; line-height: 1.35; color: var(--muted); max-width: 15em; }
+
+  .stage { position: relative; flex: 0 0 auto; width: 588px; padding-bottom: 46px; }
+  .board { position: relative; z-index: 2; display: grid; grid-template-columns: repeat(3, 1fr); gap: 7px; aspect-ratio: 1;
+           border-radius: 20px; overflow: hidden; background: var(--ink);
+           box-shadow: 0 2px 0 rgba(255,255,255,0.06) inset, 0 30px 56px -30px rgba(0,0,0,0.6); }
+  .board i { display: block; background: url('../img/puffin-960.jpg') no-repeat; background-size: 300% 300%; border-radius: 5px; }
+  .board i.picked { outline: 9px solid var(--coral); outline-offset: -9px; transform: scale(0.94); }
+  .note { position: absolute; z-index: 1; left: 7%; right: 7%; bottom: 0; height: 120px; background: var(--paper);
+          border-radius: 4px; transform: rotate(-1.6deg); box-shadow: 0 16px 30px -18px rgba(0,0,0,0.7); }
+
+  /* The hero is shorter: a smaller board, the same proportions. */
+  body.hero .frame { gap: 60px; padding: 0 80px; }
+  body.hero .stage { width: 470px; padding-bottom: 34px; }
+  body.hero .brand { margin-bottom: 34px; }
+  body.hero h1 { font-size: 66px; }
+  body.hero p { font-size: 29px; margin-top: 22px; }
+  body.hero .note { height: 100px; }
+</style>
+</head>
+<body>
+<div class="frame">
+  <div class="words">
+    <div class="brand"><img src="../logo2.png" alt="" /><span>Phuzzles</span></div>
+    <h1 id="h"></h1>
+    <p id="p"></p>
+  </div>
+  <div class="stage">
+    <div class="board" id="board"></div>
+    <div class="note"></div>
+  </div>
+</div>
+<script>
+  var hero = location.search.indexOf("hero") > -1;
+  if (hero) document.body.classList.add("hero");
+  document.getElementById("h").textContent = hero ? "Send a photo they have to solve." : "A Phuzzle for you.";
+  document.getElementById("p").textContent = hero ? "Post it as a puzzle. Whoever solves it gets to see it."
+                                                  : "Put the pieces back to see the photo.";
+  // The homepage demo's opening scramble: six swaps from solved, the eye left in place.
+  var START = [1, 0, 3, 5, 4, 6, 7, 8, 2], board = document.getElementById("board");
+  START.forEach(function (piece, slot) {
+    var t = document.createElement("i");
+    t.style.backgroundPosition = (piece % 3) * 50 + "% " + Math.floor(piece / 3) * 50 + "%";
+    if (slot === 2) t.className = "picked";
+    board.appendChild(t);
+  });
+</script>
+</body>
+</html>
