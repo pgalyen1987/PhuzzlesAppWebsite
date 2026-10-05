@@ -46,7 +46,7 @@
         font-variant-numeric:tabular-nums}
   .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;background:var(--accent);
        color:var(--bg);font-weight:700;border:none;border-radius:12px;padding:14px 22px;font-size:15px;
-       cursor:pointer;text-decoration:none;width:100%;margin-top:16px}
+       cursor:pointer;text-decoration:none;width:100%;margin-top:16px;font-family:inherit}
   .btn.ghost{background:transparent;color:var(--text);border:1px solid var(--border);font-weight:600;margin-top:10px}
   /* The photo keeps its shape: a tall one gets narrower rather than pushing everything off the screen. */
   .full{position:relative;z-index:2;display:block;max-width:100%;max-height:70vh;width:auto;height:auto;
@@ -291,6 +291,23 @@ var s=document.createElement('script');s.async=true;s.src='https://www.googletag
       cta.textContent = "Make one from your own photo";
       // Somewhere to come back to: /today always opens the current daily.
       document.getElementById("won-foot").innerHTML = 'There\'s a new one every day at 11:00 Eastern: <a href="/today/">phuzzles.app/today</a><br>The app is free on iPhone and Android, with ads.';
+      // Today's daily is the one puzzle anyone can pass on: /today opens it in any browser and unfurls with a card.
+      if (d.isPotd && !document.getElementById("share-today")) {
+        var share = document.createElement("button");
+        share.type = "button"; share.id = "share-today"; share.className = "btn ghost"; share.textContent = "Share today's puzzle";
+        var link = "https://phuzzles.app/today/?utm_source=potd-share&utm_medium=share";
+        share.onclick = function(){
+          if (navigator.share) {
+            navigator.share({ text: "I solved today's Phuzzle. Your turn.", url: link })
+              .then(function(){ ev("potd_share", { method: "sheet" }); }, function(){});
+            return;
+          }
+          (navigator.clipboard ? navigator.clipboard.writeText(link) : Promise.reject())
+            .then(function(){ share.textContent = "Link copied"; ev("potd_share", { method: "copy" }); },
+                  function(){ share.textContent = "phuzzles.app/today"; });
+        };
+        cta.insertAdjacentElement("afterend", share);
+      }
     }
     cta.href = IOS ? APPSTORE : playWith(ref);
     cta.onclick = function(){ ev("store_click", { from: "solved" }); };
