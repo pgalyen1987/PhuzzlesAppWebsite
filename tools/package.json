@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "node check-photo-urls.mjs"
+    "test": "node check-photo-urls.mjs",
+    "test:browser": "node test/site-check.mjs"
   },
   "keywords": [],
   "author": "",
