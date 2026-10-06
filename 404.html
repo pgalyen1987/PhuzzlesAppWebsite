@@ -3,6 +3,9 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
+<!-- A puzzle's address is the only key to a puzzle shared as a link, so a page opened from here (our own homepage
+     included, whose analytics would record it) is told the origin, never the address. -->
+<meta name="referrer" content="strict-origin" />
 <title>Phuzzles</title>
 <meta name="description" content="Someone sent you a photo puzzle. Solve it to reveal the picture and their hidden message." />
 <meta property="og:title" content="You've got a Phuzzle" />
@@ -81,7 +84,10 @@ window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);
 if(!/^(localhost|127\.|0\.0\.0\.0)/.test(location.hostname)){
 gtag('consent','default',{ad_storage:'denied',ad_user_data:'denied',ad_personalization:'denied',analytics_storage:'denied',region:['AT','BE','BG','HR','CY','CZ','DK','EE','FI','FR','DE','GR','HU','IE','IT','LV','LT','LU','MT','NL','PL','PT','RO','SK','SI','ES','SE','IS','LI','NO','GB','CH']});
 gtag('consent','default',{ad_storage:'denied',ad_user_data:'denied',ad_personalization:'denied',analytics_storage:'granted'});
-gtag('js',new Date());gtag('config','G-00TNDVMQNM');
+// A puzzle's address is the only key to a puzzle shared as a link, so Analytics gets the page without the id:
+// /puzzle/ or /solve/, with the query (its campaign tags) kept. The studio's puzzles are public; their events
+// carry puzzle_id (ev() below).
+gtag('js',new Date());gtag('config','G-00TNDVMQNM',{page_location:location.href.replace(/\/(puzzle|solve)\/[^\/?#]+/i,'/$1/').replace(/#.*$/,'')});
 var s=document.createElement('script');s.async=true;s.src='https://www.googletagmanager.com/gtag/js?id=G-00TNDVMQNM';document.head.appendChild(s);
 }
 </script>
@@ -162,8 +168,9 @@ var s=document.createElement('script');s.async=true;s.src='https://www.googletag
   var puzzleId; try { puzzleId = decodeURIComponent(m[1]); } catch (e) { show("notfound"); return; }
   // The viral loop, measured: opened, solved, and which store button was tapped, split by kind
   // (a "link" puzzle was sent with no in-app recipient, receiverId "__link__").
-  var KIND = "unknown";
-  function ev(name, extra){ try { if (window.gtag) gtag("event", name, Object.assign({ puzzle_kind: KIND }, extra || {})); } catch (e) {} }
+  var KIND = "unknown", PUBLIC_ID = null;
+  function ev(name, extra){ try { if (window.gtag) gtag("event", name, Object.assign({ puzzle_kind: KIND },
+    PUBLIC_ID ? { puzzle_id: PUBLIC_ID } : {}, extra || {})); } catch (e) {} }
   // Google Play passes `referrer` to the installed app; Phuzzles reads "puzzle_<id>" and opens that
   // puzzle on first launch (InstallReferrerRepository), so an install from here lands on it.
   function playWith(ref){ return PLAY + "&referrer=" + encodeURIComponent(ref); }
@@ -256,11 +263,13 @@ var s=document.createElement('script');s.async=true;s.src='https://www.googletag
 
   function startGame(img, d, sender, aspect){
     KIND = d.receiverId === "__link__" ? "link" : d.isGroupPuzzle ? "group" : d.isPublic ? "public" : "direct";
-    ev("puzzle_open");
-    var n = GRID[(d.difficulty||"MEDIUM")] || 4;
     // The daily comes from the official account (createPuzzleOfTheDay), so "phuzzles sent you a Phuzzle"
     // and "Send one back" would both be wrong. Yesterday's daily keeps the sender but loses isPotd.
     var official = d.senderId === "phuzzles-official";
+    // A studio puzzle is posted for anyone to open, so naming it costs nobody anything and keeps each daily countable.
+    if (official) PUBLIC_ID = puzzleId;
+    ev("puzzle_open");
+    var n = GRID[(d.difficulty||"MEDIUM")] || 4;
     document.getElementById("game-title").innerHTML =
       (official ? (potdIsToday(d, Date.now()) ? "Today's <em>Phuzzle</em>" : d.isPotd ? "Yesterday's <em>Phuzzle</em>" : "Solve the <em>Phuzzle</em>")
        : sender ? escapeHtml(sender)+" sent you a <em>Phuzzle</em>" : "Solve the <em>Phuzzle</em>");
