@@ -12,7 +12,6 @@
       "*.md"
     ],
     "cleanUrls": true,
-    "trailingSlash": false,
     "rewrites": [
       {
         "//": "GitHub Pages has no rewrites, so /puzzle/<id> was served as the 404 page WITH a 404 status. Every puzzle the app shares is one of these links, and link previews in Messages, WhatsApp and Slack skip a 404. Here the same file is served with a 200.",
