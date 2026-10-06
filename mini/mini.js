@@ -19,9 +19,11 @@ const NOTE_MAX = 200;       // the apps' limit
 // a cast only ever names the sender's own account.
 const FC_NAME = /^[a-z0-9][a-z0-9._-]{0,63}$/;
 // Photos come from Phuzzles' own Storage bucket, where the apps, the daily and miniappCreatePuzzle all put them.
-// The create rule takes any imageUrl string, so without this a hand-made link puzzle could point solvers at a
-// server of its own, and change the picture after anyone had looked at it.
-const OUR_PHOTOS = /^https:\/\/firebasestorage\.googleapis\.com\/v0\/b\/phuzzles\.firebasestorage\.app\/o\/[^'"()\s\\]+$/;
+// A puzzle made before the rules insisted on the sender's own upload can carry any imageUrl, so without this a
+// hand-made link puzzle could point solvers at a server of its own, and change the picture after anyone had looked
+// at it. The iPhone app's download URLs name the port (":443"); a bare "/" after /o/ can only be a "../" out to
+// another bucket, since Storage percent-encodes the file path. The same test as 404.html's OUR_PHOTOS.
+const OUR_PHOTOS = /^https:\/\/firebasestorage\.googleapis\.com(?::443)?\/v0\/b\/phuzzles\.firebasestorage\.app\/o\/[^\/?#'"()\s\\]+(?:\?[^#'"()\s\\]*)?$/;
 
 // ── The host ────────────────────────────────────────────────────────────────────────────────────────────
 // A Farcaster client frames the page (an iframe on the web, a WebView on phones) and answers the SDK with its
