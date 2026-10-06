@@ -192,11 +192,14 @@ var s=document.createElement('script');s.async=true;s.src='https://www.googletag
   function escapeHtml(s){ return String(s||"").replace(/[&<>"']/g,function(c){
     return {"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c]; }); }
 
-  // Photos come from Phuzzles' own Storage bucket, where the apps, the daily and the mini app all put them. The
-  // create rule takes any imageUrl string, so without this a hand-made link puzzle could point solvers at a server
-  // of its own (which sees everyone who opens it, and can swap the picture after anyone has looked). The same test
-  // as the mini app's OUR_PHOTOS; it also keeps quotes and brackets out of the CSS url('…') the board paints with.
-  var OUR_PHOTOS = /^https:\/\/firebasestorage\.googleapis\.com\/v0\/b\/phuzzles\.firebasestorage\.app\/o\/[^'"()\s\\]+$/;
+  // Photos come from Phuzzles' own Storage bucket, where the apps, the daily and the mini app all put them. A puzzle
+  // made before the rules insisted on the sender's own upload can carry any imageUrl, so without this a hand-made
+  // link puzzle could point solvers at a server of its own (which sees everyone who opens it, and can swap the
+  // picture after anyone has looked). The address is a Storage download URL in either app's form: the iPhone app's
+  // names the port (":443", which the rules allow too). Its file path is percent-encoded, so a bare "/" after /o/
+  // can only be a "../" climbing out to someone else's bucket on the same host, and is refused. Quotes and brackets
+  // would break out of the CSS url('…') the board paints with. The same test as the mini app's OUR_PHOTOS.
+  var OUR_PHOTOS = /^https:\/\/firebasestorage\.googleapis\.com(?::443)?\/v0\/b\/phuzzles\.firebasestorage\.app\/o\/[^\/?#'"()\s\\]+(?:\?[^#'"()\s\\]*)?$/;
 
   // The puzzle may be fine; this browser just couldn't get to it. Firebase stops signing in new visitors from one
   // address after a burst of them (auth/too-many-requests; a day of test runs tripped it on 2026-10-05 and it lifted
