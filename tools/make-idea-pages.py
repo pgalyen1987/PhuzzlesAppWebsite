@@ -37,14 +37,30 @@ def page(slug, title, desc, h1, lede, body):
     h = h.replace('  <link rel="preload" as="image" href="/img/puffin-960.jpg" />\n', "")
     stores = """        <div class="stores">
           <a href="https://apps.apple.com/app/id6766833614" target="_blank" rel="noopener"><img src="/app-store-badge.svg" alt="Download on the App Store" /></a>
-          <a href="https://play.google.com/store/apps/details?id=rebelstudios.phuzzles.app" target="_blank" rel="noopener"><img class="gp" src="/google-play-badge.png" alt="Get it on Google Play" /></a>
+          <a href="https://play.google.com/store/apps/details?id=rebelstudios.phuzzles.app&amp;referrer=utm_source%3Dphuzzles.app%26utm_medium%3Didea_page%26utm_campaign%3D{slug}" target="_blank" rel="noopener"><img class="gp" src="/google-play-badge.png" alt="Get it on Google Play" /></a>
         </div>
         <p class="price">Free, with ads. <a href="/">How Phuzzles works</a></p>
-"""
+""".replace("{slug}", slug)
     doc = (h + "</head>\n<body>\n  <div class=\"wrap\">\n" + header + "\n    <main class=\"idea\">\n"
-           f"      <h1>{h1}</h1>\n      <p class=\"lede\">{lede}</p>\n{body}{stores}    </main>\n\n" + footer + "  </div>\n</body>\n</html>\n")
+           f"      <h1>{h1}</h1>\n      <p class=\"lede\">{lede}</p>\n{body}{stores}    </main>\n\n" + footer + "  </div>\n" + FORWARD.replace("{slug}", slug) + "</body>\n</html>\n")
     (ROOT / f"{slug}.html").write_text(doc)
     print("wrote", slug + ".html", len(doc), "bytes")
+
+FORWARD = """  <script>
+    // Arrived from a tagged link (a pin, a post)? Pass its tags to Play so the install is credited to it.
+    (function () {
+      try {
+        var q = new URLSearchParams(location.search), parts = [];
+        ['utm_source', 'utm_medium', 'utm_campaign', 'utm_content'].forEach(function (k) { var v = q.get(k); if (v) parts.push(k + '=' + v); });
+        if (!q.get('utm_source')) return;
+        if (!q.get('utm_campaign')) parts.push('utm_campaign={slug}');
+        document.querySelectorAll('a[href*="play.google.com"]').forEach(function (a) {
+          a.href = a.href.split('&referrer=')[0] + '&referrer=' + encodeURIComponent(parts.join('&'));
+        });
+      } catch (e) {}
+    })();
+  </script>
+"""
 
 SEND = """        <li><b>Send it.</b> Pick someone who has Phuzzles by their username, or start a group and send one puzzle to the whole family; everyone gets the same puzzle. On Android you can also send it as a link that opens in any phone's browser, so nobody needs the app.</li>
         <li><b>Wait.</b> You get a notification when it's solved.</li>
