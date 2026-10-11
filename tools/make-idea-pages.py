@@ -80,3 +80,17 @@ page("gender-reveal-puzzle",
 """ + SEND + """      </ol>
       <p class="tip">Revealing to a group? Start a group in the app and send the puzzle once; everyone in it gets the same one.</p>
 """ + KEPT)
+
+page("birthday-puzzle",
+     "A birthday message they have to solve | Phuzzles",
+     "Send a birthday photo as a puzzle with your message hidden underneath. They read it when the last piece lands. Free on iPhone and Android.",
+     "A birthday message they have to solve",
+     "A card gets opened, read and put down. A puzzle gets a few minutes of their attention first, and your message shows up only when they finish it.",
+     """      <h2>How to do it</h2>
+      <ol>
+        <li><b>Pick the photo.</b> One they haven't seen, or one they've forgotten: the two of you ten years ago, their dog, the place you're taking them.</li>
+        <li><b>Write the message.</b> Up to 200 characters, hidden until the puzzle is solved. Say the thing you'd skip in a text.</li>
+        <li><b>Pick the size.</b> 3&times;3 for a quick smile; 6&times;6 if you want them busy for a while.</li>
+""" + SEND + """      </ol>
+      <p class="tip">Giving something you can't wrap, like tickets or a trip? Put a picture of it in the puzzle and the details in the message.</p>
+""" + KEPT)
