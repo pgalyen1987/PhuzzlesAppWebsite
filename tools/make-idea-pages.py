@@ -83,20 +83,6 @@ page("pregnancy-announcement-puzzle",
       <p class="tip">Sending it to grandparents who won't install anything? Send it from an Android phone as a link. It opens in their browser, and they solve it there.</p>
 """ + KEPT)
 
-page("gender-reveal-puzzle",
-     "A gender reveal they have to solve | Phuzzles",
-     "Hide the answer in a photo puzzle: they find out boy or girl only when the last piece lands. Free on iPhone and Android.",
-     "A gender reveal they have to solve",
-     "Turn the reveal into a puzzle. They piece the photo back together, and the answer appears only when they finish.",
-     """      <h2>How to do it</h2>
-      <ol>
-        <li><b>Pick the photo.</b> A cake, balloons, the two of you. If the colour is in every corner of the picture, they'll guess from the first piece.</li>
-        <li><b>Put the answer in the message, not the photo.</b> The message stays folded under the puzzle until the last piece lands. A neutral photo with &ldquo;It's a girl&rdquo; underneath keeps everyone guessing to the end.</li>
-        <li><b>Pick the size.</b> 3&times;3 is quick; 6&times;6 takes a while.</li>
-""" + SEND + """      </ol>
-      <p class="tip">Revealing to a group? Start a group in the app and send the puzzle once; everyone in it gets the same one.</p>
-""" + KEPT)
-
 page("birthday-puzzle",
      "A birthday message they have to solve | Phuzzles",
      "Send a birthday photo as a puzzle with your message hidden underneath. They read it when the last piece lands. Free on iPhone and Android.",
