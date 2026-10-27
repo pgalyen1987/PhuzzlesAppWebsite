@@ -190,7 +190,7 @@ function empty(kind) {
     go.onclick = () => location.reload();
   } else {
     $("empty-title").textContent = "This Phuzzle has gone";
-    $("empty-text").textContent = "Puzzles are deleted 30 days after they’re sent, and one sent straight to someone in the app only opens there.";
+    $("empty-text").textContent = "A deleted puzzle is gone for good, and one sent straight to someone in the app only opens there.";
     go.textContent = "Solve today’s puzzle";
     go.onclick = () => { location.href = "./"; };
   }
@@ -522,8 +522,8 @@ async function castIt() {
 function showSent(posted) {
   $("sent-title").textContent = posted ? "Posted" : "Not posted yet";
   $("sent-text").textContent = posted
-    ? `Whoever solves it gets to see your photo${made.note ? " and your note" : ""}. It stays up for 30 days.`
-    : "Your Phuzzle is made. Post it now, or copy the link and share it anywhere. It stays up for 30 days.";
+    ? `Whoever solves it gets to see your photo${made.note ? " and your note" : ""}.`
+    : "Your Phuzzle is made. Post it now, or copy the link and share it anywhere.";
   $("sent-img").src = made.img;
   $("sent-cuts").style.setProperty("--n", made.n);
   $("sent-post").hidden = posted;
