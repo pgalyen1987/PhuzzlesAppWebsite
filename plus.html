@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Phuzzles Plus — what it costs and what it changes</title>
+<meta name="description" content="Phuzzles Plus is US$2.99 a month: every puzzle in the public feed instead of three a day, no ads, and a daily pack. Puzzles from friends are unlimited either way." />
+<link rel="canonical" href="https://phuzzles.app/plus" />
+<link rel="icon" href="/logo-128.png" />
+<meta property="og:title" content="Phuzzles Plus" />
+<meta property="og:description" content="US$2.99 a month: the whole public feed instead of three puzzles a day, no ads, a daily pack. Friends' puzzles are unlimited either way." />
+<meta property="og:image" content="https://phuzzles.app/img/og-card.jpg" />
+<meta property="og:url" content="https://phuzzles.app/plus" />
+<meta name="twitter:card" content="summary_large_image" />
+<style>
+  @font-face { font-family:'Archivo'; src:url('/fonts/archivo-var-latin.woff2') format('woff2'); font-weight:700 900; font-stretch:62% 125%; font-display:swap; }
+  @font-face { font-family:'DM Sans'; src:url('/fonts/dm-sans-var-latin.woff2') format('woff2'); font-weight:400 600; font-display:swap; }
+  @font-face { font-family:'Gochi Hand'; src:url('/fonts/gochi-hand-400-latin.woff2') format('woff2'); font-weight:400; font-display:swap; }
+  :root{ --ink:#1A1A2E; --panel:#23233E; --text:#F5F3EF; --muted:#A9A9C6; --coral:#FF6B6B; --teal:#4ECDC4; color-scheme:dark; }
+  *{box-sizing:border-box}
+  body{ margin:0; background:var(--ink); color:var(--text); font-family:'DM Sans',system-ui,sans-serif; line-height:1.6;
+    padding-left:max(18px,env(safe-area-inset-left,0px)); padding-right:max(18px,env(safe-area-inset-right,0px)); }
+  a{color:var(--teal)}
+  .wrap{max-width:720px; margin:0 auto; padding-block:clamp(22px,4vh,44px); display:flex; flex-direction:column; gap:clamp(26px,4vh,42px)}
+  header.bar{display:flex; align-items:center; gap:12px}
+  header.bar img{width:40px; height:40px; border-radius:10px}
+  header.bar .name{font-family:'Archivo',sans-serif; font-weight:800; font-size:20px; letter-spacing:-.01em}
+  header.bar a{color:var(--text); text-decoration:none; display:flex; align-items:center; gap:12px}
+  .kicker{font-family:'Gochi Hand',cursive; color:var(--coral); font-size:22px; line-height:1}
+  h1{font-family:'Archivo',sans-serif; font-weight:900; font-size:clamp(30px,6.5vw,49px); margin:.1em 0 0; letter-spacing:-.02em; line-height:1.03}
+  h2{font-family:'Archivo',sans-serif; font-weight:800; font-size:clamp(19px,3vw,25px); margin:0 0 10px; letter-spacing:-.01em}
+  p{margin:0 0 12px}
+  .lede{font-size:clamp(17px,2.4vw,21px); max-width:52ch; margin-top:16px}
+  .lede b{color:var(--teal)}
+  section{border-top:1px solid #ffffff1a; padding-top:24px}
+  .price{background:var(--panel); border-radius:14px; padding:18px 22px}
+  .price .big{font-family:'Archivo',sans-serif; font-weight:900; font-size:clamp(26px,5vw,34px); line-height:1.1}
+  .price .big span{font-family:'DM Sans',sans-serif; font-weight:400; font-size:17px; color:var(--muted)}
+  .price p:last-child{margin:0}
+  ul.get{list-style:none; margin:0; padding:0; display:grid; gap:11px; font-size:16px}
+  ul.get li{padding-left:24px; position:relative}
+  ul.get li::before{content:"✓"; color:var(--teal); position:absolute; left:0; font-weight:700}
+  ul.limits{list-style:none; margin:0; padding:0; display:grid; gap:11px; font-size:15.5px; color:var(--text)}
+  ul.limits li{padding-left:24px; position:relative}
+  ul.limits li::before{content:"—"; color:var(--coral); position:absolute; left:0}
+  .stores{display:flex; flex-wrap:wrap; gap:14px; align-items:center}
+  .stores img{height:52px; width:auto; display:block}
+  .foot{color:var(--muted); font-size:13.5px}
+  footer{border-top:1px solid #ffffff1a; padding-top:20px; color:var(--muted); font-size:13.5px; display:flex; flex-wrap:wrap; gap:8px 18px; align-items:center}
+  footer a{color:var(--muted)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="bar"><a href="/"><img src="/logo-128.png" alt="Phuzzles logo" /><span class="name">Phuzzles</span></a></header>
+
+  <div>
+    <div class="kicker">Phuzzles Plus</div>
+    <h1>More puzzles,<br>no ads.</h1>
+    <p class="lede">Puzzles a friend sends you are unlimited, with Plus or without it, and they always
+    will be. <b>Plus is for the public feed</b> — the puzzles strangers have shared, where a free
+    account can start three a day.</p>
+  </div>
+
+  <section>
+    <h2>What you get</h2>
+    <ul class="get">
+      <li>Every puzzle in the feed, as many as you like, instead of three a day.</li>
+      <li>No ads, anywhere in the app.</li>
+      <li>A daily pack — solve the picture, then read what it actually is.</li>
+      <li>Puzzles from friends stay unlimited either way. Plus does not change them.</li>
+    </ul>
+    <p class="foot" style="margin-top:14px">Browsing the feed, sending puzzles and the daily puzzle are
+    free and are not metered. What Plus buys is how many feed puzzles you may start in a day.</p>
+  </section>
+
+  <section>
+    <h2>What it costs</h2>
+    <div class="price">
+      <p class="big">US$2.99 <span>a month</span></p>
+      <p>It renews every month until you cancel, and the app shows the price in your own currency
+      before you pay. You can cancel any time, in the
+      <a href="https://apps.apple.com/account/subscriptions">App Store</a> or on
+      <a href="https://play.google.com/store/account/subscriptions">Google Play</a> — Plus then keeps
+      working until the month you have paid for runs out.</p>
+    </div>
+  </section>
+
+  <section>
+    <h2>What it does not do</h2>
+    <ul class="limits">
+      <li>There is no free trial. The first month is the full price.</li>
+      <li>It belongs to the store you bought it from. Buying it on an iPhone does not unlock it on an
+      Android phone, because Plus is not attached to your Phuzzles account.</li>
+      <li>Deleting your Phuzzles account does not cancel the subscription. Cancel it in the store
+      first, or Apple or Google will keep charging you.</li>
+      <li>It does not add puzzle sizes, jigsaw mode or streaks. Those are in the free app.</li>
+    </ul>
+    <p class="foot" style="margin-top:14px">The full terms, including refunds, are in
+    <a href="/terms#plus">section 6 of the Terms</a>.</p>
+  </section>
+
+  <section>
+    <h2>Get the app</h2>
+    <p>Plus is bought inside the app, on the Plus screen. The app is free.</p>
+    <div class="stores">
+      <a href="https://apps.apple.com/app/id6766833614"><img src="/app-store-badge.svg" alt="Download Phuzzles on the App Store" /></a>
+      <a href="https://play.google.com/store/apps/details?id=rebelstudios.phuzzles.app&amp;referrer=utm_source%3Dphuzzles.app%26utm_medium%3Dplus_page%26utm_campaign%3Dplus"><img src="/google-play-badge.png" alt="Get Phuzzles on Google Play" /></a>
+    </div>
+    <p class="foot" style="margin-top:14px">Or solve <a href="/today/">today's puzzle</a> in your
+    browser first — no install, no account.</p>
+  </section>
+
+  <footer>
+    <span>© Rebel Studios</span>
+    <a href="/">Phuzzles</a>
+    <a href="/privacy.html">Privacy</a>
+    <a href="/terms.html">Terms</a>
+    <a href="mailto:support@phuzzles.app">support@phuzzles.app</a>
+  </footer>
+</div>
+</body>
+</html>
