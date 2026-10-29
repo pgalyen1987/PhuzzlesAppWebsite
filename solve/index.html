@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<!-- A puzzle's address is the only key to a puzzle shared as a link, so a page opened from here is told the
+     origin, never the address. -->
+<meta name="referrer" content="strict-origin" />
+<title>You've got a Phuzzle</title>
+<meta name="description" content="Someone sent you a photo puzzle. Solve it to reveal the picture and their hidden message." />
+<meta name="robots" content="noindex" />
+<meta property="og:type" content="website" />
+<meta property="og:url" content="https://phuzzles.app/solve/" />
+<meta property="og:title" content="You've got a Phuzzle" />
+<meta property="og:description" content="Solve the puzzle to reveal the photo and a hidden message. No app needed." />
+<meta property="og:image" content="https://phuzzles.app/img/og-card.jpg" />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="theme-color" content="#1A1A2E" />
+<link rel="icon" href="/logo-128.png" />
+<style>
+  @font-face{font-family:'Archivo';src:url('/fonts/archivo-var-latin.woff2') format('woff2');font-weight:700 900;font-stretch:62% 125%;font-display:swap}
+  @font-face{font-family:'DM Sans';src:url('/fonts/dm-sans-var-latin.woff2') format('woff2');font-weight:400 600;font-display:swap}
+  *{box-sizing:border-box;margin:0;padding:0}
+  :root{--bg:#1A1A2E;--border:rgba(245,243,239,.12);--text:#F5F3EF;--muted:#A9A9C6;--accent:#FF6B6B}
+  body{font-family:'DM Sans',system-ui,-apple-system,Segoe UI,Roboto,sans-serif;background:var(--bg);color:var(--text);
+       min-height:100vh;min-height:100dvh;display:flex;padding:20px;-webkit-font-smoothing:antialiased}
+  main{width:100%;max-width:420px;margin:auto;text-align:center}
+  .brand{display:inline-flex;align-items:center;gap:10px;color:var(--text);text-decoration:none;margin-bottom:26px}
+  .brand img{width:32px;height:32px;border-radius:8px}
+  .brand span{font-family:'Archivo',sans-serif;font-weight:800;font-stretch:112%;font-size:1.17rem;line-height:1}
+  h1{font-family:'Archivo',sans-serif;font-weight:800;font-stretch:108%;font-size:1.618rem;line-height:1.15;letter-spacing:-.02em;margin-bottom:10px}
+  h1 em{color:var(--accent);font-style:normal}
+  p{color:var(--muted);font-size:15px;line-height:1.5}
+  .btn{display:block;background:var(--accent);color:var(--bg);font-weight:700;border-radius:12px;padding:14px 22px;
+       font-size:15px;text-decoration:none;margin-top:22px}
+  .spin{width:34px;height:34px;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;
+        animation:s 1s linear infinite;margin:22px auto 0}
+  @keyframes s{to{transform:rotate(360deg)}}
+  .hidden{display:none}
+  @media (prefers-reduced-motion:reduce){.spin{animation:none}}
+</style>
+</head>
+<body>
+<main>
+  <a class="brand" href="/"><img src="/logo-128.png" alt="" /><span>Phuzzles</span></a>
+  <div id="opening">
+    <h1>You've got a <em>Phuzzle</em></h1>
+    <p>Opening it now.</p>
+    <div class="spin" aria-hidden="true"></div>
+  </div>
+  <div id="noid" class="hidden">
+    <h1>This link is missing its puzzle</h1>
+    <p>Whoever sent it may have cut the address short. Ask them to send it again.</p>
+    <a class="btn" href="/">What is Phuzzles?</a>
+  </div>
+</main>
+<script>
+// GitHub Pages serves a file that exists with a 200 and everything else with its 404 page, so /solve/<id>
+// (what both apps share today) can never carry a link preview: no chat builds a card for a 404. /solve/?p=<id>
+// is this file, which does return 200, so the tags above are what a recipient sees in the chat before they
+// tap. The board itself stays in one place — 404.html, where the solves we have measured came from — and
+// this hands the id straight to it.
+(function(){
+  var id = null;
+  try { id = new URLSearchParams(location.search).get("p"); } catch (e) {}
+  // Firestore has no document named "." or "..", and either would be read as a step back up the path.
+  if (!id || id === "." || id === "..") { document.getElementById("opening").className = "hidden";
+             document.getElementById("noid").className = ""; return; }
+  // The campaign tags go along so analytics still credits whoever sent the visit; ?p= does not, because the
+  // id is in the path from here on.
+  var q = "";
+  try { var u = new URLSearchParams(location.search); u.delete("p"); q = u.toString(); } catch (e) {}
+  location.replace("/solve/" + encodeURIComponent(id) + (q ? "?" + q : ""));
+})();
+</script>
+</body>
+</html>

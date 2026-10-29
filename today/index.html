@@ -16,6 +16,9 @@
 <meta name="twitter:card" content="summary_large_image" />
 <meta name="theme-color" content="#1A1A2E" />
 <link rel="icon" href="/logo-128.png" />
+<!-- The two hosts this page talks to before it can forward: sign in, then find today's puzzle. -->
+<link rel="preconnect" href="https://identitytoolkit.googleapis.com" crossorigin />
+<link rel="preconnect" href="https://firestore.googleapis.com" crossorigin />
 <style>
   @font-face{font-family:'Archivo';src:url('/fonts/archivo-var-latin.woff2') format('woff2');font-weight:700 900;font-stretch:62% 125%;font-display:swap}
   @font-face{font-family:'DM Sans';src:url('/fonts/dm-sans-var-latin.woff2') format('woff2');font-weight:400 600;font-display:swap}
@@ -51,9 +54,7 @@
     <a class="btn" href="/">Solve the homepage puzzle</a>
   </div>
 </main>
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script src="/js/firestore-rest.js"></script>
 <script>
 // One link that always opens the current Puzzle of the Day (createPuzzleOfTheDay sets isPotd on one
 // puzzle at 11:00 Eastern and clears the day before's), for bios, posters and posts that outlive a day.
@@ -72,22 +73,16 @@
     } else btn.href = "/" + location.search;
     document.getElementById("none").classList.remove("hidden");
   }
-  try {
-    firebase.initializeApp({
-      apiKey: "AIzaSyDPn4eEkZhUBp7x_3mVVcDlaiopfFDJna4",
-      authDomain: "phuzzles.firebaseapp.com",
-      projectId: "phuzzles",
-      storageBucket: "phuzzles.firebasestorage.app",
-      messagingSenderId: "945990447779",
-      appId: "1:945990447779:android:19af9e38d335e5b5368516"
-    });
-  } catch(e) {}
-  // The rules let a signed-in visitor (anonymous is enough) list isPotd puzzles.
-  firebase.auth().signInAnonymously()
-    .then(function(){ return firebase.firestore().collection("puzzles").where("isPotd", "==", true).get(); })
-    .then(function(snap){
+  // The rules let a signed-in visitor (anonymous is enough) list isPotd puzzles. This page and the solver it
+  // forwards to used to load 150 kB of Firebase SDK each and sign in twice over; both now make the two calls
+  // themselves (js/firestore-rest.js) and share the one anonymous identity.
+  PhuzzlesDB.query({
+      from: [{ collectionId: "puzzles" }],
+      where: { fieldFilter: { field: { fieldPath: "isPotd" }, op: "EQUAL", value: { booleanValue: true } } }
+    })
+    .then(function(rows){
       var ms = function(v){ return v && v.toMillis ? v.toMillis() : (typeof v === "number" ? v : 0); };
-      var docs = snap.docs.slice().sort(function(a, b){ return ms(b.data().sentAt) - ms(a.data().sentAt); });
+      var docs = rows.slice().sort(function(a, b){ return ms(b.data.sentAt) - ms(a.data.sentAt); });
       if (!docs.length) { none(); return; }
       location.replace("/solve/" + encodeURIComponent(docs[0].id) + location.search);
     })
