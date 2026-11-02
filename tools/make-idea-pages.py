@@ -62,11 +62,11 @@ FORWARD = """  <script>
   </script>
 """
 
-SEND = """        <li><b>Send it.</b> Pick someone who has Phuzzles by their username, or start a group and send one puzzle to the whole family; everyone gets the same puzzle. On Android you can also send it as a link that opens in any phone's browser, so nobody needs the app.</li>
+SEND = """        <li><b>Send it.</b> Pick someone who has Phuzzles by their username, or start a group and send one puzzle to the whole family; everyone gets the same puzzle. Or send it as a link, from an iPhone or from Android, that opens in any phone's browser, so the person you send it to doesn't need the app.</li>
         <li><b>Wait.</b> You get a notification when it's solved.</li>
 """
 KEPT = """      <h2>Worth knowing</h2>
-      <p>Only the people you send it to can open it, or anyone you give its link to. Nothing goes on the public Feed unless you post it there yourself. Puzzles and their photos are deleted from our servers after 30 days, so keep your own copy of the picture.</p>
+      <p>Only the people you send it to can open it, or anyone you give its link to. Nothing goes on the public Feed unless you post it there yourself. Puzzles and their photos are kept while your account exists and are deleted with it. Delete a puzzle in the app and its photo goes too.</p>
 """
 
 page("pregnancy-announcement-puzzle",
@@ -80,7 +80,7 @@ page("pregnancy-announcement-puzzle",
         <li><b>Pick the size.</b> 3&times;3 is quick. 6&times;6 takes a while, which is the point if you want to watch them work for it.</li>
         <li><b>Write the message.</b> Up to 200 characters, hidden until the puzzle is solved. &ldquo;Due in May&rdquo; is enough.</li>
 """ + SEND + """      </ol>
-      <p class="tip">Sending it to grandparents who won't install anything? Send it from an Android phone as a link. It opens in their browser, and they solve it there.</p>
+      <p class="tip">Sending it to grandparents who won't install anything? Send it as a link. It opens in their browser and they solve it there, with nothing to install.</p>
 """ + KEPT)
 
 page("birthday-puzzle",
@@ -94,5 +94,34 @@ page("birthday-puzzle",
         <li><b>Write the message.</b> Up to 200 characters, hidden until the puzzle is solved. Say the thing you'd skip in a text.</li>
         <li><b>Pick the size.</b> 3&times;3 for a quick smile; 6&times;6 if you want them busy for a while.</li>
 """ + SEND + """      </ol>
-      <p class="tip">Giving something you can't wrap, like tickets or a trip? Put a picture of it in the puzzle and the details in the message.</p>
+      <p class="tip">Giving something you can't wrap, like tickets or a trip? Put a picture of it in the puzzle and the details in the message &mdash; there's <a href="/surprise-trip-puzzle">a whole page on doing that</a>.</p>
+""" + KEPT)
+page("new-puppy-puzzle",
+     "A new puppy they have to solve | Phuzzles",
+     "Send a photo of your new puppy as a puzzle. The people you send it to put it back together and meet the newest member of the family only when the last piece lands. Free on iPhone and Android.",
+     "A new puppy they have to solve",
+     "Phuzzles scrambles the photo of your new best friend. The people you send it to put it back together, and meet the puppy only when the last piece lands.",
+     """      <h2>How to do it</h2>
+      <ol>
+        <li><b>Pick the photo.</b> The puppy, obviously &mdash; asleep in someone's arms, the first car ride, the whole litter if you're still choosing. If one piece gives the face away at a glance, choose a bigger puzzle.</li>
+        <li><b>Pick the size.</b> 3&times;3 is quick. 6&times;6 takes a while, which is the point if you want to watch them work for it.</li>
+        <li><b>Write the message.</b> Up to 200 characters, hidden until the puzzle is solved. &ldquo;Meet Biscuit&rdquo; is enough.</li>
+""" + SEND + """      </ol>
+      <p class="tip">Sending it to grandparents who won't install anything? Send it as a link. It opens in their browser and they solve it there, with nothing to install.</p>
+""" + KEPT)
+
+page("surprise-trip-puzzle",
+     "A surprise trip they have to solve | Phuzzles",
+     "Reveal a surprise trip as a photo puzzle. They put the picture back together to find out where they are going, and the dates are hidden underneath until the last piece lands.",
+     "A surprise trip they have to solve",
+     "The photo is the answer to &ldquo;where are we going?&rdquo; Phuzzles scrambles it, so they work the answer out a piece at a time, and the dates you folded underneath appear when the last piece lands.",
+     """      <h2>How to do it</h2>
+      <ol>
+        <li><b>Pick the photo that names the place.</b> Not a beach: the beach. The castle, the stadium, the cabin you booked, the sign at the trailhead, the boarding pass with the airport code still on it. If a stranger couldn't tell where it is, neither can they.</li>
+        <li><b>Then make it harder, not easier.</b> A landmark gives itself away from one corner piece, so go 6&times;6 and let them sit with it. Keep 3&times;3 for a photo that only means anything once it's whole.</li>
+        <li><b>Put the details in the message.</b> Up to 200 characters, hidden until the puzzle is solved: the dates, who else is coming, what to pack, whether they need to ask for the week off.</li>
+""" + SEND + """      </ol>
+      <p class="tip">Telling a whole family at once? Send it to a group. Everyone gets the same puzzle at the same time, so nobody hears it secondhand.</p>
+      <h2>What it won't do</h2>
+      <p>There is no scheduled send and no timer: a puzzle goes the moment you send it. If it has to land on a particular morning, send it that morning.</p>
 """ + KEPT)
