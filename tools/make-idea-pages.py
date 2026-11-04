@@ -73,7 +73,7 @@ page("pregnancy-announcement-puzzle",
      "A pregnancy announcement they have to solve | Phuzzles",
      "Send your pregnancy news as a photo puzzle. They see the picture, and the message hidden under it, only when the last piece lands. Free on iPhone and Android.",
      "A pregnancy announcement they have to solve",
-     "Phuzzles scrambles the photo that carries your news. The people you send it to put it back together, and the message you folded underneath shows up only when the last piece lands.",
+     "Phuzzles scrambles the photo that carries your news. The people you send it to put it back together, and the message you folded underneath shows up only when the last piece lands. You send it as a link, so the people you send it to solve it in their browser, with nothing to install.",
      """      <h2>How to do it</h2>
       <ol>
         <li><b>Pick the photo.</b> The news should be in the picture: the scan, the test, tiny shoes, a shirt that says big sister. If one piece would give it away at a glance, choose a bigger puzzle.</li>
@@ -87,7 +87,7 @@ page("birthday-puzzle",
      "A birthday message they have to solve | Phuzzles",
      "Send a birthday photo as a puzzle with your message hidden underneath. They read it when the last piece lands. Free on iPhone and Android.",
      "A birthday message they have to solve",
-     "A card gets opened, read and put down. A puzzle gets a few minutes of their attention first, and your message shows up only when they finish it.",
+     "A card gets opened, read and put down. A puzzle gets a few minutes of their attention first, and your message shows up only when they finish it. It goes as a link they open in any browser, so there is nothing for them to install.",
      """      <h2>How to do it</h2>
       <ol>
         <li><b>Pick the photo.</b> One they haven't seen, or one they've forgotten: the two of you ten years ago, their dog, the place you're taking them.</li>
@@ -100,7 +100,7 @@ page("new-puppy-puzzle",
      "A new puppy they have to solve | Phuzzles",
      "Send a photo of your new puppy as a puzzle. The people you send it to put it back together and meet the newest member of the family only when the last piece lands. Free on iPhone and Android.",
      "A new puppy they have to solve",
-     "Phuzzles scrambles the photo of your new best friend. The people you send it to put it back together, and meet the puppy only when the last piece lands.",
+     "Phuzzles scrambles the photo of your new best friend. The people you send it to put it back together, and meet the puppy only when the last piece lands. Send it as a link and they meet the puppy in their browser, with nothing for them to install.",
      """      <h2>How to do it</h2>
       <ol>
         <li><b>Pick the photo.</b> The puppy, obviously &mdash; asleep in someone's arms, the first car ride, the whole litter if you're still choosing. If one piece gives the face away at a glance, choose a bigger puzzle.</li>
@@ -114,7 +114,7 @@ page("surprise-trip-puzzle",
      "A surprise trip they have to solve | Phuzzles",
      "Reveal a surprise trip as a photo puzzle. They put the picture back together to find out where they are going, and the dates are hidden underneath until the last piece lands.",
      "A surprise trip they have to solve",
-     "The photo is the answer to &ldquo;where are we going?&rdquo; Phuzzles scrambles it, so they work the answer out a piece at a time, and the dates you folded underneath appear when the last piece lands.",
+     "The photo is the answer to &ldquo;where are we going?&rdquo; Phuzzles scrambles it, so they work the answer out a piece at a time, and the dates you folded underneath appear when the last piece lands. You send it as a link that opens in any browser, so the people you send it to do not need the app.",
      """      <h2>How to do it</h2>
       <ol>
         <li><b>Pick the photo that names the place.</b> Not a beach: the beach. The castle, the stadium, the cabin you booked, the sign at the trailhead, the boarding pass with the airport code still on it. If a stranger couldn't tell where it is, neither can they.</li>
