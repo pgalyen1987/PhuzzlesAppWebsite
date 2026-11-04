@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Phuzzles: a photo puzzle they solve to see your news</title>
-  <meta name="description" content="Turn a photo into a puzzle with a message hidden underneath, for pregnancy announcements and other news worth a minute. Free on iPhone and Android." />
+  <meta name="description" content="Turn a photo into a puzzle with a hidden message. It goes as a link in any chat, and they solve it in a browser to see both. Free on iPhone and Android." />
   <link rel="canonical" href="https://phuzzles.app/" />
   <meta property="og:type" content="website" />
   <meta property="og:url" content="https://phuzzles.app/" />
@@ -82,12 +82,13 @@
       column-gap: 56px;
       padding-block: 64px 40px;
     }
+    .hero .title { grid-area: title; align-self: end; }
     .hero h1 {
-      grid-area: title; align-self: end;
-      margin: 0 0 20px;
+      margin: 0 0 12px;
       font-family: 'Archivo', sans-serif; font-weight: 800; font-stretch: 108%;
       font-size: var(--t-h1); line-height: 1.04; letter-spacing: -0.025em;
     }
+    .deck { margin: 0 0 20px; max-width: 34ch; font-size: var(--t-lg); line-height: 1.35; color: var(--muted); }
     .copy { grid-area: copy; display: flex; flex-direction: column; }
     .copy p { margin: 0 0 28px; color: var(--muted); max-width: 34ch; }
     .copy p b { color: var(--text); font-weight: 600; }
@@ -194,7 +195,8 @@
 
     @media (max-width: 860px) {
       .hero { grid-template-columns: minmax(0, 1fr); grid-template-areas: "title" "demo" "copy"; grid-template-rows: auto; padding-block: 36px 24px; }
-      .hero h1 { margin-bottom: 20px; }
+      .hero h1 { margin-bottom: 10px; }
+      .deck { font-size: var(--t-body); margin-bottom: 16px; text-wrap: pretty; }
       .hero h1 { font-size: 2.45rem; text-wrap: balance; }
       .demo { justify-self: stretch; max-width: none; margin-bottom: 20px; }
       .copy .stores { order: -1; }
@@ -233,7 +235,10 @@ var s=document.createElement('script');s.async=true;s.src='https://www.googletag
 
     <main>
       <section class="hero">
-        <h1>Send a photo they have to solve.</h1>
+        <div class="title">
+          <h1>Send a photo they have to solve.</h1>
+          <p class="deck">Send it as a link in any chat. They solve it in their browser, with nothing to install.</p>
+        </div>
 
         <figure class="demo" aria-labelledby="demo-hint">
           <div class="demo-top"><span><b>9 pieces</b> &middot; Easy</span><span id="count" aria-live="polite">0 swaps</span></div>
