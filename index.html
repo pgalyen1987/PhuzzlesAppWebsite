@@ -259,7 +259,7 @@ var s=document.createElement('script');s.async=true;s.src='https://www.googletag
           <p>Phuzzles cuts your photo into pieces and shuffles them. Your friend swaps them back, and <b>the message you wrote only shows up when the last piece lands.</b></p>
           <div class="stores">
             <a href="https://apps.apple.com/app/id6766833614" target="_blank" rel="noopener"><img src="/app-store-badge.svg" alt="Download on the App Store" /></a>
-            <a href="https://play.google.com/store/apps/details?id=rebelstudios.phuzzles.app" target="_blank" rel="noopener"><img class="gp" src="/google-play-badge.png" alt="Get it on Google Play" /></a>
+            <a href="https://play.google.com/store/apps/details?id=rebelstudios.phuzzles.app&amp;referrer=utm_source%3Dphuzzles.app%26utm_medium%3Dhome" target="_blank" rel="noopener"><img class="gp" src="/google-play-badge.png" alt="Get it on Google Play" /></a>
           </div>
           <p class="price">Free, with ads.</p>
         </div>
@@ -350,8 +350,9 @@ var s=document.createElement('script');s.async=true;s.src='https://www.googletag
       status();
     })();
 
-    // Forward campaign source (from tracking QRs/links) to the Play Store as install-referrer,
-    // so the app's Install Referrer API can attribute the install to where the scan came from.
+    // The Play badge already carries a baseline install-referrer (utm_source=phuzzles.app,
+    // utm_medium=home) in its href, so a plain visit still attributes the install to the site.
+    // If the visitor arrived on a tracked link (QR/campaign), replace it with that fuller source.
     (function () {
       try {
         var q = new URLSearchParams(location.search);
@@ -359,10 +360,10 @@ var s=document.createElement('script');s.async=true;s.src='https://www.googletag
         ['utm_source','utm_medium','utm_campaign','utm_content'].forEach(function (k) {
           var v = q.get(k); if (v) parts.push(k + '=' + v);
         });
-        if (!parts.length) return;
+        if (!q.get('utm_source')) return;
         var referrer = encodeURIComponent(parts.join('&'));
         document.querySelectorAll('a[href*="play.google.com"]').forEach(function (a) {
-          a.href += (a.href.indexOf('?') > -1 ? '&' : '?') + 'referrer=' + referrer;
+          a.href = a.href.split('&referrer=')[0] + '&referrer=' + referrer;
         });
       } catch (e) {}
     })();
