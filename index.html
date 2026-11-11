@@ -251,7 +251,7 @@ var s=document.createElement('script');s.async=true;s.src='https://www.googletag
           </div>
           <div class="demo-foot">
             <span id="demo-hint">Tap two pieces to swap them.</span>
-            <a class="again" id="again" href="/today" hidden>Try today's puzzle</a>
+            <a class="again" id="again" href="/today/" hidden>Try today's puzzle</a>
           </div>
         </figure>
 
@@ -346,7 +346,7 @@ var s=document.createElement('script');s.async=true;s.src='https://www.googletag
         board.appendChild(b); tiles.push(b);
       }
       tiles.forEach(function (_, i) { place(i); });
-      again.href = '/today' + location.search; // campaign tags ride along to the daily
+      again.href = '/today/' + location.search; // campaign tags ride along to the daily
       status();
     })();
 
