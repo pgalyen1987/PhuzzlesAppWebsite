@@ -99,6 +99,15 @@
     .stores .gp { height: 64px; margin: -10px -8px; }
     .stores a:focus-visible { outline: 2px solid var(--teal); outline-offset: 3px; }
     .price { margin-top: 16px; font-size: var(--t-sm); color: var(--muted); }
+    /* Solving without installing is the honest third option next to the two badges, so it gets a
+       real 44px target instead of sitting in the fine print with them. */
+    .try { margin-top: 18px; }
+    .try p { font-size: var(--t-sm); color: var(--muted); }
+    .try a { display: inline-flex; align-items: center; min-height: 44px; margin-top: 10px; padding: 0 20px;
+      border: 1px solid var(--line); border-radius: 12px; color: var(--teal); font-size: var(--t-body);
+      text-decoration: none; }
+    .try a:hover { border-color: var(--teal); }
+    .try a:focus-visible { outline: 2px solid var(--teal); outline-offset: 3px; }
 
     /* ── The puzzle ── */
     .demo { grid-area: demo; margin: 0; width: 100%; max-width: 520px; justify-self: end; }
@@ -266,6 +275,11 @@ var s=document.createElement('script');s.async=true;s.src='https://www.googletag
           <a href="https://play.google.com/store/apps/details?id=rebelstudios.phuzzles.app&amp;referrer=utm_source%3Dphuzzles.app%26utm_medium%3Didea_page%26utm_campaign%3Dsurprise-trip-puzzle" target="_blank" rel="noopener"><img class="gp" src="/google-play-badge.png" alt="Get it on Google Play" /></a>
         </div>
         <p class="price">Free, with ads. <a href="/">How Phuzzles works</a></p>
+        <div class="try">
+          <p>Want to try one before you send one? Today's puzzle works the same way: solve it and the
+            note underneath tells you what you are looking at. Nothing to install.</p>
+          <a href="/today/?from=trip">Solve today's puzzle</a>
+        </div>
     </main>
 
     <footer>
