@@ -14,7 +14,7 @@ footer = footer.replace("      <p>Puffin photo by Fred Yost, U.S. Fish and Wildl
 
 EXTRA_CSS = """
     /* idea pages */
-    .idea { max-width: 720px; padding-block: 48px 72px; }
+    .idea { max-width: 720px; margin-inline: auto; padding-block: 48px 72px; }
     .idea h1 { font: 700 var(--t-h1)/1.08 'Archivo', system-ui, sans-serif; letter-spacing: -0.02em; margin: 0 0 18px; }
     .idea .lede { font-size: var(--t-lg); color: var(--muted); margin: 0 0 32px; }
     .idea h2 { font: 700 1.6rem/1.2 'Archivo', system-ui, sans-serif; margin: 44px 0 14px; }
