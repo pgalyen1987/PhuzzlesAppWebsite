@@ -35,6 +35,17 @@ def page(slug, title, desc, h1, lede, body):
     h = re.sub(r'<meta property="og:title" content="[^"]*" />', f'<meta property="og:title" content="{html.escape(h1)}" />', h)
     h = re.sub(r'<meta property="og:description" content="[^"]*" />', f'<meta property="og:description" content="{html.escape(desc)}" />', h)
     h = h.replace('  <link rel="preload" as="image" href="/img/puffin-960.jpg" />\n', "")
+    # A per-page breadcrumb so the intent pages show "Phuzzles › <page>" in search,
+    # not a bare URL. The crumb is the slug read as words; nothing invented.
+    crumb = slug.replace("-", " ")
+    crumb = crumb[0].upper() + crumb[1:]
+    breadcrumb = ('  <script type="application/ld+json">{"@context":"https://schema.org",'
+        '"@type":"BreadcrumbList","itemListElement":['
+        '{"@type":"ListItem","position":1,"name":"Phuzzles","item":"https://phuzzles.app/"},'
+        '{"@type":"ListItem","position":2,"name":"' + html.escape(crumb) + '",'
+        '"item":"https://phuzzles.app/' + slug + '"}]}</script>\n')
+    h = h.replace('id=rebelstudios.phuzzles.app"]}</script>\n',
+                  'id=rebelstudios.phuzzles.app"]}</script>\n' + breadcrumb, 1)
     stores = """        <div class="stores">
           <a href="https://apps.apple.com/app/id6766833614" target="_blank" rel="noopener"><img src="/app-store-badge.svg" alt="Download on the App Store" /></a>
           <a href="https://play.google.com/store/apps/details?id=rebelstudios.phuzzles.app&amp;referrer=utm_source%3Dphuzzles.app%26utm_medium%3Didea_page%26utm_campaign%3D{slug}" target="_blank" rel="noopener"><img class="gp" src="/google-play-badge.png" alt="Get it on Google Play" /></a>
