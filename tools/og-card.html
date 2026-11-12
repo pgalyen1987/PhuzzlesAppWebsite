@@ -97,7 +97,13 @@
       // we put in a bio or on a poster. Its card must not show store badges: the page's whole
       // promise is that there is nothing to install. No time of day, for the same reason the
       // archive carries no count -- 11:00 Eastern is a fact about our scheduler, not about the card.
-      today:     { h1: 'A new photo puzzle <em>every day</em>', foot: 'No app, no account. Solve it in your browser.' }
+      today:     { h1: 'A new photo puzzle <em>every day</em>', foot: 'No app, no account. Solve it in your browser.' },
+      // The card a RECIPIENT sees in their chat app when a friend sends them a puzzle. It is the
+      // only card addressed to someone who did not ask for it, so it names the sender's act, not
+      // the product, and it carries no store badges: the link opens a playable board in the
+      // browser. Nothing here can name the photo or the message -- the card is static and the
+      // point of the puzzle is that both are hidden until it is solved.
+      solve:     { h1: 'Someone sent you a <em>photo puzzle</em>', foot: 'No app, no account. Solve it in your browser.' }
     };
     var k = new URLSearchParams(location.search).get('k');
     var c = CARDS[k];
