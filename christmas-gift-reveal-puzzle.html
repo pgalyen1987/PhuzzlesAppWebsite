@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>A Christmas present they have to solve | Phuzzles</title>
+  <meta name="description" content="Reveal a Christmas present as a photo puzzle. They put the picture back together to find out what it is, and the details are hidden underneath until the last piece lands. It opens in any browser, so there is nothing to post and nothing to print." />
+  <link rel="canonical" href="https://phuzzles.app/christmas-gift-reveal-puzzle" />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://phuzzles.app/christmas-gift-reveal-puzzle" />
+  <meta property="og:title" content="A Christmas present they have to solve" />
+  <meta property="og:description" content="Reveal a Christmas present as a photo puzzle. They put the picture back together to find out what it is, and the details are hidden underneath until the last piece lands. It opens in any browser, so there is nothing to post and nothing to print." />
+  <meta property="og:image" content="https://phuzzles.app/img/og-card.jpg" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <link rel="icon" href="/logo-128.png" />
+  <meta name="p:domain_verify" content="2bfbe3a7439e88521da95d7c58b99bec" />
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"MobileApplication","name":"Phuzzles","alternateName":"Phuzzles: Photo Puzzle Reveal","description":"Send a photo as a puzzle. The person you send it to sees the photo, and the message hidden under it, only when they solve it.","url":"https://phuzzles.app/","image":"https://phuzzles.app/img/og-card.jpg","operatingSystem":"iOS, Android","applicationCategory":"GameApplication","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},"publisher":{"@type":"Organization","name":"Rebel Studios","url":"https://rebelstudiossoftware.com"},"sameAs":["https://apps.apple.com/app/id6766833614","https://play.google.com/store/apps/details?id=rebelstudios.phuzzles.app"]}</script>
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Phuzzles","item":"https://phuzzles.app/"},{"@type":"ListItem","position":2,"name":"Christmas present puzzle","item":"https://phuzzles.app/christmas-gift-reveal-puzzle"}]}</script>
+  <link rel="preload" as="font" type="font/woff2" href="/fonts/archivo-var-latin.woff2" crossorigin />
+  <link rel="preload" as="font" type="font/woff2" href="/fonts/dm-sans-var-latin.woff2" crossorigin />
+  <style>
+    /* Fonts are self-hosted: no request leaves for a font CDN. */
+    @font-face { font-family: 'Archivo'; src: url('/fonts/archivo-var-latin.woff2') format('woff2');
+      font-weight: 700 900; font-stretch: 62% 125%; font-display: swap; }
+    @font-face { font-family: 'DM Sans'; src: url('/fonts/dm-sans-var-latin.woff2') format('woff2');
+      font-weight: 400 600; font-display: swap; }
+    @font-face { font-family: 'Gochi Hand'; src: url('/fonts/gochi-hand-400-latin.woff2') format('woff2');
+      font-weight: 400; font-display: swap; }
+
+    /* The app's own colours: its navy ground, coral buttons and teal selection. The paper is the note. */
+    :root {
+      --ink: #1A1A2E;
+      --panel: #23233E;
+      --line: rgba(245, 243, 239, 0.12);
+      --text: #F5F3EF;
+      --muted: #A9A9C6;
+      --coral: #FF6B6B;
+      --teal: #4ECDC4;
+      --paper: #FFF3E4;
+      --paper-ink: #2A2238;
+      /* type steps by the square root of phi (1.272) from 16px */
+      --t-sm: 0.786rem;
+      --t-body: 1.0625rem;
+      --t-lg: 1.272rem;
+      --t-h2: 2.06rem;
+      --t-h1: clamp(2.4rem, 4.6vw, 3.33rem);
+      --wide: 1160px;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; }
+    html { -webkit-text-size-adjust: 100%; }
+    body {
+      margin: 0;
+      background: var(--ink);
+      color: var(--text);
+      font: 400 var(--t-body)/1.6 'DM Sans', system-ui, sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+    a { color: inherit; }
+    img { max-width: 100%; height: auto; display: block; }
+
+    .wrap { max-width: var(--wide); margin: 0 auto; padding-inline: 20px; }
+
+    /* ── Top bar ── */
+    .bar { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding-block: 22px 0; }
+    .brand { display: flex; align-items: center; gap: 12px; text-decoration: none; }
+    .brand img { width: 40px; height: 40px; border-radius: 10px; }
+    .brand span {
+      font-family: 'Archivo', sans-serif; font-weight: 800; font-stretch: 112%;
+      font-size: 1.45rem; letter-spacing: -0.01em; line-height: 1;
+    }
+    .bar .by { font-size: var(--t-sm); color: var(--muted); }
+
+    /* ── Hero: words against the puzzle at 1 : 1.618 ── */
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1.618fr);
+      grid-template-areas: "title demo" "copy demo";
+      grid-template-rows: auto 1fr;
+      column-gap: 56px;
+      padding-block: 64px 40px;
+    }
+    .hero .title { grid-area: title; align-self: end; }
+    .hero h1 {
+      margin: 0 0 12px;
+      font-family: 'Archivo', sans-serif; font-weight: 800; font-stretch: 108%;
+      font-size: var(--t-h1); line-height: 1.04; letter-spacing: -0.025em;
+    }
+    .deck { margin: 0 0 20px; max-width: 34ch; font-size: var(--t-lg); line-height: 1.35; color: var(--muted); }
+    .copy { grid-area: copy; display: flex; flex-direction: column; }
+    .copy p { margin: 0 0 28px; color: var(--muted); max-width: 34ch; }
+    .copy p b { color: var(--text); font-weight: 600; }
+    .stores { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
+    .stores a { display: block; border-radius: 8px; }
+    .stores img { height: 44px; width: auto; max-width: none; }
+    /* Google's badge PNG carries transparent padding that Apple's SVG does not */
+    .stores .gp { height: 64px; margin: -10px -8px; }
+    .stores a:focus-visible { outline: 2px solid var(--teal); outline-offset: 3px; }
+    .price { margin-top: 16px; font-size: var(--t-sm); color: var(--muted); }
+
+    /* ── The puzzle ── */
+    .demo { grid-area: demo; margin: 0; width: 100%; max-width: 520px; justify-self: end; }
+    .demo-top {
+      display: flex; justify-content: space-between; align-items: baseline;
+      font-size: var(--t-sm); color: var(--muted); margin-bottom: 10px;
+      font-variant-numeric: tabular-nums;
+    }
+    .demo-top b { color: var(--text); font-weight: 600; }
+    .stage { position: relative; padding-bottom: 34px; }
+    .board {
+      position: relative; z-index: 2;
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 3px;
+      aspect-ratio: 1; background: var(--ink); border-radius: 12px; overflow: hidden;
+      box-shadow: 0 1px 0 rgba(255,255,255,0.06) inset, 0 24px 48px -24px rgba(0,0,0,0.6);
+      transition: gap 0.35s ease;
+    }
+    .tile {
+      appearance: none; border: 0; padding: 0; margin: 0; cursor: pointer;
+      background-image: url('/img/puffin-960.jpg'); background-size: 300% 300%;
+      border-radius: 3px; transition: transform 0.14s ease, border-radius 0.35s ease, filter 0.14s ease;
+    }
+    .tile:hover { filter: brightness(1.08); }
+    .tile:focus-visible { outline: 3px solid var(--teal); outline-offset: -3px; }
+    .tile[aria-pressed="true"] { outline: 3px solid var(--coral); outline-offset: -3px; transform: scale(0.95); }
+    .tile.pop { animation: pop 0.2s ease; }
+    @keyframes pop { 40% { transform: scale(0.93); } }
+    .board.solved { gap: 0; }
+    .board.solved .tile { border-radius: 0; cursor: default; filter: none; }
+
+    /* The note tucked under the board: its edge shows, the words don't until the puzzle is solved. */
+    .note {
+      position: absolute; z-index: 1; left: 7%; right: 7%; bottom: 0;
+      background: var(--paper); color: var(--paper-ink);
+      border-radius: 2px; padding: 44px 22px 16px;
+      box-shadow: 0 1px 0 rgba(255,255,255,0.55) inset, 0 14px 30px -16px rgba(0,0,0,0.75),
+                  0 2px 4px rgba(0,0,0,0.25);
+    }
+    .note .edge {
+      position: absolute; left: 22px; right: 22px; bottom: 9px;
+      font-size: var(--t-sm); letter-spacing: 0.04em; color: #8A7F92;
+    }
+    .note .msg {
+      margin: 0; font-family: 'Gochi Hand', 'Bradley Hand', 'Segoe Print', 'DM Sans', system-ui, sans-serif;
+      font-size: 1.618rem; line-height: 1.5; visibility: hidden;
+    }
+    /* Solved: the note slides out and takes real space, so a long message never covers what follows. */
+    .stage.open { padding-bottom: 0; }
+    .stage.open .note {
+      position: relative; left: auto; right: auto; bottom: auto; margin: -24px 7% 0;
+      animation: slide-out 0.5s cubic-bezier(.2,.8,.2,1);
+    }
+    @keyframes slide-out { from { transform: translateY(-70%); } to { transform: none; } }
+    .stage.open .note .msg { visibility: visible; }
+    .stage.open .note .edge { display: none; }
+
+    .demo-foot { display: flex; justify-content: space-between; gap: 12px; margin-top: 12px; font-size: var(--t-sm); color: var(--muted); }
+    .again {
+      appearance: none; background: none; border: 0; padding: 0; font: inherit; color: var(--teal); white-space: nowrap;
+      text-decoration: underline; text-underline-offset: 3px; cursor: pointer;
+    }
+    .again[hidden] { display: none; }
+
+    /* ── On the box ── */
+    .box {
+      display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.618fr);
+      column-gap: 56px; align-items: start;
+      border-top: 1px solid var(--line);
+      padding-block: 64px 40px;
+    }
+    .box h2 {
+      margin: 0 0 8px; font-family: 'Archivo', sans-serif; font-weight: 800; font-stretch: 108%;
+      font-size: var(--t-h2); letter-spacing: -0.015em; line-height: 1.1;
+    }
+    .box .lede { margin: 0 0 28px; color: var(--muted); }
+    .shot { max-width: 300px; justify-self: center; }
+    .shot img { border-radius: 18px; }
+    .shot figcaption { margin-top: 10px; font-size: var(--t-sm); color: var(--muted); text-align: center; }
+    dl { margin: 0; }
+    dl div {
+      display: grid; grid-template-columns: 7.5em minmax(0, 1fr); gap: 16px;
+      padding-block: 14px; border-top: 1px solid var(--line);
+    }
+    dl div:last-child { border-bottom: 1px solid var(--line); }
+    dt { font-weight: 600; }
+    dd { margin: 0; color: var(--muted); }
+
+    /* ── Footer ── */
+    footer { border-top: 1px solid var(--line); padding-block: 28px 44px; font-size: var(--t-sm); color: var(--muted); }
+    footer p { margin: 0 0 12px; max-width: 62ch; }
+    footer nav { display: flex; flex-wrap: wrap; gap: 8px 20px; margin-bottom: 18px; }
+    footer a { text-underline-offset: 3px; }
+    footer a:hover { color: var(--text); }
+
+    @media (max-width: 860px) {
+      .hero { grid-template-columns: minmax(0, 1fr); grid-template-areas: "title" "demo" "copy"; grid-template-rows: auto; padding-block: 36px 24px; }
+      .hero h1 { margin-bottom: 10px; }
+      .deck { font-size: var(--t-body); margin-bottom: 16px; text-wrap: pretty; }
+      .hero h1 { font-size: 2.45rem; text-wrap: balance; }
+      .demo { justify-self: stretch; max-width: none; margin-bottom: 20px; }
+      .copy .stores { order: -1; }
+      .copy .price { order: -1; margin: 10px 0 28px; }
+      .box { grid-template-columns: minmax(0, 1fr); row-gap: 32px; padding-block: 44px 28px; }
+      .shot { order: 2; max-width: 240px; }
+    }
+    @media (max-width: 420px) {
+      .bar .by { display: none; }
+      dl div { grid-template-columns: minmax(0, 1fr); gap: 2px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .board, .tile { transition: none; }
+      .tile.pop, .stage.open .note { animation: none; }
+    }
+    footer .ideas a { white-space: nowrap; }
+
+    /* idea pages */
+    .idea { max-width: 720px; margin-inline: auto; padding-block: 48px 72px; }
+    .idea h1 { font: 700 var(--t-h1)/1.08 'Archivo', system-ui, sans-serif; letter-spacing: -0.02em; margin: 0 0 18px; }
+    .idea .lede { font-size: var(--t-lg); color: var(--muted); margin: 0 0 32px; }
+    .idea h2 { font: 700 1.6rem/1.2 'Archivo', system-ui, sans-serif; margin: 44px 0 14px; }
+    .idea ol { padding-left: 1.2em; }
+    .idea li { margin: 0 0 14px; }
+    .idea li b { color: var(--paper); }
+    .idea .tip { background: var(--panel); border: 1px solid var(--line); border-left: 3px solid var(--coral); border-radius: 14px; padding: 16px 18px; margin: 28px 0; }
+    .idea .stores { margin-top: 28px; }
+    .idea a { color: var(--teal); }
+    /* The one thing to do on the page, and it sits in the first screen: measured 2026-11-11, the
+       first tappable element used to be 1,671px down a 2,212px page, so a visitor from a pin saw
+       a headline and a paragraph and nothing to do. Action first, explanation under it. */
+    .try { margin: 0 0 10px; }
+    .try p { font-size: var(--t-sm); color: var(--muted); margin: 12px 0 0; }
+    .try a { display: inline-flex; align-items: center; min-height: 44px; padding: 0 20px;
+      border: 1px solid var(--line); border-radius: 12px; color: var(--teal); font-size: var(--t-body);
+      text-decoration: none; }
+    .try a:hover { border-color: var(--teal); }
+    .try a:focus-visible { outline: 2px solid var(--teal); outline-offset: 3px; }
+  </style>
+<!-- Google Analytics: the property shared by Rebel Studios sites (reports split by hostname). Visitors in the
+     EEA, UK and Switzerland default to consent "denied" (cookieless, no cookies); ads storage is never granted. -->
+<script>
+window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}
+if(!/^(localhost|127\.|0\.0\.0\.0)/.test(location.hostname)){
+gtag('consent','default',{ad_storage:'denied',ad_user_data:'denied',ad_personalization:'denied',analytics_storage:'denied',region:['AT','BE','BG','HR','CY','CZ','DK','EE','FI','FR','DE','GR','HU','IE','IT','LV','LT','LU','MT','NL','PL','PT','RO','SK','SI','ES','SE','IS','LI','NO','GB','CH']});
+gtag('consent','default',{ad_storage:'denied',ad_user_data:'denied',ad_personalization:'denied',analytics_storage:'granted'});
+gtag('js',new Date());gtag('config','G-00TNDVMQNM');
+var s=document.createElement('script');s.async=true;s.src='https://www.googletagmanager.com/gtag/js?id=G-00TNDVMQNM';document.head.appendChild(s);
+}
+</script>
+</head>
+<body>
+  <div class="wrap">
+    <header class="bar">
+      <a class="brand" href="/"><img src="/logo-128.png" alt="" width="40" height="40" /><span>Phuzzles</span></a>
+      <span class="by">A Rebel Studios app</span>
+    </header>
+
+    <main class="idea">
+      <h1>A Christmas present they have to solve</h1>
+      <p class="lede">Some presents will not go in a box. A flight, a ticket, a weekend away, a dog arriving in January. Phuzzles scrambles the photo of the thing itself, so they work out what it is a piece at a time, and the details you folded underneath show up when the last piece lands. It goes as a link that opens in any browser, so the person you send it to does not need the app and nothing has to arrive in the post.</p>
+      <div class="try">
+        <a href="/today/?from=christmas">Solve today's puzzle</a>
+        <p>Try one before you send one. It works like the one you would send, and there is nothing
+          to install.</p>
+      </div>
+      <h2>How to do it</h2>
+      <ol>
+        <li><b>Pick the photo that gives it away last.</b> Not a beach, not a generic dog: the tickets on the kitchen table with the date showing, the cabin under snow, the puppy in the breeder's arms, the departures board. If the first corner piece answers the question, pick a different photo.</li>
+        <li><b>Match the size to who is holding the phone.</b> 6&times;6 for the adult who is going to sit down with it and a coffee. 3&times;3 for a seven year old on Christmas morning, who wants the answer now and will put the phone down if it takes longer than that.</li>
+        <li><b>Put the details in the message.</b> Up to 200 characters, hidden until the puzzle is solved: the date, who else is coming, what it cost you to keep quiet about it since October.</li>
+        <li><b>Send it when you want it opened.</b> Pick someone who has Phuzzles by their username, or start a group and send one puzzle to the whole family, so everyone gets the same puzzle and nobody hears it secondhand. Or send it as a link, from an iPhone or from Android, that opens in any phone's browser.</li>
+        <li><b>Wait.</b> You get a notification when it's solved.</li>
+      </ol>
+      <p class="tip">The people who are not in the room are the ones this is for. A posted puzzle has to be ordered and printed and mailed in time. A link reaches your mother three time zones away while the wrapping paper is still on the floor.</p>
+      <h2>What it won't do</h2>
+      <p>It will not go under the tree. There is no printed copy and no card: what they get is a link on their phone, so if the present has to be a physical object in their hands, this is the wrong thing to use.</p>
+      <p>There is also no scheduled send and no timer. A puzzle goes the moment you send it, so if it has to land on Christmas morning, send it on Christmas morning.</p>
+      <h2>Worth knowing</h2>
+      <p>Only the people you send it to can open it, or anyone you give its link to. Nothing goes on the public Feed unless you post it there yourself. Puzzles and their photos are kept while your account exists and are deleted with it. Delete a puzzle in the app and its photo goes too.</p>
+        <div class="stores">
+          <a href="https://apps.apple.com/app/id6766833614" target="_blank" rel="noopener"><img src="/app-store-badge.svg" alt="Download on the App Store" /></a>
+          <a href="https://play.google.com/store/apps/details?id=rebelstudios.phuzzles.app&amp;referrer=utm_source%3Dphuzzles.app%26utm_medium%3Didea_page%26utm_campaign%3Dchristmas-gift-reveal-puzzle" target="_blank" rel="noopener"><img class="gp" src="/google-play-badge.png" alt="Get it on Google Play" /></a>
+        </div>
+        <p class="price">Free, with ads. <a href="/">How Phuzzles works</a></p>
+    </main>
+
+    <footer>
+      <p>Phuzzles is made by Rebel Studios. Questions, bugs or a puzzle that won't open: <a href="mailto:support@phuzzles.app">support@phuzzles.app</a></p>
+      <p class="ideas">Ideas: <a href="/pregnancy-announcement-puzzle">a pregnancy announcement</a> &middot; <a href="/birthday-puzzle">a birthday</a> &middot; <a href="/new-puppy-puzzle">a new puppy</a> &middot; <a href="/surprise-trip-puzzle">a surprise trip</a> &middot; <a href="/christmas-gift-reveal-puzzle">a Christmas present</a></p>
+      <nav aria-label="More from Phuzzles">
+        <a href="/plus">Phuzzles Plus</a>
+        <a href="/press">Press kit</a>
+        <a href="/privacy.html">Privacy</a>
+        <a href="/terms.html">Terms</a>
+        <a href="/delete-account">Delete your account</a>
+        <a href="/child-safety">Child safety</a>
+      </nav>
+    </footer>
+  </div>
+  <script>
+    // Arrived from a tagged link (a pin, a post)? Pass its tags to Play so the install is credited to it.
+    (function () {
+      try {
+        var q = new URLSearchParams(location.search), parts = [];
+        ['utm_source', 'utm_medium', 'utm_campaign', 'utm_content'].forEach(function (k) { var v = q.get(k); if (v) parts.push(k + '=' + v); });
+        if (!q.get('utm_source')) return;
+        if (!q.get('utm_campaign')) parts.push('utm_campaign=christmas-gift-reveal-puzzle');
+        document.querySelectorAll('a[href*="play.google.com"]').forEach(function (a) {
+          a.href = a.href.split('&referrer=')[0] + '&referrer=' + encodeURIComponent(parts.join('&'));
+        });
+      } catch (e) {}
+    })();
+  </script>
+</body>
+</html>
