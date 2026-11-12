@@ -215,6 +215,7 @@ var s=document.createElement('script');s.async=true;s.src='https://www.googletag
     if (l === "ja" || l.indexOf("ja-") === 0) return "ja";
     if (l === "fr" || l.indexOf("fr-") === 0) return "fr";
     if (l === "es" || l.indexOf("es-") === 0) return "es";
+    if (l === "de" || l.indexOf("de-") === 0) return "de";
     return "en";
   })();
   var STR = {
@@ -328,6 +329,43 @@ var s=document.createElement('script');s.async=true;s.src='https://www.googletag
       busySub: "Phuzzles solo admite un número limitado de personas a la vez desde una misma red. Inténtalo de nuevo en unos minutos.",
       offlineSub: "El rompecabezas no se cargó. Revisa tu conexión e inténtalo de nuevo.",
       tryAgain: "Reintentar"
+    },
+    de: {
+      loading: "Dein Phuzzle wird geladen…",
+      gtToday: "Das <em>Phuzzle</em> des Tages",
+      gtYesterday: "Das <em>Phuzzle</em> von gestern",
+      gtSolve: "Löse das <em>Phuzzle</em>",
+      gtSender: function(x){ return escapeHtml(x) + " hat dir ein <em>Phuzzle</em> geschickt"; },
+      gameSub: function(n,total){ return "Zieh ein Teil auf ein anderes, um sie zu tauschen, oder tippe beide an. " + n + " breit, " + total + " Teile."; },
+      progress: function(home,total){ return home + " von " + total + " an ihrem Platz"; },
+      moves: function(m){ return m + (m === 1 ? " Tausch" : " Tausche"); },
+      peekLabel: "Gedrückt halten, um das Foto zu sehen",
+      wonSolved: "Gelöst.",
+      wonImgAlt: "Das wieder zusammengesetzte Foto",
+      wonFewest: function(m){ return "In " + m + (m === 1 ? " Tausch" : " Tauschen") + " gelöst, das mögliche Minimum."; },
+      won: function(m,f){ return "In " + m + (m === 1 ? " Tausch" : " Tauschen") + " gelöst (mögliches Minimum: " + f + ")."; },
+      pitch: "<b>Phuzzles</b> macht aus einem Foto ein Puzzle, das du verschickst. Man löst es, um das Bild und deine Nachricht zu sehen.",
+      ctaMakeDefault: "Schick eins zurück",
+      ctaMakeOfficial: "Mach eins mit deinem Foto",
+      wonFootDefault: "Kostenlos für iPhone und Android, mit Werbung.",
+      wonFootOfficial: "Jeden Tag ein neues um 11:00 Uhr (US-Ostküstenzeit): <a href=\"/today/\">phuzzles.app/today</a><br>Die App ist kostenlos für iPhone und Android, mit Werbung.",
+      shareToday: "Das heutige Puzzle teilen",
+      linkCopied: "Link kopiert",
+      brag: function(m,f){ return "Ich habe das heutige Phuzzle in " + m + (m === 1 ? " Tausch" : " Tauschen") + " gelöst (das mögliche Minimum ist " + f + "). Du bist dran."; },
+      instGot: "Du hast ein <em>Phuzzle</em> bekommen!",
+      instSender: function(x){ return escapeHtml(x) + " hat dir ein <em>Phuzzle</em> geschickt!"; },
+      instSub: "Lade die App, um es zu lösen und die versteckte Nachricht zu sehen.",
+      instPlay: "Jetzt bei Google Play",
+      appStore: "Laden im App Store",
+      instHome: "Was ist Phuzzles?",
+      nfTitle: "Seite nicht gefunden",
+      nfSub: "Dieser Link führt nirgendwohin.",
+      nfBtn: "Zu Phuzzles",
+      busyTitle: "Zu viele Erstbesuche aus diesem Netzwerk",
+      offlineTitle: "Phuzzles ist nicht erreichbar",
+      busySub: "Aus einem Netzwerk können nur begrenzt viele Personen gleichzeitig teilnehmen. Versuch es in ein paar Minuten noch einmal.",
+      offlineSub: "Das Puzzle wurde nicht geladen. Prüf deine Verbindung und versuch es noch einmal.",
+      tryAgain: "Erneut versuchen"
     }
   };
   function D(key){ var d = STR[LANG]; return d ? d[key] : undefined; }
