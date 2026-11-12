@@ -46,6 +46,18 @@ ul{list-style:none;display:grid;gap:22px;margin-top:40px;grid-template-columns:r
 .cap{display:block;padding:6px 14px 15px;color:var(--muted);font-size:13.5px}
 footer{margin-top:60px;color:var(--muted);font-size:14px}
 footer a{color:var(--teal)}
+/* The exit this page did not have. Proportions step by phi off the h1's 55px cap. */
+.send{margin-top:97px;max-width:655px;background:var(--panel);border-radius:14px;padding:clamp(21px,5vw,34px)}
+.send h2{font-family:'Archivo',sans-serif;font-weight:800;font-size:clamp(26px,4vw,34px);line-height:1.12;letter-spacing:-.015em}
+.send p{color:var(--muted);margin-top:13px;max-width:56ch}
+.send a{color:var(--teal)}
+.stores{display:flex;flex-wrap:wrap;align-items:center;gap:12px;margin-top:21px}
+.stores a{display:block;border-radius:8px}
+.stores img{height:44px;width:auto}
+/* Google's badge PNG carries transparent padding that Apple's SVG does not */
+.stores .gp{height:64px;margin:-10px -8px}
+.stores a:focus-visible{outline:2px solid var(--teal);outline-offset:3px}
+.price{margin-top:16px;font-size:14px;color:var(--muted)}
 </style>
 </head>
 <body>
@@ -330,6 +342,19 @@ footer a{color:var(--teal)}
       </a>
     </li>
   </ul>
+  <section class="send">
+    <h2>Send one of your own</h2>
+    <p>These 39 are ours. They work the way the one you send works: a photo in pieces, and a note
+       underneath it that shows up when the last piece lands. Yours would be your photo, and the
+       thing you actually want to say.</p>
+    <p>Making one needs the app, on an iPhone or on Android. Solving one needs nothing at all,
+       same as every puzzle on this page.</p>
+    <div class="stores">
+      <a href="https://apps.apple.com/app/id6766833614" target="_blank" rel="noopener"><img src="/app-store-badge.svg" alt="Download on the App Store" /></a>
+      <a href="https://play.google.com/store/apps/details?id=rebelstudios.phuzzles.app&amp;referrer=utm_source%3Dphuzzles.app%26utm_medium%3Darchive_page%26utm_campaign%3Ddaily" target="_blank" rel="noopener"><img class="gp" src="/google-play-badge.png" alt="Get it on Google Play" /></a>
+    </div>
+    <p class="price">Free, with ads. <a href="/">How Phuzzles works</a></p>
+  </section>
   <footer>
     <a href="/">Phuzzles</a> · Made by Rebel Studios ·
     Photos are public domain or openly licensed; each puzzle credits its source.
