@@ -133,17 +133,17 @@
     .note {
       position: absolute; z-index: 1; left: 7%; right: 7%; bottom: 0;
       background: var(--paper); color: var(--paper-ink);
-      border-radius: 3px; padding: 44px 22px 16px;
-      box-shadow: 0 10px 24px -12px rgba(0,0,0,0.7);
-      transform: rotate(-1.2deg);
+      border-radius: 2px; padding: 44px 22px 16px;
+      box-shadow: 0 1px 0 rgba(255,255,255,0.55) inset, 0 14px 30px -16px rgba(0,0,0,0.75),
+                  0 2px 4px rgba(0,0,0,0.25);
     }
     .note .edge {
       position: absolute; left: 22px; right: 22px; bottom: 9px;
       font-size: var(--t-sm); letter-spacing: 0.04em; color: #8A7F92;
     }
     .note .msg {
-      margin: 0; font-family: 'Gochi Hand', 'Comic Sans MS', cursive;
-      font-size: 1.618rem; line-height: 1.25; visibility: hidden;
+      margin: 0; font-family: 'Gochi Hand', 'Bradley Hand', 'Segoe Print', 'DM Sans', system-ui, sans-serif;
+      font-size: 1.618rem; line-height: 1.5; visibility: hidden;
     }
     /* Solved: the note slides out and takes real space, so a long message never covers what follows. */
     .stage.open { padding-bottom: 0; }
@@ -151,7 +151,7 @@
       position: relative; left: auto; right: auto; bottom: auto; margin: -24px 7% 0;
       animation: slide-out 0.5s cubic-bezier(.2,.8,.2,1);
     }
-    @keyframes slide-out { from { transform: translateY(-70%) rotate(-1.2deg); } to { transform: rotate(-1.2deg); } }
+    @keyframes slide-out { from { transform: translateY(-70%); } to { transform: none; } }
     .stage.open .note .msg { visibility: visible; }
     .stage.open .note .edge { display: none; }
 

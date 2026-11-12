@@ -86,10 +86,17 @@
   .full{position:relative;z-index:2;display:block;max-width:100%;max-height:70vh;width:auto;height:auto;
         margin:6px auto 0;border-radius:12px;box-shadow:0 24px 48px -24px rgba(0,0,0,.7)}
   /* Their message, on the same paper note the homepage tucks under its puzzle. */
-  .reveal{position:relative;z-index:1;margin:-10px 7% 0;padding:26px 20px 16px;background:var(--paper);
-          color:var(--paper-ink);border-radius:3px;box-shadow:0 10px 24px -12px rgba(0,0,0,.7);
-          transform:rotate(-1.2deg);text-align:left}
-  .reveal .msg{font-family:'Gochi Hand','Comic Sans MS',cursive;font-size:1.618rem;line-height:1.25;overflow-wrap:anywhere}
+  /* The note is the payoff, so it is set square to the photo: a small arbitrary tilt reads as
+     misaligned rather than as a note someone tossed down. Edge is a bright inset top line over a
+     soft drop, so it sits ON the photo as paper instead of floating as a coloured div. */
+  .reveal{position:relative;z-index:1;margin:-10px 7% 0;padding:34px 26px 21px;background:var(--paper);
+          color:var(--paper-ink);border-radius:2px;
+          box-shadow:0 1px 0 rgba(255,255,255,.55) inset,0 14px 30px -16px rgba(0,0,0,.75),
+                     0 2px 4px rgba(0,0,0,.25);
+          text-align:left}
+  /* No 'Comic Sans MS' and no generic `cursive`: on Windows `cursive` resolves to Comic Sans, so
+     leaving it in would keep the exact failure we are removing. Falls back to the brand sans. */
+  .reveal .msg{font-family:'Gochi Hand','Bradley Hand','Segoe Print','DM Sans',system-ui,sans-serif;font-size:1.618rem;line-height:1.5;overflow-wrap:anywhere}
   /* A note the sender chose to leave unlocked sits above the board instead of under the photo. */
   #game-reveal{margin:0 7% 16px}
   .pitch{margin:26px auto 0;max-width:34ch;color:var(--muted);font-size:15px;line-height:1.5}

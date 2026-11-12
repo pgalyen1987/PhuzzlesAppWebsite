@@ -132,12 +132,13 @@
   /* The note folded under the board slides out once it is solved, on the homepage's paper. */
   .note {
     position: relative; z-index: 1; margin: -10px 6% 0; padding: 26px 20px 16px;
-    background: var(--paper); color: var(--paper-ink); border-radius: 3px;
-    box-shadow: 0 10px 24px -12px rgba(0,0,0,0.7); transform: rotate(-1.2deg);
+    background: var(--paper); color: var(--paper-ink); border-radius: 2px;
+    box-shadow: 0 1px 0 rgba(255,255,255,0.55) inset, 0 14px 30px -16px rgba(0,0,0,0.75),
+                0 2px 4px rgba(0,0,0,0.25);
     animation: slide-out 0.5s cubic-bezier(.2,.8,.2,1);
   }
-  @keyframes slide-out { from { transform: translateY(-60%) rotate(-1.2deg); opacity: 0; } to { transform: rotate(-1.2deg); opacity: 1; } }
-  .msg { margin: 0; font-family: 'Gochi Hand', 'Comic Sans MS', cursive; font-size: 1.45rem; line-height: 1.25;
+  @keyframes slide-out { from { transform: translateY(-60%); opacity: 0; } to { transform: none; opacity: 1; } }
+  .msg { margin: 0; font-family: 'Gochi Hand', 'Bradley Hand', 'Segoe Print', 'DM Sans', system-ui, sans-serif; font-size: 1.45rem; line-height: 1.5;
          overflow-wrap: anywhere; white-space: pre-line; }
   .msg.long { font-size: var(--t-lg); }
 
@@ -207,7 +208,7 @@
   .paper {
     display: block; width: 100%; resize: none; border: 0; border-radius: 3px; padding: 14px 16px;
     background: var(--paper); color: var(--paper-ink); box-shadow: 0 10px 24px -12px rgba(0,0,0,0.7);
-    font: 400 var(--t-lg)/1.3 'Gochi Hand', 'Comic Sans MS', cursive;
+    font: 400 var(--t-lg)/1.45 'Gochi Hand', 'Bradley Hand', 'Segoe Print', 'DM Sans', system-ui, sans-serif;
   }
   .paper::placeholder { color: #9A8F99; }
   .paper:focus-visible { outline: 2px solid var(--teal); outline-offset: 3px; }
