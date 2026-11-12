@@ -89,14 +89,14 @@ const html = `<!doctype html>
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-<title>Every Phuzzle of the Day — solve any of them free</title>
+<title>Every Phuzzle of the Day: solve any of them free</title>
 <meta name="description" content="${rows.length} daily photo puzzles, newest first. Solve any of them in your browser: no app, no account, no sign-up." />
 <link rel="canonical" href="https://phuzzles.app/daily/" />
 <meta property="og:type" content="website" />
 <meta property="og:url" content="https://phuzzles.app/daily/" />
 <meta property="og:title" content="Every Phuzzle of the Day" />
 <meta property="og:description" content="${rows.length} daily photo puzzles. Solve any of them in your browser, nothing to install." />
-<meta property="og:image" content="https://phuzzles.app/img/og-card.jpg" />
+<meta property="og:image" content="https://phuzzles.app/img/og-daily.jpg" />
 <meta name="twitter:card" content="summary_large_image" />
 <meta name="theme-color" content="#1A1A2E" />
 <link rel="icon" href="/logo-128.png" />
@@ -129,8 +129,9 @@ footer a{color:var(--teal)}
 <body>
 <div class="wrap">
   <h1>Every Phuzzle of the Day</h1>
-  <p class="lede">${rows.length} daily photo puzzles, newest first. Every one is still solvable in your browser —
-     no app, no account, nothing to install. <a href="/today/">Today's is here</a>, and a new one lands at 11:00 Eastern.</p>
+  <p class="lede">${rows.length} daily photo puzzles, newest first. Every one is still solvable in your
+     browser. No app, no account, nothing to install. <a href="/today/">Today's is here</a>, and a new
+     one lands at 11:00 Eastern.</p>
   <p class="lede">The previews are scrambled, same as the puzzles. That is rather the point.</p>
   <ul>
 ${cards}
