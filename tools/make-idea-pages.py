@@ -24,11 +24,12 @@ EXTRA_CSS = """
     .idea .tip { background: var(--panel); border: 1px solid var(--line); border-left: 3px solid var(--coral); border-radius: 14px; padding: 16px 18px; margin: 28px 0; }
     .idea .stores { margin-top: 28px; }
     .idea a { color: var(--teal); }
-    /* Solving without installing is the honest third option next to the two badges, so it gets a
-       real 44px target instead of sitting in the fine print with them. */
-    .try { margin-top: 18px; }
-    .try p { font-size: var(--t-sm); color: var(--muted); }
-    .try a { display: inline-flex; align-items: center; min-height: 44px; margin-top: 10px; padding: 0 20px;
+    /* The one thing to do on the page, and it sits in the first screen: measured 2026-11-11, the
+       first tappable element used to be 1,671px down a 2,212px page, so a visitor from a pin saw
+       a headline and a paragraph and nothing to do. Action first, explanation under it. */
+    .try { margin: 0 0 10px; }
+    .try p { font-size: var(--t-sm); color: var(--muted); margin: 12px 0 0; }
+    .try a { display: inline-flex; align-items: center; min-height: 44px; padding: 0 20px;
       border: 1px solid var(--line); border-radius: 12px; color: var(--teal); font-size: var(--t-body);
       text-decoration: none; }
     .try a:hover { border-color: var(--teal); }
@@ -63,14 +64,15 @@ def page(slug, title, desc, h1, lede, body):
           <a href="https://play.google.com/store/apps/details?id=rebelstudios.phuzzles.app&amp;referrer=utm_source%3Dphuzzles.app%26utm_medium%3Didea_page%26utm_campaign%3D{slug}" target="_blank" rel="noopener"><img class="gp" src="/google-play-badge.png" alt="Get it on Google Play" /></a>
         </div>
         <p class="price">Free, with ads. <a href="/">How Phuzzles works</a></p>
-        <div class="try">
-          <p>Want to try one before you send one? Today's puzzle works the same way: solve it and the
-            note underneath tells you what you are looking at. Nothing to install.</p>
-          <a href="/today/?from={from}">Solve today's puzzle</a>
-        </div>
-""".replace("{slug}", slug).replace("{from}", FROM[slug])
+""".replace("{slug}", slug)
+    try_block = """      <div class="try">
+        <a href="/today/?from={from}">Solve today's puzzle</a>
+        <p>Try one before you send one. It works like the one you would send, and there is nothing
+          to install.</p>
+      </div>
+""".replace("{from}", FROM[slug])
     doc = (h + "</head>\n<body>\n  <div class=\"wrap\">\n" + header + "\n    <main class=\"idea\">\n"
-           f"      <h1>{h1}</h1>\n      <p class=\"lede\">{lede}</p>\n{body}{stores}    </main>\n\n" + footer + "  </div>\n" + FORWARD.replace("{slug}", slug) + "</body>\n</html>\n")
+           f"      <h1>{h1}</h1>\n      <p class=\"lede\">{lede}</p>\n{try_block}{body}{stores}    </main>\n\n" + footer + "  </div>\n" + FORWARD.replace("{slug}", slug) + "</body>\n</html>\n")
     (ROOT / f"{slug}.html").write_text(doc)
     print("wrote", slug + ".html", len(doc), "bytes")
 

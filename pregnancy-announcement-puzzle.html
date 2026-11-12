@@ -225,11 +225,12 @@
     .idea .tip { background: var(--panel); border: 1px solid var(--line); border-left: 3px solid var(--coral); border-radius: 14px; padding: 16px 18px; margin: 28px 0; }
     .idea .stores { margin-top: 28px; }
     .idea a { color: var(--teal); }
-    /* Solving without installing is the honest third option next to the two badges, so it gets a
-       real 44px target instead of sitting in the fine print with them. */
-    .try { margin-top: 18px; }
-    .try p { font-size: var(--t-sm); color: var(--muted); }
-    .try a { display: inline-flex; align-items: center; min-height: 44px; margin-top: 10px; padding: 0 20px;
+    /* The one thing to do on the page, and it sits in the first screen: measured 2026-11-11, the
+       first tappable element used to be 1,671px down a 2,212px page, so a visitor from a pin saw
+       a headline and a paragraph and nothing to do. Action first, explanation under it. */
+    .try { margin: 0 0 10px; }
+    .try p { font-size: var(--t-sm); color: var(--muted); margin: 12px 0 0; }
+    .try a { display: inline-flex; align-items: center; min-height: 44px; padding: 0 20px;
       border: 1px solid var(--line); border-radius: 12px; color: var(--teal); font-size: var(--t-body);
       text-decoration: none; }
     .try a:hover { border-color: var(--teal); }
@@ -257,6 +258,11 @@ var s=document.createElement('script');s.async=true;s.src='https://www.googletag
     <main class="idea">
       <h1>A pregnancy announcement they have to solve</h1>
       <p class="lede">Phuzzles scrambles the photo that carries your news. The people you send it to put it back together, and the message you folded underneath shows up only when the last piece lands. You send it as a link, so the people you send it to solve it in their browser, with nothing to install.</p>
+      <div class="try">
+        <a href="/today/?from=pregnancy">Solve today's puzzle</a>
+        <p>Try one before you send one. It works like the one you would send, and there is nothing
+          to install.</p>
+      </div>
       <h2>How to do it</h2>
       <ol>
         <li><b>Pick the photo.</b> The news should be in the picture: the scan, the test, tiny shoes, a shirt that says big sister. If one piece would give it away at a glance, choose a bigger puzzle.</li>
@@ -273,11 +279,6 @@ var s=document.createElement('script');s.async=true;s.src='https://www.googletag
           <a href="https://play.google.com/store/apps/details?id=rebelstudios.phuzzles.app&amp;referrer=utm_source%3Dphuzzles.app%26utm_medium%3Didea_page%26utm_campaign%3Dpregnancy-announcement-puzzle" target="_blank" rel="noopener"><img class="gp" src="/google-play-badge.png" alt="Get it on Google Play" /></a>
         </div>
         <p class="price">Free, with ads. <a href="/">How Phuzzles works</a></p>
-        <div class="try">
-          <p>Want to try one before you send one? Today's puzzle works the same way: solve it and the
-            note underneath tells you what you are looking at. Nothing to install.</p>
-          <a href="/today/?from=pregnancy">Solve today's puzzle</a>
-        </div>
     </main>
 
     <footer>
