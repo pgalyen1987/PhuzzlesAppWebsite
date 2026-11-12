@@ -233,7 +233,8 @@ var s=document.createElement('script');s.async=true;s.src='https://www.googletag
 // visitor's language before the crawler reads them.
 window.PHZ = (function () {
   var l = ((navigator.languages && navigator.languages[0]) || navigator.language || "en").toLowerCase();
-  var lang = (l === "ja" || l.indexOf("ja-") === 0) ? "ja" : "en";
+  var base = l.split("-")[0];
+  var lang = (base === "ja" || base === "fr") ? base : "en";
   var STR = {
     ja: {
       title: "Phuzzles\uff1a\u89e3\u3044\u3066\u521d\u3081\u3066\u898b\u3089\u308c\u308b\u5199\u771f\u30d1\u30ba\u30eb",
@@ -280,6 +281,52 @@ window.PHZ = (function () {
       solvedIn: function (n) { return n + "\u56de\u306e\u5165\u308c\u66ff\u3048\u3067\u5b8c\u6210"; },
       pieceLabel: function (r, c) { return r + "\u884c" + c + "\u5217\u306e\u30d4\u30fc\u30b9"; },
       hintDone: "\u305d\u306e\u30e1\u30c3\u30bb\u30fc\u30b8\u306f\u3001\u305a\u3063\u3068\u30d1\u30ba\u30eb\u306e\u4e0b\u306b\u6298\u308a\u305f\u305f\u307e\u308c\u3066\u3044\u307e\u3057\u305f\u3002"
+    },
+    fr: {
+      title: "Phuzzles : une photo à résoudre pour découvrir votre nouvelle",
+      by: "Une app de Rebel Studios",
+      h1: "Envoyez une photo qu'il faut résoudre.",
+      deck: "Envoyez-la en lien dans n'importe quelle messagerie. On la résout dans le navigateur, sans rien installer.",
+      pieces: "<b>9 pièces</b> &middot; Facile",
+      boardLabel: "Un puzzle photo de 3 sur 3",
+      msg: "Cet oiseau vit sur une île au large du Maine, aux États-Unis. À votre tour d'en envoyer une.",
+      edge: "Un message est glissé sous ce puzzle",
+      hint: "Touchez deux pièces pour les échanger.",
+      again: "Essayez le puzzle du jour",
+      copy: "Phuzzles découpe votre photo en pièces et les mélange. Votre ami les remet en place, et <b>le message que vous avez écrit n'apparaît qu'une fois la dernière pièce posée.</b>",
+      altAppStore: "Télécharger dans l'App Store",
+      altPlay: "Disponible sur Google Play",
+      price: "Gratuit, avec publicités. Les écrans de l'appli sont en anglais uniquement.",
+      shotAlt: "L'écran de résolution dans l'appli Phuzzles : un puzzle 5 sur 5 de fleurs de cerisier, avec le nombre de coups, de pièces restantes et de pièces bien placées en haut.",
+      shotCap: "Résoudre un 5×5 dans l'appli",
+      boxH: "Au dos de la boîte",
+      boxLede: "Ce que vous obtenez, et ce qu'il advient de votre photo.",
+      dtPieces: "Pièces",
+      ddPieces: "9, 16, 25 ou 36. Facile, c'est 3×3 ; Expert, c'est 6×6.",
+      dtMessage: "Message",
+      ddMessage: "Jusqu'à 200 caractères. Il reste caché jusqu'à ce que le puzzle soit résolu.",
+      dtSending: "Envoi",
+      ddSending: "À quelqu'un qui a Phuzzles, par nom d'utilisateur, ou à un groupe. Vous pouvez aussi envoyer n'importe quel puzzle en lien, à n'importe qui.",
+      dtSolving: "Résolution",
+      ddSolving: "Dans l'appli, ou depuis un lien dans le navigateur de n'importe quel téléphone, sans installation.",
+      dtDaily: "Chaque jour",
+      ddDaily: "Un nouveau puzzle chaque jour à 11h00 (heure de l'Est des États-Unis), à partir d'une photo du domaine public. Résolvez celui du jour dans votre navigateur : <a href=\"/today/\">phuzzles.app/today</a>",
+      dtPrice: "Prix",
+      ddPrice: "Gratuit, avec publicités. <a href=\"/plus\">Phuzzles Plus</a> est un abonnement mensuel : sans publicités, et le Feed sans limite quotidienne. Le prix est affiché sur l'App Store et Google Play.",
+      footContact: "Phuzzles est créé par Rebel Studios. Questions, bugs ou un puzzle qui ne s'ouvre pas : <a href=\"mailto:support@phuzzles.app\">support@phuzzles.app</a> (écrivez-nous en anglais).",
+      footIdeas: "Idées (pages en anglais) :",
+      navLabel: "Autres pages de Phuzzles",
+      navPress: "Kit presse",
+      navPrivacy: "Confidentialité",
+      navTerms: "Conditions",
+      navDelete: "Supprimer votre compte",
+      navChild: "Sécurité des enfants",
+      credit: "Photo de macareux : Fred Yost, U.S. Fish and Wildlife Service (domaine public).",
+      swaps: function (n) { return n + (n === 1 ? " échange" : " échanges"); },
+      inPlace: function (home, total) { return home + " sur " + total + " en place"; },
+      solvedIn: function (n) { return "Résolu en " + n + (n === 1 ? " échange" : " échanges"); },
+      pieceLabel: function (r, c) { return "Pièce à la ligne " + r + ", colonne " + c; },
+      hintDone: "Ce message était glissé sous le puzzle depuis le début."
     }
   };
   var d = STR[lang] || {};
