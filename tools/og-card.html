@@ -103,7 +103,17 @@
       // the product, and it carries no store badges: the link opens a playable board in the
       // browser. Nothing here can name the photo or the message -- the card is static and the
       // point of the puzzle is that both are hidden until it is solved.
-      solve:     { h1: 'Someone sent you a <em>photo puzzle</em>', foot: 'No app, no account. Solve it in your browser.' }
+      solve:     { h1: 'Someone sent you a <em>photo puzzle</em>', foot: 'No app, no account. Solve it in your browser.' },
+      // /plus/ is the only page that asks for money, so its card states the LIMIT of what the
+      // money buys rather than selling the upgrade. No price digit: the card is one static image
+      // served worldwide and US$2.99 is the United States price only, so a number on it would be
+      // a false claim everywhere else.
+      plus:      { h1: 'More puzzles,<br><em>no ads</em>', foot: "Friends' puzzles are unlimited either way." },
+      // The card an editor sees when the press page gets pasted into a newsroom chat. It leads
+      // with the one thing that separates us from every other photo-puzzle app -- you send it --
+      // and the foot says what is behind the link instead of selling the app to someone whose job
+      // is not to install it.
+      press:     { h1: 'The photo puzzle you <em>send</em>', foot: 'Press kit: the facts, screenshots, and who to email.' }
     };
     var k = new URLSearchParams(location.search).get('k');
     var c = CARDS[k];
