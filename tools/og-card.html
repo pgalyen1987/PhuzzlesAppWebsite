@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>Phuzzles link card</title>
+<style>
+  /* Self-hosted, same files the site serves. Rendered at 1200x630 by make-og-cards.sh. */
+  @font-face { font-family: 'Archivo'; src: url('../fonts/archivo-var-latin.woff2') format('woff2');
+    font-weight: 700 900; font-stretch: 62% 125%; }
+  @font-face { font-family: 'DM Sans'; src: url('../fonts/dm-sans-var-latin.woff2') format('woff2');
+    font-weight: 400 600; }
+  @font-face { font-family: 'Gochi Hand'; src: url('../fonts/gochi-hand-400-latin.woff2') format('woff2');
+    font-weight: 400; }
+
+  :root {
+    --ink: #1A1A2E; --panel: #23233E; --text: #F5F3EF; --muted: #A9A9C6;
+    --coral: #FF6B6B; --teal: #4ECDC4; --paper: #FFF3E4; --paper-ink: #2A2238;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; background: var(--ink); }
+  body { width: 1200px; height: 630px; overflow: hidden; }
+
+  /* Words against the puzzle at 1.618 : 1 */
+  .card {
+    width: 1200px; height: 630px; display: grid;
+    grid-template-columns: 1.618fr 1fr; column-gap: 52px;
+    align-items: center; padding: 58px 64px 62px;
+    background: var(--ink); color: var(--text);
+    font: 400 20px/1.5 'DM Sans', sans-serif;
+  }
+
+  .left { display: flex; flex-direction: column; height: 100%; justify-content: space-between; }
+  .brand { display: flex; align-items: center; gap: 14px; }
+  .brand img { width: 52px; height: 52px; border-radius: 13px; }
+  .brand span { font-family: 'Archivo', sans-serif; font-weight: 800; font-stretch: 112%;
+    font-size: 34px; letter-spacing: -0.01em; }
+  h1 { margin: 0; font-family: 'Archivo', sans-serif; font-weight: 800; font-stretch: 108%;
+    font-size: 62px; line-height: 1.02; letter-spacing: -0.028em; max-width: 15ch; }
+  h1 em { font-style: normal; color: var(--coral); }
+  .foot { font-size: 21px; color: var(--muted); }
+
+  /* The board: before it is solved you cannot see the picture, so the pieces are blank. */
+  .stage { position: relative; padding-bottom: 54px; justify-self: center; }
+  .board { position: relative; z-index: 2; display: grid; grid-template-columns: repeat(3, 1fr);
+    gap: 4px; width: 322px; aspect-ratio: 1; background: var(--ink); border-radius: 14px;
+    overflow: hidden; box-shadow: 0 1px 0 rgba(255,255,255,0.07) inset, 0 28px 56px -26px rgba(0,0,0,0.75); }
+  .tile { background: var(--panel); border-radius: 3px; }
+  /* Each piece catches the light differently, the way nine photo pieces would. */
+  .tile:nth-child(1) { background: #272745; } .tile:nth-child(2) { background: #212139; }
+  .tile:nth-child(3) { background: #2B2B4C; } .tile:nth-child(4) { background: #202038; }
+  .tile:nth-child(5) { background: #292947; } .tile:nth-child(6) { background: #232340; }
+  .tile:nth-child(7) { background: #2C2C4E; } .tile:nth-child(8) { background: #242442; }
+  .tile:nth-child(9) { background: #1F1F36; }
+  /* The app's own two tile states: one piece picked up, one waiting to swap with it. */
+  .tile.held { outline: 3px solid var(--coral); outline-offset: -3px; transform: scale(0.95); }
+  .tile.next { outline: 3px solid var(--teal); outline-offset: -3px; }
+
+  /* The note tucked under the board, exactly as the app holds it: the edge shows, the words do not. */
+  .note { position: absolute; z-index: 1; left: 26px; right: 26px; bottom: 0; height: 112px;
+    background: var(--paper); border-radius: 3px; transform: rotate(-1deg);
+    box-shadow: 0 1px 0 rgba(255,255,255,0.55) inset, 0 16px 34px -18px rgba(0,0,0,0.8),
+                0 2px 4px rgba(0,0,0,0.3); }
+  .note .edge { position: absolute; left: 0; right: 0; bottom: 14px; text-align: center; white-space: nowrap;
+    font-size: 16px; letter-spacing: 0.035em; color: #8A7F92; }
+</style>
+</head>
+<body>
+  <div class="card">
+    <div class="left">
+      <div class="brand"><img src="../logo-128.png" alt="" /><span>Phuzzles</span></div>
+      <h1 id="h1">A photo they have to solve</h1>
+      <p class="foot">Free on iPhone and Android</p>
+    </div>
+    <div class="stage">
+      <div class="board">
+        <div class="tile"></div><div class="tile"></div><div class="tile next"></div>
+        <div class="tile"></div><div class="tile held"></div><div class="tile"></div>
+        <div class="tile"></div><div class="tile"></div><div class="tile"></div>
+      </div>
+      <div class="note">
+        <span class="edge" id="edge">A message is folded underneath</span>
+      </div>
+    </div>
+  </div>
+  <script>
+    // One card per idea page: ?k=<key>. The headline is that page's own h1.
+    var CARDS = {
+      pregnancy: 'A pregnancy announcement they have to <em>solve</em>',
+      birthday:  'A birthday message they have to <em>solve</em>',
+      puppy:     'A new puppy they have to <em>solve</em>',
+      trip:      'A surprise trip they have to <em>solve</em>',
+      christmas: 'A Christmas present they have to <em>solve</em>'
+    };
+    var k = new URLSearchParams(location.search).get('k');
+    if (CARDS[k]) document.getElementById('h1').innerHTML = CARDS[k];
+  </script>
+</body>
+</html>
