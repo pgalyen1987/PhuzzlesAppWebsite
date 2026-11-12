@@ -225,78 +225,170 @@ gtag('js',new Date());gtag('config','G-00TNDVMQNM');
 var s=document.createElement('script');s.async=true;s.src='https://www.googletagmanager.com/gtag/js?id=G-00TNDVMQNM';document.head.appendChild(s);
 }
 </script>
+<script>
+// i18n. The page speaks the browser's language and falls back to English. Keys live only in the
+// dictionaries below: a missing key leaves the English that is already in the markup, so English
+// cannot drift out of sync. The app's own screens are English, which the localised copy says next
+// to the store badges. The og:/meta tags stay English because a static host cannot know the
+// visitor's language before the crawler reads them.
+window.PHZ = (function () {
+  var l = ((navigator.languages && navigator.languages[0]) || navigator.language || "en").toLowerCase();
+  var lang = (l === "ja" || l.indexOf("ja-") === 0) ? "ja" : "en";
+  var STR = {
+    ja: {
+      title: "Phuzzles\uff1a\u89e3\u3044\u3066\u521d\u3081\u3066\u898b\u3089\u308c\u308b\u5199\u771f\u30d1\u30ba\u30eb",
+      by: "Rebel Studios \u306e\u30a2\u30d7\u30ea",
+      h1: "\u89e3\u3051\u305f\u3089\u898b\u3048\u308b\u5199\u771f\u3092\u9001\u308b\u3002",
+      deck: "\u3069\u306e\u30c1\u30e3\u30c3\u30c8\u3067\u3082\u30ea\u30f3\u30af\u3067\u9001\u308c\u307e\u3059\u3002\u76f8\u624b\u306f\u30d6\u30e9\u30a6\u30b6\u3067\u89e3\u304f\u3060\u3051\u3002\u30a4\u30f3\u30b9\u30c8\u30fc\u30eb\u306f\u4e0d\u8981\u3067\u3059\u3002",
+      pieces: "<b>9\u30d4\u30fc\u30b9</b> &middot; \u304b\u3093\u305f\u3093",
+      boardLabel: "3\u00d73 \u306e\u5199\u771f\u30d1\u30ba\u30eb",
+      msg: "\u3053\u306e\u9ce5\u306f\u30e1\u30a4\u30f3\u5dde\u6c96\u306e\u5cf6\u306b\u3059\u3093\u3067\u3044\u307e\u3059\u3002\u6b21\u306f\u3042\u306a\u305f\u304c\u9001\u308b\u756a\u3067\u3059\u3002",
+      edge: "\u3053\u306e\u4e0b\u306b\u30e1\u30c3\u30bb\u30fc\u30b8\u304c\u96a0\u308c\u3066\u3044\u307e\u3059",
+      hint: "2\u3064\u306e\u30d4\u30fc\u30b9\u3092\u30bf\u30c3\u30d7\u3059\u308b\u3068\u5165\u308c\u66ff\u308f\u308a\u307e\u3059\u3002",
+      again: "\u4eca\u65e5\u306e\u30d1\u30ba\u30eb\u3092\u89e3\u304f",
+      copy: "Phuzzles \u306f\u5199\u771f\u3092\u30d4\u30fc\u30b9\u306b\u5207\u3063\u3066\u30b7\u30e3\u30c3\u30d5\u30eb\u3057\u307e\u3059\u3002\u76f8\u624b\u304c\u305d\u308c\u3092\u4e26\u3079\u76f4\u3057\u3001<b>\u6700\u5f8c\u306e\u30d4\u30fc\u30b9\u304c\u306f\u307e\u3063\u305f\u3068\u304d\u306b\u3001\u3042\u306a\u305f\u304c\u66f8\u3044\u305f\u30e1\u30c3\u30bb\u30fc\u30b8\u304c\u73fe\u308c\u307e\u3059\u3002</b>",
+      altAppStore: "App Store \u304b\u3089\u30c0\u30a6\u30f3\u30ed\u30fc\u30c9",
+      altPlay: "Google Play \u3067\u624b\u306b\u5165\u308c\u3088\u3046",
+      price: "\u5e83\u544a\u3064\u304d\u3067\u7121\u6599\u3002\u30a2\u30d7\u30ea\u306e\u753b\u9762\u306f\u82f1\u8a9e\u306e\u307f\u3067\u3059\u3002",
+      shotAlt: "\u30a2\u30d7\u30ea\u306e\u89e3\u7b54\u753b\u9762\u3002\u685c\u306e\u5199\u771f\u306e 5\u00d75 \u30d1\u30ba\u30eb\u3068\u3001\u4e0a\u90e8\u306b\u624b\u6570\u3001\u6b8b\u308a\u306e\u30d4\u30fc\u30b9\u6570\u3001\u6b63\u3057\u3044\u4f4d\u7f6e\u306e\u30d4\u30fc\u30b9\u6570\u3002",
+      shotCap: "\u30a2\u30d7\u30ea\u3067 5\u00d75 \u3092\u89e3\u304f",
+      boxH: "\u7bb1\u306e\u88cf\u306e\u8aac\u660e",
+      boxLede: "\u4f55\u304c\u3067\u304d\u308b\u306e\u304b\u3001\u305d\u3057\u3066\u5199\u771f\u306f\u3069\u3046\u6271\u308f\u308c\u308b\u306e\u304b\u3002",
+      dtPieces: "\u30d4\u30fc\u30b9\u6570",
+      ddPieces: "9\u30fb16\u30fb25\u30fb36\u3002\u304b\u3093\u305f\u3093\u306f 3\u00d73\u3001\u30a8\u30ad\u30b9\u30d1\u30fc\u30c8\u306f 6\u00d76\u3002",
+      dtMessage: "\u30e1\u30c3\u30bb\u30fc\u30b8",
+      ddMessage: "200\u6587\u5b57\u307e\u3067\u3002\u30d1\u30ba\u30eb\u304c\u89e3\u3051\u308b\u307e\u3067\u96a0\u308c\u305f\u307e\u307e\u3067\u3059\u3002",
+      dtSending: "\u9001\u308a\u65b9",
+      ddSending: "Phuzzles \u3092\u4f7f\u3063\u3066\u3044\u308b\u4eba\u3078\u30e6\u30fc\u30b6\u30fc\u540d\u3067\u3001\u307e\u305f\u306f\u30b0\u30eb\u30fc\u30d7\u3078\u3002\u3069\u306e\u30d1\u30ba\u30eb\u3082\u30ea\u30f3\u30af\u306b\u3059\u308c\u3070\u3001\u8ab0\u306b\u3067\u3082\u9001\u308c\u307e\u3059\u3002",
+      dtSolving: "\u89e3\u304d\u65b9",
+      ddSolving: "\u30a2\u30d7\u30ea\u3067\u3001\u307e\u305f\u306f\u30ea\u30f3\u30af\u304b\u3089\u30b9\u30de\u30db\u306e\u30d6\u30e9\u30a6\u30b6\u3067\u3002\u30a4\u30f3\u30b9\u30c8\u30fc\u30eb\u306f\u4e0d\u8981\u3067\u3059\u3002",
+      dtDaily: "\u6bce\u65e5\u306e\u4e00\u554f",
+      ddDaily: "\u30a2\u30e1\u30ea\u30ab\u6771\u90e8\u6642\u9593\u306e\u6bce\u65e5 11:00 \u306b\u3001\u30d1\u30d6\u30ea\u30c3\u30af\u30c9\u30e1\u30a4\u30f3\u306e\u5199\u771f\u304b\u3089\u65b0\u3057\u3044\u4e00\u554f\u3002\u4eca\u65e5\u306e\u5206\u306f\u30d6\u30e9\u30a6\u30b6\u3067\u89e3\u3051\u307e\u3059\uff1a<a href=\"/today/\">phuzzles.app/today</a>",
+      dtPrice: "\u6599\u91d1",
+      ddPrice: "\u5e83\u544a\u3064\u304d\u3067\u7121\u6599\u3002<a href=\"/plus\">Phuzzles Plus</a> \u306f\u6708\u984d\u306e\u30b5\u30d6\u30b9\u30af\u30ea\u30d7\u30b7\u30e7\u30f3\u3067\u3001\u5e83\u544a\u304c\u306a\u304f\u306a\u308a\u3001\u30d5\u30a3\u30fc\u30c9\u306e1\u65e5\u306e\u4e0a\u9650\u3082\u306a\u304f\u306a\u308a\u307e\u3059\u3002\u4fa1\u683c\u306f App Store \u3068 Google Play \u306b\u8868\u793a\u3055\u308c\u307e\u3059\u3002",
+      footContact: "Phuzzles \u306f Rebel Studios \u304c\u4f5c\u3063\u3066\u3044\u307e\u3059\u3002\u8cea\u554f\u3001\u4e0d\u5177\u5408\u3001\u958b\u304b\u306a\u3044\u30d1\u30ba\u30eb\u306f <a href=\"mailto:support@phuzzles.app\">support@phuzzles.app</a> \u3078\uff08\u82f1\u8a9e\u3067\u304a\u9001\u308a\u304f\u3060\u3055\u3044\uff09\u3002",
+      footIdeas: "\u4f7f\u3044\u304b\u305f\uff08\u30ea\u30f3\u30af\u5148\u306f\u82f1\u8a9e\u30d8\u309a\u30fc\u30b8\uff09\uff1a",
+      navLabel: "Phuzzles \u306e\u4ed6\u306e\u30da\u30fc\u30b8",
+      navPress: "\u30d7\u30ec\u30b9\u30ad\u30c3\u30c8",
+      navPrivacy: "\u30d7\u30e9\u30a4\u30d0\u30b7\u30fc",
+      navTerms: "\u5229\u7528\u898f\u7d04",
+      navDelete: "\u30a2\u30ab\u30a6\u30f3\u30c8\u306e\u524a\u9664",
+      navChild: "\u5b50\u3069\u3082\u306e\u5b89\u5168",
+      credit: "\u30c4\u30ce\u30e1\u30c9\u30ea\u306e\u5199\u771f\uff1aFred Yost\u3001U.S. Fish and Wildlife Service\uff08\u30d1\u30d6\u30ea\u30c3\u30af\u30c9\u30e1\u30a4\u30f3\uff09\u3002",
+      swaps: function (n) { return n + "\u56de\u306e\u5165\u308c\u66ff\u3048"; },
+      inPlace: function (home, total) { return total + "\u500b\u4e2d" + home + "\u500b\u304c\u6b63\u3057\u3044\u4f4d\u7f6e"; },
+      solvedIn: function (n) { return n + "\u56de\u306e\u5165\u308c\u66ff\u3048\u3067\u5b8c\u6210"; },
+      pieceLabel: function (r, c) { return r + "\u884c" + c + "\u5217\u306e\u30d4\u30fc\u30b9"; },
+      hintDone: "\u305d\u306e\u30e1\u30c3\u30bb\u30fc\u30b8\u306f\u3001\u305a\u3063\u3068\u30d1\u30ba\u30eb\u306e\u4e0b\u306b\u6298\u308a\u305f\u305f\u307e\u308c\u3066\u3044\u307e\u3057\u305f\u3002"
+    }
+  };
+  var d = STR[lang] || {};
+  if (lang !== "en") {
+    document.documentElement.lang = lang;
+    if (d.title) document.title = d.title;
+  }
+  return {
+    lang: lang,
+    d: d,
+    // A key with no translation leaves the English already in the DOM untouched.
+    apply: function () {
+      if (lang === "en") return;
+      var n = 0, i, el, list;
+      list = document.querySelectorAll("[data-i18n]");
+      for (i = 0; i < list.length; i++) {
+        el = list[i];
+        var v = d[el.getAttribute("data-i18n")];
+        if (typeof v === "string") { el.innerHTML = v; n++; }
+      }
+      list = document.querySelectorAll("[data-i18n-alt]");
+      for (i = 0; i < list.length; i++) {
+        el = list[i];
+        var a = d[el.getAttribute("data-i18n-alt")];
+        if (typeof a === "string") { el.alt = a; n++; }
+      }
+      list = document.querySelectorAll("[data-i18n-label]");
+      for (i = 0; i < list.length; i++) {
+        el = list[i];
+        var b = d[el.getAttribute("data-i18n-label")];
+        if (typeof b === "string") { el.setAttribute("aria-label", b); n++; }
+      }
+      return n;
+    }
+  };
+})();
+</script>
 </head>
 <body>
   <div class="wrap">
     <header class="bar">
       <a class="brand" href="/"><img src="/logo-128.png" alt="" width="40" height="40" /><span>Phuzzles</span></a>
-      <span class="by">A Rebel Studios app</span>
+      <span class="by" data-i18n="by">A Rebel Studios app</span>
     </header>
 
     <main>
       <section class="hero">
         <div class="title">
-          <h1>Send a photo they have to solve.</h1>
-          <p class="deck">Send it as a link in any chat. They solve it in their browser, with nothing to install.</p>
+          <h1 data-i18n="h1">Send a photo they have to solve.</h1>
+          <p class="deck" data-i18n="deck">Send it as a link in any chat. They solve it in their browser, with nothing to install.</p>
         </div>
 
         <figure class="demo" aria-labelledby="demo-hint">
-          <div class="demo-top"><span><b>9 pieces</b> &middot; Easy</span><span id="count" aria-live="polite">0 swaps</span></div>
+          <div class="demo-top"><span data-i18n="pieces"><b>9 pieces</b> &middot; Easy</span><span id="count" aria-live="polite">0 swaps</span></div>
           <div class="stage" id="stage">
-            <div class="board" id="board" role="group" aria-label="A 3 by 3 photo puzzle"></div>
+            <div class="board" id="board" role="group" data-i18n-label="boardLabel" aria-label="A 3 by 3 photo puzzle"></div>
             <div class="note" id="note">
-              <p class="msg" id="msg" aria-live="polite">This one lives on an island off the coast of Maine. Your turn to send one.</p>
-              <span class="edge">A message is folded under this puzzle</span>
+              <p class="msg" id="msg" aria-live="polite" data-i18n="msg">This one lives on an island off the coast of Maine. Your turn to send one.</p>
+              <span class="edge" data-i18n="edge">A message is folded under this puzzle</span>
             </div>
           </div>
           <div class="demo-foot">
-            <span id="demo-hint">Tap two pieces to swap them.</span>
-            <a class="again" id="again" href="/today/" hidden>Try today's puzzle</a>
+            <span id="demo-hint" data-i18n="hint">Tap two pieces to swap them.</span>
+            <a class="again" id="again" href="/today/" hidden data-i18n="again">Try today's puzzle</a>
           </div>
         </figure>
 
         <div class="copy">
-          <p>Phuzzles cuts your photo into pieces and shuffles them. Your friend swaps them back, and <b>the message you wrote only shows up when the last piece lands.</b></p>
+          <p data-i18n="copy">Phuzzles cuts your photo into pieces and shuffles them. Your friend swaps them back, and <b>the message you wrote only shows up when the last piece lands.</b></p>
           <div class="stores">
-            <a href="https://apps.apple.com/app/id6766833614" target="_blank" rel="noopener"><img src="/app-store-badge.svg" alt="Download on the App Store" /></a>
-            <a href="https://play.google.com/store/apps/details?id=rebelstudios.phuzzles.app&amp;referrer=utm_source%3Dphuzzles.app%26utm_medium%3Dhome" target="_blank" rel="noopener"><img class="gp" src="/google-play-badge.png" alt="Get it on Google Play" /></a>
+            <a href="https://apps.apple.com/app/id6766833614" target="_blank" rel="noopener"><img src="/app-store-badge.svg" data-i18n-alt="altAppStore" alt="Download on the App Store" /></a>
+            <a href="https://play.google.com/store/apps/details?id=rebelstudios.phuzzles.app&amp;referrer=utm_source%3Dphuzzles.app%26utm_medium%3Dhome" target="_blank" rel="noopener"><img class="gp" src="/google-play-badge.png" data-i18n-alt="altPlay" alt="Get it on Google Play" /></a>
           </div>
-          <p class="price">Free, with ads.</p>
+          <p class="price" data-i18n="price">Free, with ads.</p>
         </div>
       </section>
 
       <section class="box" aria-labelledby="box-h">
         <figure class="shot">
-          <img src="/screen-2.jpg" width="480" height="961" loading="lazy" decoding="async" alt="The solve screen in the Phuzzles app: a 5 by 5 puzzle of cherry blossoms, with moves, pieces remaining and pieces correct counted along the top" />
-          <figcaption>Solving a 5&times;5 in the app</figcaption>
+          <img src="/screen-2.jpg" width="480" height="961" loading="lazy" decoding="async" data-i18n-alt="shotAlt" alt="The solve screen in the Phuzzles app: a 5 by 5 puzzle of cherry blossoms, with moves, pieces remaining and pieces correct counted along the top" />
+          <figcaption data-i18n="shotCap">Solving a 5&times;5 in the app</figcaption>
         </figure>
         <div>
-          <h2 id="box-h">On the box</h2>
-          <p class="lede">What you get, and what happens to your photo.</p>
+          <h2 id="box-h" data-i18n="boxH">On the box</h2>
+          <p class="lede" data-i18n="boxLede">What you get, and what happens to your photo.</p>
           <dl>
-            <div><dt>Pieces</dt><dd>9, 16, 25 or 36. Easy is 3&times;3, Expert is 6&times;6.</dd></div>
-            <div><dt>Message</dt><dd>Up to 200 characters. It stays hidden until the puzzle is solved.</dd></div>
-            <div><dt>Sending</dt><dd>To someone who has Phuzzles, by username, or to a group. You can also send any puzzle as a link, to anyone.</dd></div>
-            <div><dt>Solving</dt><dd>In the app, or from a link in any phone's browser, no install needed.</dd></div>
-            <div><dt>Daily</dt><dd>A new puzzle every day at 11:00 Eastern, made from a public-domain photo. Solve today's in your browser: <a href="/today/">phuzzles.app/today</a></dd></div>
-            <div><dt>Price</dt><dd>Free, with ads. <a href="/plus">Phuzzles Plus</a> is US$2.99 a month: no ads, and the Feed without a daily limit.</dd></div>
+            <div><dt data-i18n="dtPieces">Pieces</dt><dd data-i18n="ddPieces">9, 16, 25 or 36. Easy is 3&times;3, Expert is 6&times;6.</dd></div>
+            <div><dt data-i18n="dtMessage">Message</dt><dd data-i18n="ddMessage">Up to 200 characters. It stays hidden until the puzzle is solved.</dd></div>
+            <div><dt data-i18n="dtSending">Sending</dt><dd data-i18n="ddSending">To someone who has Phuzzles, by username, or to a group. You can also send any puzzle as a link, to anyone.</dd></div>
+            <div><dt data-i18n="dtSolving">Solving</dt><dd data-i18n="ddSolving">In the app, or from a link in any phone's browser, no install needed.</dd></div>
+            <div><dt data-i18n="dtDaily">Daily</dt><dd data-i18n="ddDaily">A new puzzle every day at 11:00 Eastern, made from a public-domain photo. Solve today's in your browser: <a href="/today/">phuzzles.app/today</a></dd></div>
+            <div><dt data-i18n="dtPrice">Price</dt><dd data-i18n="ddPrice">Free, with ads. <a href="/plus">Phuzzles Plus</a> is US$2.99 a month: no ads, and the Feed without a daily limit.</dd></div>
           </dl>
         </div>
       </section>
     </main>
 
     <footer>
-      <p>Phuzzles is made by Rebel Studios. Questions, bugs or a puzzle that won't open: <a href="mailto:support@phuzzles.app">support@phuzzles.app</a></p>
-      <p class="ideas">Ideas: <a href="/pregnancy-announcement-puzzle">a pregnancy announcement</a> &middot; <a href="/birthday-puzzle">a birthday</a> &middot; <a href="/new-puppy-puzzle">a new puppy</a> &middot; <a href="/surprise-trip-puzzle">a surprise trip</a></p>
-      <nav aria-label="More from Phuzzles">
+      <p data-i18n="footContact">Phuzzles is made by Rebel Studios. Questions, bugs or a puzzle that won't open: <a href="mailto:support@phuzzles.app">support@phuzzles.app</a></p>
+      <p class="ideas"><span data-i18n="footIdeas">Ideas:</span> <a href="/pregnancy-announcement-puzzle">a pregnancy announcement</a> &middot; <a href="/birthday-puzzle">a birthday</a> &middot; <a href="/new-puppy-puzzle">a new puppy</a> &middot; <a href="/surprise-trip-puzzle">a surprise trip</a></p>
+      <nav data-i18n-label="navLabel" aria-label="More from Phuzzles">
         <a href="/plus">Phuzzles Plus</a>
-        <a href="/press">Press kit</a>
-        <a href="/privacy.html">Privacy</a>
-        <a href="/terms.html">Terms</a>
-        <a href="/delete-account">Delete your account</a>
-        <a href="/child-safety">Child safety</a>
+        <a href="/press" data-i18n="navPress">Press kit</a>
+        <a href="/privacy.html" data-i18n="navPrivacy">Privacy</a>
+        <a href="/terms.html" data-i18n="navTerms">Terms</a>
+        <a href="/delete-account" data-i18n="navDelete">Delete your account</a>
+        <a href="/child-safety" data-i18n="navChild">Child safety</a>
       </nav>
-      <p>Puffin photo by Fred Yost, U.S. Fish and Wildlife Service (public domain).</p>
+      <p data-i18n="credit">Puffin photo by Fred Yost, U.S. Fish and Wildlife Service (public domain).</p>
     </footer>
   </div>
 
@@ -304,8 +396,11 @@ var s=document.createElement('script');s.async=true;s.src='https://www.googletag
     // The demo puzzle. order[slot] = which piece sits in that slot; solved when order[i] === i.
     // It opens on a fixed scramble (six swaps from solved, the eye left in place as a foothold)
     // so the first look is the same for everyone and never already solved.
+    PHZ.apply();
+
     (function () {
       var N = 3, START = [1, 0, 3, 5, 4, 6, 7, 8, 2];
+      var D = PHZ.d;
       var board = document.getElementById('board'), stage = document.getElementById('stage');
       var count = document.getElementById('count'), hint = document.getElementById('demo-hint');
       var again = document.getElementById('again');
@@ -314,12 +409,17 @@ var s=document.createElement('script');s.async=true;s.src='https://www.googletag
       function place(slot) {
         var p = order[slot], t = tiles[slot];
         t.style.backgroundPosition = (p % N) * 50 + '% ' + Math.floor(p / N) * 50 + '%';
-        t.setAttribute('aria-label', 'Piece in row ' + (Math.floor(slot / N) + 1) + ', column ' + (slot % N + 1));
+        var row = Math.floor(slot / N) + 1, col = slot % N + 1;
+        t.setAttribute('aria-label', D.pieceLabel ? D.pieceLabel(row, col)
+          : 'Piece in row ' + row + ', column ' + col);
       }
       function inPlace() { var n = 0; for (var i = 0; i < order.length; i++) if (order[i] === i) n++; return n; }
       function status() {
-        count.textContent = done ? 'Solved in ' + swaps + (swaps === 1 ? ' swap' : ' swaps')
-          : swaps + (swaps === 1 ? ' swap' : ' swaps') + ' · ' + inPlace() + ' of 9 in place';
+        var sw = D.swaps ? D.swaps(swaps) : swaps + (swaps === 1 ? ' swap' : ' swaps');
+        count.textContent = done
+          ? (D.solvedIn ? D.solvedIn(swaps) : 'Solved in ' + sw)
+          : sw + ' · ' + (D.inPlace ? D.inPlace(inPlace(), order.length)
+                                        : inPlace() + ' of 9 in place');
       }
       function tap(slot) {
         if (done) return;
@@ -335,7 +435,7 @@ var s=document.createElement('script');s.async=true;s.src='https://www.googletag
       function finish() {
         done = true; board.classList.add('solved'); stage.classList.add('open');
         tiles.forEach(function (t) { t.disabled = true; t.removeAttribute('aria-pressed'); });
-        hint.textContent = 'That note was folded under it the whole time.';
+        hint.textContent = D.hintDone || 'That note was folded under it the whole time.';
         again.hidden = false;
         if (window.gtag) gtag('event', 'demo_solved', { swaps: swaps });
       }
