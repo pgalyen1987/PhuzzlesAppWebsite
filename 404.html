@@ -223,7 +223,7 @@ var s=document.createElement('script');s.async=true;s.src='https://www.googletag
     ja: {
       loading: "Phuzzleを読み込み中…",
       gtToday: "今日の<em>Phuzzle</em>",
-      gtYesterday: "昨日の<em>Phuzzle</em>",
+      gtYesterday: "昨日の<em>Phuzzle</em>", solveAnother: "もう一問、アプリなしで",
       gtSolve: "<em>Phuzzle</em>を解こう",
       gtSender: function(x){ return escapeHtml(x) + "さんから<em>Phuzzle</em>が届きました"; },
       gameSub: function(n,total){ return "ピースを別のピースにドラッグするか、2つをタップして入れ替えます。横" + n + "列、全" + total + "ピース。"; },
@@ -260,7 +260,7 @@ var s=document.createElement('script');s.async=true;s.src='https://www.googletag
     fr: {
       loading: "Chargement de votre Phuzzle…",
       gtToday: "Le <em>Phuzzle</em> du jour",
-      gtYesterday: "Le <em>Phuzzle</em> d'hier",
+      gtYesterday: "Le <em>Phuzzle</em> d'hier", solveAnother: "En résoudre un autre, sans appli",
       gtSolve: "Résolvez le <em>Phuzzle</em>",
       gtSender: function(x){ return escapeHtml(x) + " vous a envoyé un <em>Phuzzle</em>"; },
       gameSub: function(n,total){ return "Faites glisser une pièce sur une autre pour les échanger, ou touchez les deux. " + n + " de large, " + total + " pièces."; },
@@ -297,7 +297,7 @@ var s=document.createElement('script');s.async=true;s.src='https://www.googletag
     es: {
       loading: "Cargando tu Phuzzle…",
       gtToday: "El <em>Phuzzle</em> de hoy",
-      gtYesterday: "El <em>Phuzzle</em> de ayer",
+      gtYesterday: "El <em>Phuzzle</em> de ayer", solveAnother: "Resuelve otro, sin aplicación",
       gtSolve: "Resuelve el <em>Phuzzle</em>",
       gtSender: function(x){ return escapeHtml(x) + " te ha enviado un <em>Phuzzle</em>"; },
       gameSub: function(n,total){ return "Arrastra una pieza sobre otra para intercambiarlas, o toca las dos. " + n + " de ancho, " + total + " piezas."; },
@@ -334,7 +334,7 @@ var s=document.createElement('script');s.async=true;s.src='https://www.googletag
     de: {
       loading: "Dein Phuzzle wird geladen…",
       gtToday: "Das <em>Phuzzle</em> des Tages",
-      gtYesterday: "Das <em>Phuzzle</em> von gestern",
+      gtYesterday: "Das <em>Phuzzle</em> von gestern", solveAnother: "Noch eins lösen, ohne App",
       gtSolve: "Löse das <em>Phuzzle</em>",
       gtSender: function(x){ return escapeHtml(x) + " hat dir ein <em>Phuzzle</em> geschickt"; },
       gameSub: function(n,total){ return "Zieh ein Teil auf ein anderes, um sie zu tauschen, oder tippe beide an. " + n + " breit, " + total + " Teile."; },
@@ -371,7 +371,7 @@ var s=document.createElement('script');s.async=true;s.src='https://www.googletag
     pt: {
       loading: "Carregando seu Phuzzle…",
       gtToday: "O <em>Phuzzle</em> de hoje",
-      gtYesterday: "O <em>Phuzzle</em> de ontem",
+      gtYesterday: "O <em>Phuzzle</em> de ontem", solveAnother: "Resolver outro, sem aplicativo",
       gtSolve: "Resolva o <em>Phuzzle</em>",
       gtSender: function(x){ return escapeHtml(x) + " te mandou um <em>Phuzzle</em>"; },
       gameSub: function(n,total){ return "Arraste uma peça sobre outra para trocá-las, ou toque nas duas. " + n + " de largura, " + total + " peças."; },
@@ -685,6 +685,21 @@ var s=document.createElement('script');s.async=true;s.src='https://www.googletag
     }
     cta.href = IOS ? APPSTORE : playWith(ref);
     cta.onclick = function(){ ev("store_click", { from: "solved" }); };
+
+    // MEASURED 2026-11-12 (GA4, 30 days): 16 people solved a puzzle here and 3 clicked a store
+    // button. Installing an app is a large ask ten seconds after a thirty-second puzzle, and until
+    // now it was the ONLY thing offered to someone who solved a friend's link. /daily/ now holds
+    // every past daily, so there is finally something to offer that costs the visitor nothing.
+    // Tracked separately from store_click so the two can be compared in a week.
+    if (!document.getElementById("more-puzzles")) {
+      var more = document.createElement("a");
+      more.id = "more-puzzles";
+      more.className = "btn ghost";
+      more.href = "/daily/?utm_source=solved&utm_medium=web_solver";
+      more.textContent = T("solveAnother", "Solve another, no app needed");
+      more.onclick = function(){ ev("archive_click", { from: "solved" }); };
+      cta.insertAdjacentElement("afterend", more);
+    }
     if (!PHONE) { cta.classList.add("hidden"); badges("won-stores", playWith(ref), "solved"); }
     ev("puzzle_solved_web", { swaps: moves, fewest: fewest, pieces: pieces });
     // Tell the sender: a link puzzle has no receiver in the app, so without this nobody would know it
