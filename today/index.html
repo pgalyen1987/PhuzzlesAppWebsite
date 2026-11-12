@@ -44,16 +44,108 @@
 <main>
   <a class="brand" href="/"><img src="/logo-128.png" alt="" /><span>Phuzzles</span></a>
   <div id="finding">
-    <h1>Today’s photo puzzle</h1>
-    <p>Finding today's puzzle.</p>
+    <h1 id="t-h1">Today’s photo puzzle</h1>
+    <p id="t-finding">Finding today's puzzle.</p>
     <div class="spin" aria-hidden="true"></div>
   </div>
   <div id="none" class="hidden">
-    <h1>Today's puzzle isn't up yet</h1>
+    <h1 id="t-nonetitle">Today's puzzle isn't up yet</h1>
     <p id="why">A new one goes up every day at 11:00 Eastern. The puzzle on our homepage is always there in the meantime.</p>
-    <a class="btn" href="/">Solve the homepage puzzle</a>
+    <a class="btn" id="t-nonebtn" href="/">Solve the homepage puzzle</a>
   </div>
 </main>
+<script>
+// i18n. /today/ is the permanent link on the posters, the QR codes and a bio, so for plenty of
+// people it is the first Phuzzles page they ever see, and on a day with no daily puzzle it is the
+// only one. Same fall-through as /solve/ and /daily/: the browser's language, with the
+// server-rendered English left in place as the fallback, so a missing key cannot drift. The
+// <head>/og tags stay English for the reason /solve/ gives: a static host cannot know the reader's
+// language before a link preview is built. The four network-error strings and "Try again" are
+// copied verbatim from the solver (404.html), and each "11:00 Eastern" is the wording /daily/
+// already uses, so the surfaces cannot say it two ways.
+var PhuzzlesT = (function(){
+  var l = ((navigator.languages && navigator.languages[0]) || navigator.language || "en").toLowerCase();
+  var LANG =
+    (l === "ja" || l.indexOf("ja-") === 0) ? "ja" :
+    (l === "fr" || l.indexOf("fr-") === 0) ? "fr" :
+    (l === "es" || l.indexOf("es-") === 0) ? "es" :
+    (l === "de" || l.indexOf("de-") === 0) ? "de" :
+    (l === "pt" || l.indexOf("pt-") === 0) ? "pt" : "en";
+  var STR = {
+    ja: {
+      h1: "今日の写真パズル",
+      finding: "今日のパズルを探しています。",
+      noneTitle: "今日のパズルはまだ出ていません",
+      noneWhy: "新作は毎日アメリカ東部時間11:00に出ます。それまでは、トップページのパズルがいつでも解けます。",
+      noneBtn: "トップページのパズルを解く",
+      busyTitle: "このネットワークからの初回アクセスが多すぎます",
+      busySub: "1つのネットワークから同時に入れる人数には限りがあります。数分後にもう一度お試しください。",
+      offlineTitle: "Phuzzlesに接続できませんでした",
+      offlineSub: "パズルを読み込めませんでした。接続を確認して、もう一度お試しください。",
+      tryAgain: "もう一度試す"
+    },
+    fr: {
+      h1: "Le puzzle photo du jour",
+      finding: "Recherche du puzzle du jour.",
+      noneTitle: "Le puzzle du jour n'est pas encore en ligne",
+      noneWhy: "Un nouveau arrive chaque jour à 11h00 (heure de l'Est des États-Unis). En attendant, celui de la page d'accueil est toujours là.",
+      noneBtn: "Résoudre le puzzle de la page d'accueil",
+      busyTitle: "Trop de premières visites depuis ce réseau",
+      busySub: "Phuzzles ne peut accueillir qu'un nombre limité de personnes à la fois depuis un même réseau. Réessayez dans quelques minutes.",
+      offlineTitle: "Impossible de joindre Phuzzles",
+      offlineSub: "Le puzzle ne s'est pas chargé. Vérifiez votre connexion et réessayez.",
+      tryAgain: "Réessayer"
+    },
+    es: {
+      h1: "El puzzle de fotos de hoy",
+      finding: "Buscando el puzzle de hoy.",
+      noneTitle: "El puzzle de hoy aún no está",
+      noneWhy: "Uno nuevo llega cada día a las 11:00 (hora del Este de EE. UU.). Mientras tanto, el de la página de inicio siempre está ahí.",
+      noneBtn: "Resolver el puzzle de la página de inicio",
+      busyTitle: "Demasiadas primeras visitas desde esta red",
+      busySub: "Phuzzles solo admite un número limitado de personas a la vez desde una misma red. Inténtalo de nuevo en unos minutos.",
+      offlineTitle: "No se pudo conectar con Phuzzles",
+      offlineSub: "El rompecabezas no se cargó. Revisa tu conexión e inténtalo de nuevo.",
+      tryAgain: "Reintentar"
+    },
+    de: {
+      h1: "Das Fotopuzzle des Tages",
+      finding: "Das heutige Puzzle wird gesucht.",
+      noneTitle: "Das heutige Puzzle ist noch nicht da",
+      noneWhy: "Jeden Tag um 11:00 Uhr (US-Ostküstenzeit) kommt ein neues dazu. Bis dahin ist das Puzzle auf der Startseite immer da.",
+      noneBtn: "Das Puzzle auf der Startseite lösen",
+      busyTitle: "Zu viele Erstbesuche aus diesem Netzwerk",
+      busySub: "Aus einem Netzwerk können nur begrenzt viele Personen gleichzeitig teilnehmen. Versuch es in ein paar Minuten noch einmal.",
+      offlineTitle: "Phuzzles ist nicht erreichbar",
+      offlineSub: "Das Puzzle wurde nicht geladen. Prüf deine Verbindung und versuch es noch einmal.",
+      tryAgain: "Erneut versuchen"
+    },
+    pt: {
+      h1: "O quebra-cabeça de fotos de hoje",
+      finding: "Procurando o quebra-cabeça de hoje.",
+      noneTitle: "O quebra-cabeça de hoje ainda não está no ar",
+      noneWhy: "Um novo chega todo dia às 11:00 (horário do leste dos EUA). Até lá, o da página inicial está sempre lá.",
+      noneBtn: "Resolver o quebra-cabeça da página inicial",
+      busyTitle: "Muitas primeiras visitas desta rede",
+      busySub: "De uma mesma rede, só um número limitado de pessoas pode entrar ao mesmo tempo. Tente de novo em alguns minutos.",
+      offlineTitle: "Não foi possível conectar ao Phuzzles",
+      offlineSub: "O quebra-cabeça não carregou. Verifique a sua conexão e tente de novo.",
+      tryAgain: "Tentar de novo"
+    }
+  };
+  var d = STR[LANG];
+  function T(k, fallback){ return (d && d[k]) || fallback; }
+  if (!d) return T;
+  document.documentElement.lang = LANG;
+  function txt(id, v){ var el = document.getElementById(id); if (el && v) el.textContent = v; }
+  txt("t-h1", d.h1);
+  txt("t-finding", d.finding);
+  txt("t-nonetitle", d.noneTitle);
+  txt("why", d.noneWhy);
+  txt("t-nonebtn", d.noneBtn);
+  return T;
+})();
+</script>
 <script src="/js/firestore-rest.js"></script>
 <script>
 // One link that always opens the current Puzzle of the Day (createPuzzleOfTheDay sets isPotd on one
@@ -69,7 +161,7 @@
     if (title) {
       document.querySelector("#none h1").textContent = title;
       document.getElementById("why").textContent = msg;
-      btn.textContent = "Try again"; btn.href = location.href;
+      btn.textContent = PhuzzlesT("tryAgain", "Try again"); btn.href = location.href;
     } else btn.href = "/" + location.search;
     document.getElementById("none").classList.remove("hidden");
   }
@@ -91,9 +183,11 @@
     // people behind one address, so it isn't their connection. The same words as the 404 solver and the mini app.
     .catch(function(e){
       if (e && e.code === "auth/too-many-requests")
-        none("Too many first visits from this network", "Phuzzles can only let in so many at once from one network. Try again in a few minutes.");
+        none(PhuzzlesT("busyTitle", "Too many first visits from this network"),
+             PhuzzlesT("busySub", "Phuzzles can only let in so many at once from one network. Try again in a few minutes."));
       else
-        none("Couldn’t reach Phuzzles", "Today’s puzzle didn’t load. Check your connection and try again.");
+        none(PhuzzlesT("offlineTitle", "Couldn’t reach Phuzzles"),
+             PhuzzlesT("offlineSub", "Today’s puzzle didn’t load. Check your connection and try again."));
     });
 })();
 </script>
