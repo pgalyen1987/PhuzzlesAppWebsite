@@ -157,7 +157,7 @@ var s=document.createElement('script');s.async=true;s.src='https://www.googletag
       </div>
       <div class="meta"><span id="progress"></span><span><span id="moves">0 swaps</span> · <span id="timer">0:00</span></span></div>
       <button class="btn ghost hidden" type="button" id="peek-btn">
-        <span id="peek-chip"><img alt="" aria-hidden="true" /></span>Hold to see the photo
+        <span id="peek-chip"><img alt="" aria-hidden="true" /></span><span id="peek-label">Hold to see the photo</span>
       </button>
     </div>
 
@@ -204,6 +204,119 @@ var s=document.createElement('script');s.async=true;s.src='https://www.googletag
   var PHONE = IOS || /Android/i.test(navigator.userAgent);
   var GRID = PhuzzleSolver.GRID;
 
+  // ---------------------------------------------------------------------------------------------
+  // i18n. This page is the recipient's surface, the one part a non-English speaker can use without
+  // installing anything, so it speaks the browser's language and falls back to English. A missing
+  // key falls through to the English literal passed at each call site, so English is never
+  // duplicated and cannot drift. The app's own screens are English; the link-preview (og:) tags
+  // stay English too, because a static host can't know the recipient's language before paint.
+  var LANG = (function(){
+    var l = ((navigator.languages && navigator.languages[0]) || navigator.language || "en").toLowerCase();
+    if (l === "ja" || l.indexOf("ja-") === 0) return "ja";
+    if (l === "fr" || l.indexOf("fr-") === 0) return "fr";
+    return "en";
+  })();
+  var STR = {
+    ja: {
+      loading: "Phuzzleを読み込み中…",
+      gtToday: "今日の<em>Phuzzle</em>",
+      gtYesterday: "昨日の<em>Phuzzle</em>",
+      gtSolve: "<em>Phuzzle</em>を解こう",
+      gtSender: function(x){ return escapeHtml(x) + "さんから<em>Phuzzle</em>が届きました"; },
+      gameSub: function(n,total){ return "ピースを別のピースにドラッグするか、2つをタップして入れ替えます。横" + n + "列、全" + total + "ピース。"; },
+      progress: function(home,total){ return total + "個中" + home + "個が正しい位置"; },
+      moves: function(m){ return m + "回の入れ替え"; },
+      peekLabel: "長押しで写真を見る",
+      wonSolved: "完成。",
+      wonImgAlt: "組み立て直した写真",
+      wonFewest: function(m){ return m + "回の入れ替えで完成。これが最小手数です。"; },
+      won: function(m,f){ return m + "回の入れ替えで完成（最小手数は" + f + "）。"; },
+      pitch: "<b>Phuzzles</b>は写真を、送れるパズルに変えます。相手はそれを解いて、写真とあなたのメッセージを見ます。",
+      ctaMakeDefault: "お返しを送る",
+      ctaMakeOfficial: "自分の写真で作る",
+      wonFootDefault: "iPhoneとAndroidで無料。広告つき。",
+      wonFootOfficial: "毎日アメリカ東部時間11:00に新作が出ます：<a href=\"/today/\">phuzzles.app/today</a><br>アプリはiPhoneとAndroidで無料、広告つき。",
+      shareToday: "今日のパズルをシェア",
+      linkCopied: "リンクをコピーしました",
+      brag: function(m,f){ return "今日のPhuzzleを" + m + "回の入れ替えで解きました（最小手数は" + f + "）。次はあなたの番。"; },
+      instGot: "<em>Phuzzle</em>が届きました！",
+      instSender: function(x){ return escapeHtml(x) + "さんから<em>Phuzzle</em>が届きました！"; },
+      instSub: "アプリを入手して解くと、隠されたメッセージが現れます。",
+      instPlay: "Google Play で手に入れよう",
+      appStore: "App Store からダウンロード",
+      instHome: "Phuzzlesとは？",
+      nfTitle: "ページが見つかりません",
+      nfSub: "このリンクはどこにもつながっていません。",
+      nfBtn: "Phuzzlesへ",
+      busyTitle: "このネットワークからの初回アクセスが多すぎます",
+      offlineTitle: "Phuzzlesに接続できませんでした",
+      busySub: "1つのネットワークから同時に入れる人数には限りがあります。数分後にもう一度お試しください。",
+      offlineSub: "パズルを読み込めませんでした。接続を確認して、もう一度お試しください。",
+      tryAgain: "もう一度試す"
+    },
+    fr: {
+      loading: "Chargement de votre Phuzzle…",
+      gtToday: "Le <em>Phuzzle</em> du jour",
+      gtYesterday: "Le <em>Phuzzle</em> d'hier",
+      gtSolve: "Résolvez le <em>Phuzzle</em>",
+      gtSender: function(x){ return escapeHtml(x) + " vous a envoyé un <em>Phuzzle</em>"; },
+      gameSub: function(n,total){ return "Faites glisser une pièce sur une autre pour les échanger, ou touchez les deux. " + n + " de large, " + total + " pièces."; },
+      progress: function(home,total){ return home + " sur " + total + " en place"; },
+      moves: function(m){ return m + (m === 1 ? " échange" : " échanges"); },
+      peekLabel: "Maintenez pour voir la photo",
+      wonSolved: "Résolu.",
+      wonImgAlt: "La photo reconstituée",
+      wonFewest: function(m){ return "Résolu en " + m + (m === 1 ? " échange" : " échanges") + ", le minimum possible."; },
+      won: function(m,f){ return "Résolu en " + m + (m === 1 ? " échange" : " échanges") + " (minimum possible : " + f + ")."; },
+      pitch: "<b>Phuzzles</b> transforme une photo en un puzzle que vous envoyez. On le résout pour découvrir l'image et votre message.",
+      ctaMakeDefault: "Renvoyez-en un",
+      ctaMakeOfficial: "Créez-en un avec votre photo",
+      wonFootDefault: "Gratuit sur iPhone et Android, avec publicités.",
+      wonFootOfficial: "Un nouveau chaque jour à 11h00 (heure de l'Est des États-Unis) : <a href=\"/today/\">phuzzles.app/today</a><br>L'appli est gratuite sur iPhone et Android, avec publicités.",
+      shareToday: "Partager le puzzle du jour",
+      linkCopied: "Lien copié",
+      brag: function(m,f){ return "J'ai résolu le Phuzzle du jour en " + m + (m === 1 ? " échange" : " échanges") + " (le minimum possible est " + f + "). À ton tour."; },
+      instGot: "Vous avez reçu un <em>Phuzzle</em> !",
+      instSender: function(x){ return escapeHtml(x) + " vous a envoyé un <em>Phuzzle</em> !"; },
+      instSub: "Téléchargez l'appli pour le résoudre et dévoiler le message caché.",
+      instPlay: "Disponible sur Google Play",
+      appStore: "Télécharger dans l'App Store",
+      instHome: "Qu'est-ce que Phuzzles ?",
+      nfTitle: "Page introuvable",
+      nfSub: "Ce lien ne mène nulle part.",
+      nfBtn: "Aller sur Phuzzles",
+      busyTitle: "Trop de premières visites depuis ce réseau",
+      offlineTitle: "Impossible de joindre Phuzzles",
+      busySub: "Phuzzles ne peut accueillir qu'un nombre limité de personnes à la fois depuis un même réseau. Réessayez dans quelques minutes.",
+      offlineSub: "Le puzzle ne s'est pas chargé. Vérifiez votre connexion et réessayez.",
+      tryAgain: "Réessayer"
+    }
+  };
+  function D(key){ var d = STR[LANG]; return d ? d[key] : undefined; }
+  function T(key, en){ var v = D(key); return v != null ? v : en; }
+  function Tf(key, enFn){ var v = D(key); return (typeof v === "function") ? v : enFn; }
+  if (LANG !== "en") {
+    document.documentElement.lang = LANG;
+    (function(){
+      var S = function(sel, key, html){ var el = document.querySelector(sel), v = D(key);
+        if (el && v != null) { if (html) el.innerHTML = v; else el.textContent = v; } };
+      S("#loading .eyebrow", "loading");
+      S("#peek-label", "peekLabel");
+      S("#won .pitch", "pitch", true);
+      S("#won h1", "wonSolved");
+      S("#cta-make", "ctaMakeDefault");
+      S("#won-foot", "wonFootDefault");
+      S("#inst-sub", "instSub");
+      S("#inst-play", "instPlay");
+      S("#inst-home", "instHome");
+      S("#nf-title", "nfTitle");
+      S("#nf-sub", "nfSub");
+      S("#nf-btn", "nfBtn");
+      var wi = document.getElementById("won-img"), a = D("wonImgAlt");
+      if (wi && a != null) wi.setAttribute("alt", a);
+    })();
+  }
+
   function show(id){ ["loading","game","won","install","notfound"].forEach(function(x){
       document.getElementById(x).classList.toggle("hidden", x!==id); }); }
 
@@ -241,10 +354,10 @@ var s=document.createElement('script');s.async=true;s.src='https://www.googletag
 
   function toInstall(sender){
     document.getElementById("inst-title").innerHTML =
-      (sender ? escapeHtml(sender) + " sent you a <em>Phuzzle</em>!" : "You've got a <em>Phuzzle</em>!");
+      (sender ? Tf("instSender", function(x){ return escapeHtml(x) + " sent you a <em>Phuzzle</em>!"; })(sender) : T("instGot","You've got a <em>Phuzzle</em>!"));
     var inst = document.getElementById("inst-play");
     inst.href = IOS ? APPSTORE : playWith("puzzle_" + puzzleId);
-    if (IOS) inst.textContent = "Download on the App Store";
+    if (IOS) inst.textContent = T("appStore","Download on the App Store");
     inst.onclick = function(){ ev("store_click", { from: "install_wall" }); };
     if (!PHONE) { inst.classList.add("hidden"); badges("inst-stores", playWith("puzzle_" + puzzleId), "install_wall"); }
     ev("puzzle_install_wall");
@@ -267,11 +380,11 @@ var s=document.createElement('script');s.async=true;s.src='https://www.googletag
   // within minutes), and an office, a campus or a phone carrier puts many people behind one address, so that is not
   // a connection problem. Either way a store button was the wrong answer: say what happened and offer a retry.
   function cantOpen(busy){
-    document.getElementById("nf-title").textContent = busy ? "Too many first visits from this network" : "Couldn’t reach Phuzzles";
-    document.getElementById("nf-sub").textContent = busy ? "Phuzzles can only let in so many at once from one network. Try again in a few minutes."
-      : "The puzzle didn’t load. Check your connection and try again.";
+    document.getElementById("nf-title").textContent = busy ? T("busyTitle","Too many first visits from this network") : T("offlineTitle","Couldn’t reach Phuzzles");
+    document.getElementById("nf-sub").textContent = busy ? T("busySub","Phuzzles can only let in so many at once from one network. Try again in a few minutes.")
+      : T("offlineSub","The puzzle didn’t load. Check your connection and try again.");
     var again = document.getElementById("nf-btn");
-    again.textContent = "Try again"; again.href = location.href;
+    again.textContent = T("tryAgain","Try again"); again.href = location.href;
     ev("puzzle_cant_open", { why: busy ? "busy" : "offline" });
     show("notfound");
   }
@@ -319,10 +432,10 @@ var s=document.createElement('script');s.async=true;s.src='https://www.googletag
     var n = Math.min(GRID[(d.difficulty||"MEDIUM")] || 4, 4), total = n * n;
     pieces = total;
     document.getElementById("game-title").innerHTML =
-      (official ? (potdIsToday(d, Date.now()) ? "Today's <em>Phuzzle</em>" : d.isPotd ? "Yesterday's <em>Phuzzle</em>" : "Solve the <em>Phuzzle</em>")
-       : sender ? escapeHtml(sender)+" sent you a <em>Phuzzle</em>" : "Solve the <em>Phuzzle</em>");
+      (official ? (potdIsToday(d, Date.now()) ? T("gtToday","Today's <em>Phuzzle</em>") : d.isPotd ? T("gtYesterday","Yesterday's <em>Phuzzle</em>") : T("gtSolve","Solve the <em>Phuzzle</em>"))
+       : sender ? Tf("gtSender", function(x){ return escapeHtml(x)+" sent you a <em>Phuzzle</em>"; })(sender) : T("gtSolve","Solve the <em>Phuzzle</em>"));
     document.getElementById("game-sub").textContent =
-      "Drag a piece onto another to swap them, or tap both. " + n + " across, " + total + " pieces.";
+      Tf("gameSub", function(n,total){ return "Drag a piece onto another to swap them, or tap both. " + n + " across, " + total + " pieces."; })(n, total);
     // A sender can leave the note unlocked (messageLocked = false), which is the one setting that gives a
     // stranger a reason to finish. Locked is the default, and a locked note waits for win().
     var msg = d.message && String(d.message).trim();
@@ -342,8 +455,8 @@ var s=document.createElement('script');s.async=true;s.src='https://www.googletag
 
     function count(moves, home){
       swaps = moves; inPlace = home;
-      document.getElementById("progress").textContent = home + " of " + total + " in place";
-      document.getElementById("moves").textContent = moves + " swap" + (moves === 1 ? "" : "s");
+      document.getElementById("progress").textContent = Tf("progress", function(home,total){ return home + " of " + total + " in place"; })(home, total);
+      document.getElementById("moves").textContent = Tf("moves", function(moves){ return moves + " swap" + (moves === 1 ? "" : "s"); })(moves);
     }
     count(0, 0);
 
@@ -427,22 +540,21 @@ var s=document.createElement('script');s.async=true;s.src='https://www.googletag
     else { rev.classList.add("hidden"); }
     // The par is the same fact whoever sent the puzzle, so every solve gets it, not only the studio's.
     document.querySelector("#won h1").textContent = moves === fewest
-      ? "Solved in " + moves + " swap" + (moves === 1 ? "" : "s") + ", the fewest possible."
-      : "Solved in " + moves + " swaps (fewest possible: " + fewest + ").";
+      ? Tf("wonFewest", function(moves){ return "Solved in " + moves + " swap" + (moves === 1 ? "" : "s") + ", the fewest possible."; })(moves)
+      : Tf("won", function(moves,fewest){ return "Solved in " + moves + " swaps (fewest possible: " + fewest + ")."; })(moves, fewest);
     var cta = document.getElementById("cta-make");
     var official = d.senderId === "phuzzles-official";
     // Installs from the daily get their own source, so the Play report can tell them apart.
     var ref = (official ? "utm_source=potd" : "utm_source=puzzle_link") + "&utm_medium=web_solver";
     if (official) {
-      cta.textContent = "Make one from your own photo";
+      cta.textContent = T("ctaMakeOfficial","Make one from your own photo");
       // Somewhere to come back to: /today always opens the current daily.
-      document.getElementById("won-foot").innerHTML = 'There\'s a new one every day at 11:00 Eastern: <a href="/today/">phuzzles.app/today</a><br>The app is free on iPhone and Android, with ads.';
+      document.getElementById("won-foot").innerHTML = T("wonFootOfficial", 'There\'s a new one every day at 11:00 Eastern: <a href="/today/">phuzzles.app/today</a><br>The app is free on iPhone and Android, with ads.');
       // Today's daily is the one puzzle anyone can pass on: /today opens it in any browser and unfurls with a card.
       if (potdIsToday(d, Date.now()) && !document.getElementById("share-today")) {
-        var brag = "I solved today's Phuzzle in " + moves + " swap" + (moves === 1 ? "" : "s") +
-          " (the fewest possible is " + fewest + "). Your turn.";
+        var brag = Tf("brag", function(moves,fewest){ return "I solved today's Phuzzle in " + moves + " swap" + (moves === 1 ? "" : "s") + " (the fewest possible is " + fewest + "). Your turn."; })(moves, fewest);
         var share = document.createElement("button");
-        share.type = "button"; share.id = "share-today"; share.className = "btn ghost"; share.textContent = "Share today's puzzle";
+        share.type = "button"; share.id = "share-today"; share.className = "btn ghost"; share.textContent = T("shareToday","Share today's puzzle");
         var link = "https://phuzzles.app/today/?utm_source=potd-share&utm_medium=share";
         share.onclick = function(){
           if (navigator.share) {
@@ -451,7 +563,7 @@ var s=document.createElement('script');s.async=true;s.src='https://www.googletag
             return;
           }
           (navigator.clipboard ? navigator.clipboard.writeText(brag + " " + link) : Promise.reject())
-            .then(function(){ share.textContent = "Link copied"; ev("potd_share", { method: "copy" }); },
+            .then(function(){ share.textContent = T("linkCopied","Link copied"); ev("potd_share", { method: "copy" }); },
                   function(){ share.textContent = "phuzzles.app/today"; });
         };
         cta.insertAdjacentElement("afterend", share);
