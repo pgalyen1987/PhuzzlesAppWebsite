@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>Phuzzles pin card</title>
+<style>
+  /* Same system as og-card.html, laid out tall. Rendered at 1000x1500 by make-pin-cards.sh. */
+  @font-face { font-family: 'Archivo'; src: url('../fonts/archivo-var-latin.woff2') format('woff2');
+    font-weight: 700 900; font-stretch: 62% 125%; }
+  @font-face { font-family: 'DM Sans'; src: url('../fonts/dm-sans-var-latin.woff2') format('woff2');
+    font-weight: 400 600; }
+
+  :root {
+    --ink: #1A1A2E; --panel: #23233E; --text: #F5F3EF; --muted: #A9A9C6;
+    --coral: #FF6B6B; --teal: #4ECDC4; --paper: #FFF3E4;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; background: var(--ink); }
+  body { width: 1000px; height: 1500px; overflow: hidden; }
+
+  .card { width: 1000px; height: 1500px; display: flex; flex-direction: column;
+    padding: 72px 76px 68px; background: var(--ink); color: var(--text);
+    font: 400 20px/1.5 'DM Sans', sans-serif; }
+
+  .brand { display: flex; align-items: center; gap: 16px; }
+  .brand img { width: 58px; height: 58px; border-radius: 14px; }
+  .brand span { font-family: 'Archivo', sans-serif; font-weight: 800; font-stretch: 112%;
+    font-size: 38px; letter-spacing: -0.01em; }
+
+  h1 { margin: 48px 0 0; font-family: 'Archivo', sans-serif; font-weight: 800; font-stretch: 108%;
+    font-size: 82px; line-height: 1.02; letter-spacing: -0.03em; }
+  h1 em { font-style: normal; color: var(--coral); }
+
+  /* The words against the board at 1 : 1.618 of the space below the brand. */
+  .stage { position: relative; margin: 76px auto 0; padding-bottom: 76px; }
+  .board { position: relative; z-index: 2; display: grid; grid-template-columns: repeat(3, 1fr);
+    gap: 7px; width: 600px; aspect-ratio: 1; background: var(--ink); border-radius: 20px;
+    overflow: hidden; box-shadow: 0 1px 0 rgba(255,255,255,0.07) inset, 0 40px 80px -34px rgba(0,0,0,0.78); }
+  .tile { border-radius: 4px; }
+  .tile:nth-child(1) { background: #32325A; } .tile:nth-child(2) { background: #2A2A4C; }
+  .tile:nth-child(3) { background: #383863; } .tile:nth-child(4) { background: #353560; }
+  .tile:nth-child(5) { background: #292947; } .tile:nth-child(6) { background: #2E2E52; }
+  .tile:nth-child(7) { background: #3A3A66; } .tile:nth-child(8) { background: #2F2F55; }
+  .tile:nth-child(9) { background: #282846; }
+  .tile.held { outline: 4px solid var(--coral); outline-offset: -4px; transform: scale(0.95); }
+  .tile.next { outline: 4px solid var(--teal); outline-offset: -4px; }
+
+  .note { position: absolute; z-index: 1; left: 42px; right: 42px; bottom: 0; height: 146px;
+    background: var(--paper); border-radius: 4px; transform: rotate(-1deg);
+    box-shadow: 0 1px 0 rgba(255,255,255,0.55) inset, 0 20px 42px -20px rgba(0,0,0,0.8),
+                0 2px 5px rgba(0,0,0,0.3); }
+  .note .edge { position: absolute; left: 0; right: 0; bottom: 18px; text-align: center; white-space: nowrap;
+    font-size: 19px; letter-spacing: 0.035em; color: #8A7F92; }
+
+  .foot { margin-top: auto; font-size: 25px; color: var(--muted); }
+</style>
+</head>
+<body>
+  <div class="card">
+    <div class="brand"><img src="../logo-128.png" alt="" /><span>Phuzzles</span></div>
+    <h1 id="h1">A photo they have to solve</h1>
+    <div class="stage">
+      <div class="board">
+        <div class="tile"></div><div class="tile"></div><div class="tile next"></div>
+        <div class="tile"></div><div class="tile held"></div><div class="tile"></div>
+        <div class="tile"></div><div class="tile"></div><div class="tile"></div>
+      </div>
+      <div class="note"><span class="edge">A message is folded underneath</span></div>
+    </div>
+    <p class="foot" id="foot">Free on iPhone and Android &middot; phuzzles.app</p>
+  </div>
+  <script>
+    // One pin per idea page: ?k=<key>. The headline is that page's own h1.
+    var CARDS = {
+      pregnancy: 'A pregnancy announcement they have to <em>solve</em>',
+      birthday:  'A birthday message they have to <em>solve</em>',
+      puppy:     'A new puppy they have to <em>solve</em>',
+      trip:      'A surprise trip they have to <em>solve</em>',
+      christmas: 'A Christmas present they have to <em>solve</em>'
+    };
+    var k = new URLSearchParams(location.search).get('k');
+    if (CARDS[k]) document.getElementById('h1').innerHTML = CARDS[k];
+  </script>
+</body>
+</html>
