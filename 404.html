@@ -216,6 +216,7 @@ var s=document.createElement('script');s.async=true;s.src='https://www.googletag
     if (l === "fr" || l.indexOf("fr-") === 0) return "fr";
     if (l === "es" || l.indexOf("es-") === 0) return "es";
     if (l === "de" || l.indexOf("de-") === 0) return "de";
+    if (l === "pt" || l.indexOf("pt-") === 0) return "pt";
     return "en";
   })();
   var STR = {
@@ -366,6 +367,43 @@ var s=document.createElement('script');s.async=true;s.src='https://www.googletag
       busySub: "Aus einem Netzwerk können nur begrenzt viele Personen gleichzeitig teilnehmen. Versuch es in ein paar Minuten noch einmal.",
       offlineSub: "Das Puzzle wurde nicht geladen. Prüf deine Verbindung und versuch es noch einmal.",
       tryAgain: "Erneut versuchen"
+    },
+    pt: {
+      loading: "Carregando seu Phuzzle…",
+      gtToday: "O <em>Phuzzle</em> de hoje",
+      gtYesterday: "O <em>Phuzzle</em> de ontem",
+      gtSolve: "Resolva o <em>Phuzzle</em>",
+      gtSender: function(x){ return escapeHtml(x) + " te mandou um <em>Phuzzle</em>"; },
+      gameSub: function(n,total){ return "Arraste uma peça sobre outra para trocá-las, ou toque nas duas. " + n + " de largura, " + total + " peças."; },
+      progress: function(home,total){ return home + " de " + total + " no lugar"; },
+      moves: function(m){ return m + (m === 1 ? " troca" : " trocas"); },
+      peekLabel: "Segure para ver a foto",
+      wonSolved: "Resolvido.",
+      wonImgAlt: "A foto remontada",
+      wonFewest: function(m){ return "Resolvido em " + m + (m === 1 ? " troca" : " trocas") + ", o mínimo possível."; },
+      won: function(m,f){ return "Resolvido em " + m + (m === 1 ? " troca" : " trocas") + " (mínimo possível: " + f + ")."; },
+      pitch: "<b>Phuzzles</b> transforma uma foto em um quebra-cabeça que você manda. A pessoa resolve para ver a imagem e a sua mensagem.",
+      ctaMakeDefault: "Mande um de volta",
+      ctaMakeOfficial: "Faça um com a sua foto",
+      wonFootDefault: "Grátis no iPhone e no Android, com anúncios.",
+      wonFootOfficial: "Um novo todo dia às 11:00 (horário do leste dos EUA): <a href=\"/today/\">phuzzles.app/today</a><br>O app é grátis no iPhone e no Android, com anúncios.",
+      shareToday: "Compartilhar o quebra-cabeça de hoje",
+      linkCopied: "Link copiado",
+      brag: function(m,f){ return "Resolvi o Phuzzle de hoje em " + m + (m === 1 ? " troca" : " trocas") + " (o mínimo possível é " + f + "). Agora é a sua vez."; },
+      instGot: "Você recebeu um <em>Phuzzle</em>!",
+      instSender: function(x){ return escapeHtml(x) + " te mandou um <em>Phuzzle</em>!"; },
+      instSub: "Baixe o app para resolver e ver a mensagem escondida.",
+      instPlay: "Disponível no Google Play",
+      appStore: "Baixar na App Store",
+      instHome: "O que é Phuzzles?",
+      nfTitle: "Página não encontrada",
+      nfSub: "Este link não leva a lugar nenhum.",
+      nfBtn: "Ir para o Phuzzles",
+      busyTitle: "Muitas primeiras visitas desta rede",
+      offlineTitle: "Não foi possível conectar ao Phuzzles",
+      busySub: "De uma mesma rede, só um número limitado de pessoas pode entrar ao mesmo tempo. Tente de novo em alguns minutos.",
+      offlineSub: "O quebra-cabeça não carregou. Verifique a sua conexão e tente de novo.",
+      tryAgain: "Tentar de novo"
     }
   };
   function D(key){ var d = STR[LANG]; return d ? d[key] : undefined; }
