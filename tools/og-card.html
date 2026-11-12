@@ -92,7 +92,12 @@
       christmas: 'A Christmas present they have to <em>solve</em>',
       // The archive is the one page that needs no install, so it says so instead of naming the
       // stores. No puzzle count: a card is static and the page restocks without it.
-      daily:     { h1: 'Every Phuzzle of the Day', foot: 'No app, no account. Solve it in your browser.' }
+      daily:     { h1: 'Every Phuzzle of the Day', foot: 'No app, no account. Solve it in your browser.' },
+      // /today/ is a permanent link that forwards to whichever puzzle is current, so it is the one
+      // we put in a bio or on a poster. Its card must not show store badges: the page's whole
+      // promise is that there is nothing to install. No time of day, for the same reason the
+      // archive carries no count -- 11:00 Eastern is a fact about our scheduler, not about the card.
+      today:     { h1: 'A new photo puzzle <em>every day</em>', foot: 'No app, no account. Solve it in your browser.' }
     };
     var k = new URLSearchParams(location.search).get('k');
     var c = CARDS[k];
