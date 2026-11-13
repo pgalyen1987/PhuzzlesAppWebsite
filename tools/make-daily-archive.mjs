@@ -107,12 +107,12 @@ const html = `<!doctype html>
 <link rel="alternate" hreflang="de" href="https://phuzzles.app/de/daily/" />
 <link rel="alternate" hreflang="pt" href="https://phuzzles.app/pt/daily/" />
 <!-- /lang-alternates -->
-<title>Every Phuzzle of the Day: solve any of them free</title>
+<title>Daily photo puzzles, free in your browser</title>
 <meta name="description" content="${rows.length} daily photo puzzles, newest first. Solve any of them in your browser: no app, no account, no sign-up." />
 <link rel="canonical" href="https://phuzzles.app/daily/" />
 <meta property="og:type" content="website" />
 <meta property="og:url" content="https://phuzzles.app/daily/" />
-<meta property="og:title" content="Every Phuzzle of the Day" />
+<meta property="og:title" content="Daily photo puzzles, free in your browser" />
 <meta property="og:description" content="${rows.length} daily photo puzzles. Solve any of them in your browser, nothing to install." />
 <meta property="og:image" content="https://phuzzles.app/img/og-daily.jpg" />
 <meta name="twitter:card" content="summary_large_image" />
@@ -203,6 +203,7 @@ ${cards}
   if (LANG === "en") return;
   var STR = {
     ja: {
+      title: "毎日の写真パズル、ブラウザで無料",
       h1: "これまでの Phuzzle of the Day",
       lede1: function(n){ return n + "日分の写真パズル、新しい順です。どれも今もブラウザで解けます。アプリも、アカウントも、インストールも要りません。<a href='/today/'>今日の分はこちら</a>。新作は毎日アメリカ東部時間11:00に出ます。"; },
       lede2: "プレビューはパズルと同じように、ばらばらにしてあります。それがこのページの趣旨です。",
@@ -216,6 +217,7 @@ ${cards}
       pieces: function(n){ return n + "ピース"; }
     },
     fr: {
+      title: "Puzzles photo quotidiens, gratuits dans le navigateur",
       h1: "Tous les Phuzzle of the Day",
       lede1: function(n){ return n + " puzzles photo quotidiens, du plus récent au plus ancien. Chacun se résout encore dans votre navigateur. Pas d'appli, pas de compte, rien à installer. <a href='/today/'>Celui du jour est ici</a>, et un nouveau arrive chaque jour à 11h00 (heure de l'Est des États-Unis)."; },
       lede2: "Les aperçus sont mélangés, comme les puzzles. C'est précisément l'intérêt.",
@@ -229,6 +231,7 @@ ${cards}
       pieces: function(n){ return n + " pièces"; }
     },
     es: {
+      title: "Puzzles de fotos diarios, gratis en tu navegador",
       h1: "Todos los Phuzzle of the Day",
       lede1: function(n){ return n + " puzzles de fotos diarios, del más nuevo al más antiguo. Todos se pueden resolver todavía en tu navegador. Sin app, sin cuenta, nada que instalar. <a href='/today/'>El de hoy está aquí</a>, y uno nuevo llega cada día a las 11:00 (hora del Este de EE. UU.)."; },
       lede2: "Las vistas previas están revueltas, igual que los puzzles. Esa es justamente la idea.",
@@ -242,6 +245,7 @@ ${cards}
       pieces: function(n){ return n + " piezas"; }
     },
     de: {
+      title: "Tägliche Fotopuzzles, kostenlos im Browser",
       h1: "Alle Phuzzle of the Day",
       lede1: function(n){ return n + " tägliche Fotopuzzles, neueste zuerst. Jedes lässt sich noch im Browser lösen. Keine App, kein Konto, nichts zu installieren. <a href='/today/'>Das von heute ist hier</a>, und jeden Tag um 11:00 Uhr (US-Ostküstenzeit) kommt ein neues dazu."; },
       lede2: "Die Vorschauen sind verwürfelt, genau wie die Puzzles. Das ist durchaus der Sinn der Sache.",
@@ -255,6 +259,7 @@ ${cards}
       pieces: function(n){ return n + " Teile"; }
     },
     pt: {
+      title: "Quebra-cabeças de fotos diários, grátis no navegador",
       h1: "Todos os Phuzzle of the Day",
       lede1: function(n){ return n + " quebra-cabeças de fotos diários, do mais novo ao mais antigo. Todos ainda dá para resolver no seu navegador. Sem app, sem conta, nada para instalar. <a href='/today/'>O de hoje está aqui</a>, e um novo chega todo dia às 11:00 (horário do leste dos EUA)."; },
       lede2: "As prévias estão embaralhadas, como os quebra-cabeças. É justamente essa a ideia.",

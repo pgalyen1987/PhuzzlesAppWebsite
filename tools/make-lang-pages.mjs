@@ -58,9 +58,10 @@ const PAGES = [
     // i18n addresses them by id.
     attr: "id",
     keyOf: (key) => `t-${key}`,
-    // It has no title string of its own: the h1 is the headline in every language, and the lede is
-    // the sentence it leads with, so the snippet and the chat preview get words already shipped.
-    titleKey: "h1",
+    // Its h1 is the headline on the page; the title is the one a stranger searches for, so it is
+    // its own string. The lede is the sentence the page leads with, so the snippet and the chat
+    // preview get words already shipped.
+    titleKey: "title",
     descKey: "lede1",
     // Several of its strings are functions of the puzzle count, which the page states once.
     fnArg: (src) => Number(src.match(/var N = (\d+);/)[1]),
