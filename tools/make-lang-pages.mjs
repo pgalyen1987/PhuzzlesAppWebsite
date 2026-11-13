@@ -46,6 +46,36 @@ const PAGES = [
     // The logo and the footer point home: the translated home page, not the English one.
     links: (lang) => [['href="/"', `href="/${lang}/"`]],
   },
+  {
+    // The daily archive. Written by tools/make-daily-archive.mjs, which re-runs this script, so the
+    // copies cannot survive a restock of the page they were copied from.
+    src: "daily/index.html",
+    out: (lang) => [lang, "daily", "index.html"],
+    canonical: "https://phuzzles.app/daily/",
+    ogUrl: "https://phuzzles.app/daily/",
+    href: (lang) => `https://phuzzles.app/${lang}/daily/`,
+    // This page marks its strings with `id="t-h1"` rather than data-i18n, because its own runtime
+    // i18n addresses them by id.
+    attr: "id",
+    keyOf: (key) => `t-${key}`,
+    // It has no title string of its own: the h1 is the headline in every language, and the lede is
+    // the sentence it leads with, so the snippet and the chat preview get words already shipped.
+    titleKey: "h1",
+    descKey: "lede1",
+    // Several of its strings are functions of the puzzle count, which the page states once.
+    fnArg: (src) => Number(src.match(/var N = (\d+);/)[1]),
+    // The ItemList describes the 39 puzzles once, at the English address.
+    dropJsonLd: true,
+    // "How Phuzzles works" and the footer wordmark point home; both appear in the markup with double
+    // quotes and inside the dictionary with single ones. /today/ is left alone: it has no address of
+    // its own and localises itself from the browser.
+    links: (lang) => [['href="/"', `href="/${lang}/"`], ["href='/'", `href='/${lang}/'`]],
+    // The per-card "16 pieces" labels are the one string that repeats, so they are keyed by piece
+    // count in the markup rather than by name. Without this a translated page carries 39 English
+    // labels until its own script re-applies them.
+    each: (out, d) => d.pieces ? out.replace(/(<em data-pc="(\d+)">)[^<]*/g,
+      (_, open, pc) => open + d.pieces(Number(pc))) : out,
+  },
 ];
 
 // Replace the contents of the element carrying `attr="key"`, counting nested tags of the same name
@@ -55,6 +85,8 @@ function replaceInner(html, attr, key, value) {
   if (at < 0) return { html, hit: false };
   const open = html.lastIndexOf("<", at);
   const tag = html.slice(open + 1).match(/^[a-zA-Z0-9]+/)[0];
+  // An <img> marked with the key carries its string in alt, not in children it cannot have.
+  if (/^(img|input|br|hr|meta|link|source)$/i.test(tag)) return { html, hit: false };
   const openEnd = html.indexOf(">", at);
   let i = openEnd + 1, depth = 1, close = -1;
   const o = new RegExp(`<${tag}[\\s>]`, "i"), c = new RegExp(`</${tag}>`, "i");
@@ -95,11 +127,24 @@ function relink(html, pairs) {
 // Entities and tags are fine inside the page; a <meta content> wants neither.
 const plain = (s) => s.replace(/<[^>]+>/g, "").replace(/&middot;/g, "·").replace(/&times;/g, "×");
 
+// A dictionary value is a finished string, or a function of the one number the page states (the
+// puzzle count). Anything else -- a function needing runtime state -- stays for the page's own
+// script to apply.
+function str(value, n) {
+  if (typeof value === "string") return value;
+  if (typeof value === "function" && n !== null && value.length === 1) {
+    const out = value(n);
+    return typeof out === "string" ? out : null;
+  }
+  return null;
+}
+
 let pages = 0, total = 0;
 for (const page of PAGES) {
   const src = readFileSync(join(root, page.src), "utf8");
 
   // The dictionary, read out of the page rather than duplicated here.
+  const n0 = page.fnArg ? page.fnArg(src) : null;
   const dict = src.match(/var STR = (\{[\s\S]*?\n {2}\});/);
   if (!dict) throw new Error(`${page.src}: could not find \`var STR = {...};\` — did the i18n block move?`);
   const STR = new Function("return " + dict[1])();
@@ -111,11 +156,12 @@ for (const page of PAGES) {
     out = out.replace('<html lang="en">', `<html lang="${lang}" data-lang="${lang}">`);
     if (out.indexOf(`data-lang="${lang}"`) < 0) throw new Error(`${page.src}: <html lang="en"> not found`);
 
-    if (d.title) {
-      out = out.replace(/<title>[^<]*<\/title>/, `<title>${d.title}</title>`);
-      out = out.replace(/(<meta property="og:title" content=")[^"]*"/, `$1${plain(d.title)}"`);
+    const title = d[page.titleKey || "title"];
+    if (title) {
+      out = out.replace(/<title>[^<]*<\/title>/, `<title>${plain(title)}</title>`);
+      out = out.replace(/(<meta property="og:title" content=")[^"]*"/, `$1${plain(title)}"`);
     }
-    const desc = d[page.descKey];
+    const desc = str(d[page.descKey], n0);
     if (desc) {
       out = out.replace(/(<meta name="description" content=")[^"]*"/, `$1${plain(desc)}"`);
       out = out.replace(/(<meta property="og:description" content=")[^"]*"/, `$1${plain(desc)}"`);
@@ -124,18 +170,23 @@ for (const page of PAGES) {
                       `<link rel="canonical" href="${page.href(lang)}" />`);
     out = out.replace(`<meta property="og:url" content="${page.ogUrl}" />`,
                       `<meta property="og:url" content="${page.href(lang)}" />`);
-    if (page.dropJsonLd) out = out.replace(/ {2}<script type="application\/ld\+json">[\s\S]*?<\/script>\n/, "");
+    if (page.dropJsonLd) out = out.replace(/ *<script type="application\/ld\+json">[\s\S]*?<\/script>\n/, "");
 
-    for (const [key, value] of Object.entries(d)) {
-      if (typeof value !== "string") continue;      // swaps(), inPlace() and friends stay runtime
-      let r = replaceInner(out, "data-i18n", key, value);
+    const attr = page.attr || "data-i18n";
+    const keyOf = page.keyOf || ((key) => key);
+    for (const [key, raw] of Object.entries(d)) {
+      const value = str(raw, n0);
+      if (value === null) continue;                 // swaps(), inPlace() and friends stay runtime
+      const k = keyOf(key);
+      let r = replaceInner(out, attr, k, value);
       if (r.hit) { out = r.html; n++; }
-      r = setAttr(out, "data-i18n-alt", key, "alt", plain(value));
+      r = setAttr(out, attr === "id" ? attr : "data-i18n-alt", attr === "id" ? k : key, "alt", plain(value));
       if (r.hit) { out = r.html; n++; }
-      r = setAttr(out, "data-i18n-label", key, "aria-label", plain(value));
+      r = setAttr(out, attr === "id" ? attr : "data-i18n-label", attr === "id" ? k : key, "aria-label", plain(value));
       if (r.hit) { out = r.html; n++; }
     }
 
+    if (page.each) out = page.each(out, d);
     out = relink(out, page.links(lang));
 
     const parts = page.out(lang);

@@ -14,6 +14,7 @@
  * Usage: node tools/make-daily-archive.mjs   (writes daily/index.html)
  */
 import fs from "node:fs";
+import { execFileSync } from "node:child_process";
 import { createRequire } from "node:module";
 const require = createRequire("/home/me/AndroidStudioProjects/PhuzzlesApp/functions/package.json");
 const admin = require("firebase-admin");
@@ -96,6 +97,16 @@ const html = `<!doctype html>
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<!-- lang-alternates: /ja/daily/ and friends are this page with its own dictionary already applied,
+     written by tools/make-lang-pages.mjs and regenerated at the bottom of this script. -->
+<link rel="alternate" hreflang="x-default" href="https://phuzzles.app/daily/" />
+<link rel="alternate" hreflang="en" href="https://phuzzles.app/daily/" />
+<link rel="alternate" hreflang="ja" href="https://phuzzles.app/ja/daily/" />
+<link rel="alternate" hreflang="fr" href="https://phuzzles.app/fr/daily/" />
+<link rel="alternate" hreflang="es" href="https://phuzzles.app/es/daily/" />
+<link rel="alternate" hreflang="de" href="https://phuzzles.app/de/daily/" />
+<link rel="alternate" hreflang="pt" href="https://phuzzles.app/pt/daily/" />
+<!-- /lang-alternates -->
 <title>Every Phuzzle of the Day: solve any of them free</title>
 <meta name="description" content="${rows.length} daily photo puzzles, newest first. Solve any of them in your browser: no app, no account, no sign-up." />
 <link rel="canonical" href="https://phuzzles.app/daily/" />
@@ -181,7 +192,8 @@ ${cards}
 // stay in a neutral long form; the per-card caption is the puzzle's own message and is left as-is.
 (function(){
   var N = ${rows.length};
-  var l = ((navigator.languages && navigator.languages[0]) || navigator.language || "en").toLowerCase();
+  var l = (document.documentElement.getAttribute("data-lang") ||
+           (navigator.languages && navigator.languages[0]) || navigator.language || "en").toLowerCase();
   var LANG =
     (l === "ja" || l.indexOf("ja-") === 0) ? "ja" :
     (l === "fr" || l.indexOf("fr-") === 0) ? "fr" :
@@ -281,3 +293,8 @@ ${cards}
 fs.mkdirSync("daily", { recursive: true });
 fs.writeFileSync("daily/index.html", html);
 console.log(`wrote daily/index.html with ${rows.length} puzzles (${(html.length/1024).toFixed(1)} KB)`);
+
+// The five /xx/daily/ pages are copies of the file just written, so a restock that left them alone
+// would publish last month's archive in five languages. Regenerate them here rather than trusting
+// anyone to remember the second command.
+execFileSync(process.execPath, [new URL("make-lang-pages.mjs", import.meta.url).pathname], { stdio: "inherit" });
