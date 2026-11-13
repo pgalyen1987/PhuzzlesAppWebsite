@@ -82,7 +82,14 @@ const jsonld = {
     url: `https://phuzzles.app/solve/?p=${r.id}`, name: `Phuzzle of the Day, ${fmt(r.date)}` })),
 };
 
-const gtag = fs.readFileSync("/tmp/claude-1000/-home-me/8320ef49-3c24-4b11-a089-67586866f146/scratchpad/gtag.html", "utf8").split("</script>")[0] + "</script>";
+// Analytics: reuse the exact gtag <script> block that index.html ships, read from the committed
+// file rather than a per-session /tmp scratchpad (that path was tied to one session UUID and
+// vanished between restocks, so the next regenerate would throw ENOENT). Fail loud if the block
+// ever moves, so a change to index.html can never silently drop analytics from the archive.
+const indexHtml = fs.readFileSync(new URL("../index.html", import.meta.url), "utf8");
+const gtagMatch = indexHtml.match(/<script>\s*window\.dataLayer[\s\S]*?<\/script>/);
+if (!gtagMatch) throw new Error("make-daily-archive: gtag <script> block not found in index.html");
+const gtag = gtagMatch[0];
 
 const html = `<!doctype html>
 <html lang="en">
