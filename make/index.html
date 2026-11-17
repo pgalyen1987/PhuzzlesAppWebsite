@@ -196,6 +196,11 @@ var s=document.createElement('script');s.async=true;s.src='https://www.googletag
   <ul class="limits">
     <li>The puzzle is not posted anywhere. The link is the only way to it, and it is not listed on the feed.</li>
     <li>Photos are checked automatically before a link is made, and some are refused.</li>
+    <!-- TRUE AS DEPLOYED, AND COUPLED TO A COMMIT THAT IS NOT. Production still runs main's
+         cleanupExpiredPuzzles (30 days): scheduledCleanup was last deployed 2026-10-20, and the
+         commit that sets RETAIN_DAYS = null -- puzzles kept for the life of the account, owner's
+         call "ok keep them" -- is 5d6a16d, dated 2026-10-29, still undeployed. The DAY that commit
+         ships, this line becomes false and must be changed with it. -->
     <li>Puzzles are deleted after 30 days, so the link stops working then.</li>
     <li>Up to 20 a day per account.</li>
     <li>Something wrong with a puzzle? <a href="mailto:support@phuzzles.app">support@phuzzles.app</a>, with its link.</li>
