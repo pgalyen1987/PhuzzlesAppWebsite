@@ -1,0 +1,168 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Phuzzle of the day</title>
+<!-- A fragment meant to sit inside someone else's page. It must never compete with /today/ in search,
+     and on its own it is half a page: no heading, no nav, no explanation. -->
+<meta name="robots" content="noindex" />
+<!-- The host page's address must not travel to Firebase with every request. -->
+<meta name="referrer" content="strict-origin" />
+<link rel="icon" href="/logo-128.png" />
+<style>
+  @font-face{font-family:'DM Sans';src:url('/fonts/dm-sans-var-latin.woff2') format('woff2');font-weight:400 600;font-display:swap}
+  @font-face{font-family:'Gochi Hand';src:url('/fonts/gochi-hand-400-latin.woff2') format('woff2');font-weight:400;font-display:swap}
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  :root{--bg:#1A1A2E;--surface:#23233E;--border:rgba(245,243,239,.12);--text:#F5F3EF;--muted:#A9A9C6;
+        --accent:#FF6B6B;--good:#4ECDC4;--good-dim:rgba(78,205,196,.45);--paper:#FFF3E4;--paper-ink:#2A2238}
+  html,body{height:100%}
+  body{font-family:'DM Sans',system-ui,-apple-system,Segoe UI,Roboto,sans-serif;background:var(--bg);
+       color:var(--text);-webkit-font-smoothing:antialiased;padding:14px;display:flex}
+  /* One column, capped: in a wide sidebar the board should not become a poster. */
+  .card{width:100%;max-width:420px;margin:auto;display:flex;flex-direction:column}
+
+  .top{display:flex;justify-content:space-between;align-items:baseline;gap:10px;margin-bottom:10px;
+       font-size:13px;line-height:1.2}
+  .label{font-weight:600;letter-spacing:.01em}
+  .meta{color:var(--muted);font-variant-numeric:tabular-nums}
+
+  #board{width:100%;aspect-ratio:1/1;display:grid;gap:3px;background:var(--surface);
+         border:1px solid var(--border);border-radius:14px;padding:6px;touch-action:manipulation}
+  #board>span{background:var(--bg);border-radius:4px}
+  .tile{-webkit-appearance:none;appearance:none;border:0;padding:0;margin:0;background-color:var(--surface);
+        background-size:cover;background-repeat:no-repeat;border-radius:4px;cursor:pointer;
+        transition:transform .12s ease,box-shadow .12s ease,outline-color .12s;outline:3px solid transparent;
+        outline-offset:-3px;position:relative;touch-action:none;
+        -webkit-tap-highlight-color:transparent;-webkit-user-select:none;user-select:none}
+  .tile:focus-visible{outline-color:var(--good)}
+  .tile.ok{box-shadow:inset 0 0 0 2px var(--good-dim)}
+  .tile.sel{outline-color:var(--accent);transform:scale(.94);z-index:2;box-shadow:0 6px 18px rgba(255,107,107,.35)}
+  .tile.pop{animation:pop .2s ease}
+  @keyframes pop{40%{transform:scale(.93)}}
+  .solved .tile{border-radius:0;cursor:default}
+
+  /* The note is the payoff, on the same paper the rest of the site folds under a puzzle. */
+  .note{margin:-8px 7% 0;padding:22px 18px 16px;background:var(--paper);color:var(--paper-ink);
+        border-radius:4px;box-shadow:0 14px 30px -18px rgba(0,0,0,.7)}
+  .note p{font-family:'Gochi Hand','Bradley Hand','Segoe Print','DM Sans',system-ui,sans-serif;
+          font-size:1.272rem;line-height:1.45;overflow-wrap:anywhere}
+
+  .foot{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:11px;
+        font-size:13px;color:var(--muted)}
+  .foot a{color:var(--good);text-decoration:underline;text-underline-offset:3px;white-space:nowrap}
+  .by{margin-top:7px;font-size:11px;color:var(--muted);text-decoration:none;align-self:flex-start;opacity:.75}
+  .by:hover{opacity:1}
+  .by b{color:var(--text);font-weight:600}
+
+  .msgbox{padding:26px 6px;text-align:center;color:var(--muted);font-size:14px;line-height:1.5}
+  .hidden{display:none}
+  @media (prefers-reduced-motion:reduce){.tile,.tile.pop{transition:none;animation:none}}
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="top">
+    <span class="label">Phuzzle of the day</span>
+    <span class="meta" id="meta" aria-live="polite"></span>
+  </div>
+
+  <div id="board" role="group" aria-label="Today's photo puzzle"></div>
+
+  <div class="note hidden" id="note"><p id="msg"></p></div>
+
+  <div class="foot" id="foot">
+    <span id="hint">Tap two pieces to swap them.</span>
+    <a id="cta" href="https://phuzzles.app/make/?utm_source=embed&amp;utm_medium=widget" target="_blank" rel="noopener">Make your own</a>
+  </div>
+
+  <div class="msgbox hidden" id="problem"></div>
+
+  <a class="by" href="https://phuzzles.app/today/?utm_source=embed&amp;utm_medium=widget" target="_blank" rel="noopener"><b>Phuzzles</b> &middot; a new photo every day</a>
+</div>
+
+<script src="/js/firestore-rest.js"></script>
+<script src="/js/solver.js"></script>
+<script>
+// The daily, playable inside somebody else's page.
+//
+// WHY THIS EXISTS. phuzzles.app has no search authority and no audience of its own, and both take years.
+// A site that already has them can run the daily for free: the photos are curated CC0/public domain
+// (potd_pool, seeded by tools/seed-potd.mjs), so an embedder carries no licence risk, which is the usual
+// reason a blog will not host someone else's picture.
+//
+// ONLY THE DAILY IS EVER SHOWN HERE. A link puzzle is a private message between two people and is never
+// moderated, so it must never be rendered into a page anyone can frame. The isPotd query below is the
+// whole access story: it can return nothing, but it cannot return somebody's private photo.
+(function () {
+  var GRID = PhuzzleSolver.GRID;
+  // The same shape the solver trusts: our own Storage bucket, nothing else.
+  var OUR_PHOTOS = /^https:\/\/firebasestorage\.googleapis\.com(?::443)?\/v0\/b\/phuzzles\.firebasestorage\.app\/o\/[^\/?#'"()\s\\]+(?:\?[^#'"()\s\\]*)?$/;
+  var board = document.getElementById("board"), meta = document.getElementById("meta");
+
+  function problem(text) {
+    document.getElementById("board").classList.add("hidden");
+    document.getElementById("foot").classList.add("hidden");
+    var p = document.getElementById("problem");
+    p.textContent = text;
+    p.classList.remove("hidden");
+  }
+
+  meta.textContent = "Loading";
+
+  PhuzzlesDB.query({
+    from: [{ collectionId: "puzzles" }],
+    where: { fieldFilter: { field: { fieldPath: "isPotd" }, op: "EQUAL", value: { booleanValue: true } } }
+  }).then(function (rows) {
+    var ms = function (v) { return v && v.toMillis ? v.toMillis() : (typeof v === "number" ? v : 0); };
+    var docs = rows.slice().sort(function (a, b) { return ms(b.data.sentAt) - ms(a.data.sentAt); });
+    if (!docs.length) { problem("Today's puzzle isn't up yet. A new one arrives every day at 11:00 Eastern."); return; }
+
+    var id = docs[0].id, d = docs[0].data;
+    var img = typeof d.imageUrl === "string" && OUR_PHOTOS.test(d.imageUrl) ? d.imageUrl : null;
+    if (!img) { problem("Today's puzzle couldn't be loaded."); return; }
+
+    // The web solver caps the daily at 4x4: a 6x6 of 40px pieces in a sidebar is not a puzzle, it is a chore.
+    var n = Math.min(GRID[d.difficulty || "MEDIUM"] || 4, 4), total = n * n;
+    board.style.gridTemplateColumns = "repeat(" + n + ",1fr)";
+    board.style.gridTemplateRows = "repeat(" + n + ",1fr)";
+    var cells = ""; for (var i = 0; i < total; i++) cells += "<span></span>";
+    board.innerHTML = cells;
+
+    function count(moves, home) { meta.textContent = home + " of " + total + " in place"; }
+    count(0, 0);
+
+    var full = new Image();
+    full.onload = function () {
+      // seed: the id, so every site showing today's puzzle shows the SAME scramble and two readers'
+      // swap counts mean the same thing. saveKey: a half-done board survives a page reload.
+      PhuzzleSolver.mount(board, {
+        img: img, n: n, aspect: full.naturalWidth / full.naturalHeight, seed: id,
+        saveKey: "phz:embed:" + id,
+        onSwap: count,
+        onSolve: function (r) {
+          board.classList.add("solved");
+          meta.textContent = r.moves + " swap" + (r.moves === 1 ? "" : "s")
+            + (r.moves === r.fewest ? ", the fewest possible" : " (fewest: " + r.fewest + ")");
+          var msg = d.message && String(d.message).trim();
+          if (msg) {
+            document.getElementById("msg").textContent = msg;
+            document.getElementById("note").classList.remove("hidden");
+          }
+          document.getElementById("hint").textContent = "Come back tomorrow for a new one.";
+        }
+      });
+    };
+    full.onerror = function () { problem("Today's puzzle couldn't be loaded."); };
+    full.src = img;
+  }).catch(function (e) {
+    // Many readers behind one address (an office, a campus, a carrier) can trip Firebase's sign-in limit,
+    // which is not the reader's connection and should not read as one.
+    problem(e && e.code === "auth/too-many-requests"
+      ? "Too many first visits from this network just now. Try again in a few minutes."
+      : "Couldn't reach Phuzzles. Check your connection and try again.");
+  });
+})();
+</script>
+</body>
+</html>
