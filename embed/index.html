@@ -95,6 +95,72 @@
 // moderated, so it must never be rendered into a page anyone can frame. The isPotd query below is the
 // whole access story: it can return nothing, but it cannot return somebody's private photo.
 (function () {
+  // The widget lands on somebody else's site, which may be in any language, so it speaks the
+  // reader's rather than the host's. Same fall-through as the rest of the site: English literals
+  // stay at the call sites and a missing key uses them.
+  var l = ((navigator.languages && navigator.languages[0]) || navigator.language || "en").toLowerCase();
+  var LANG = l === "ja" || l.indexOf("ja-") === 0 ? "ja"
+           : l === "pt" || l.indexOf("pt-") === 0 ? "pt"
+           : l === "es" || l.indexOf("es-") === 0 ? "es"
+           : l === "fr" || l.indexOf("fr-") === 0 ? "fr"
+           : l === "de" || l.indexOf("de-") === 0 ? "de" : "en";
+  var STR = {
+    ja: { title: "今日のPhuzzle", loading: "読み込み中", hint: "2つのピースをタップで入れ替え",
+          cta: "自分でも作る", by: "毎日あたらしい写真を1枚",
+          place: function (h, t) { return t + "個中" + h + "個が正しい位置"; },
+          swaps: function (m, f) { return m === f ? m + "手、最小手数です" : m + "手（最小は" + f + "）"; },
+          back: "あすまた新しい一問を。",
+          none: "今日の分はまだ公開されていません。毎日アメリカ東部時間11:00に新しい一問が出ます。",
+          load: "今日の分を読み込めませんでした。",
+          busy: "このネットワークからの新規アクセスが多すぎます。数分後にお試しください。",
+          off: "Phuzzlesに接続できませんでした。接続を確認してお試しください。" },
+    pt: { title: "Phuzzle do dia", loading: "Carregando", hint: "Toque em duas peças para trocá-las.",
+          cta: "Faça o seu", by: "uma foto nova todo dia",
+          place: function (h, t) { return h + " de " + t + " no lugar"; },
+          swaps: function (m, f) { return m === f ? m + (m === 1 ? " troca" : " trocas") + ", o mínimo possível" : m + (m === 1 ? " troca" : " trocas") + " (mínimo: " + f + ")"; },
+          back: "Volte amanhã para um novo.",
+          none: "O quebra-cabeça de hoje ainda não está no ar. Um novo chega todo dia às 11:00 (horário do leste dos EUA).",
+          load: "Não deu para carregar o quebra-cabeça de hoje.",
+          busy: "Muitas primeiras visitas desta rede agora. Tente de novo em alguns minutos.",
+          off: "Não foi possível conectar ao Phuzzles. Verifique a sua conexão e tente de novo." },
+    es: { title: "Phuzzle del día", loading: "Cargando", hint: "Toca dos piezas para intercambiarlas.",
+          cta: "Haz el tuyo", by: "una foto nueva cada día",
+          place: function (h, t) { return h + " de " + t + " en su lugar"; },
+          swaps: function (m, f) { return m === f ? m + (m === 1 ? " intercambio" : " intercambios") + ", el mínimo posible" : m + (m === 1 ? " intercambio" : " intercambios") + " (mínimo: " + f + ")"; },
+          back: "Vuelve mañana por uno nuevo.",
+          none: "El rompecabezas de hoy aún no está. Llega uno nuevo cada día a las 11:00 (hora del Este de EE. UU.).",
+          load: "No se pudo cargar el rompecabezas de hoy.",
+          busy: "Demasiadas primeras visitas desde esta red. Inténtalo de nuevo en unos minutos.",
+          off: "No se pudo conectar con Phuzzles. Revisa tu conexión e inténtalo de nuevo." },
+    fr: { title: "Le Phuzzle du jour", loading: "Chargement", hint: "Touchez deux pièces pour les échanger.",
+          cta: "Faites le vôtre", by: "une nouvelle photo chaque jour",
+          place: function (h, t) { return h + " sur " + t + " en place"; },
+          swaps: function (m, f) { return m === f ? m + (m === 1 ? " échange" : " échanges") + ", le minimum possible" : m + (m === 1 ? " échange" : " échanges") + " (minimum : " + f + ")"; },
+          back: "Revenez demain pour un nouveau.",
+          none: "Le puzzle du jour n'est pas encore là. Un nouveau arrive chaque jour à 11h00 (heure de l'Est des États-Unis).",
+          load: "Le puzzle du jour n'a pas pu être chargé.",
+          busy: "Trop de premières visites depuis ce réseau. Réessayez dans quelques minutes.",
+          off: "Impossible de joindre Phuzzles. Vérifiez votre connexion et réessayez." },
+    de: { title: "Phuzzle des Tages", loading: "Wird geladen", hint: "Zwei Teile antippen, um sie zu tauschen.",
+          cta: "Mach dein eigenes", by: "jeden Tag ein neues Foto",
+          place: function (h, t) { return h + " von " + t + " an ihrem Platz"; },
+          swaps: function (m, f) { return m === f ? m + (m === 1 ? " Tausch" : " Tausche") + ", das mögliche Minimum" : m + (m === 1 ? " Tausch" : " Tausche") + " (Minimum: " + f + ")"; },
+          back: "Komm morgen für ein neues wieder.",
+          none: "Das heutige Puzzle ist noch nicht da. Jeden Tag um 11:00 Uhr (US-Ostküstenzeit) kommt ein neues.",
+          load: "Das heutige Puzzle konnte nicht geladen werden.",
+          busy: "Zu viele Erstbesuche aus diesem Netzwerk. Versuch es in ein paar Minuten noch einmal.",
+          off: "Phuzzles ist nicht erreichbar. Prüf deine Verbindung und versuch es noch einmal." }
+  };
+  var D = STR[LANG] || null;
+  function T(k, en) { var v = D && D[k]; return v == null ? en : v; }
+  function Tf(k, enFn) { var v = D && D[k]; return typeof v === "function" ? v : enFn; }
+  if (D) {
+    document.documentElement.lang = LANG;
+    document.querySelector(".label").textContent = T("title", "Phuzzle of the day");
+    document.getElementById("hint").textContent = T("hint", "Tap two pieces to swap them.");
+    document.getElementById("cta").textContent = T("cta", "Make your own");
+    document.querySelector(".by").innerHTML = "<b>Phuzzles</b> &middot; " + T("by", "a new photo every day");
+  }
   var GRID = PhuzzleSolver.GRID;
   // The same shape the solver trusts: our own Storage bucket, nothing else.
   var OUR_PHOTOS = /^https:\/\/firebasestorage\.googleapis\.com(?::443)?\/v0\/b\/phuzzles\.firebasestorage\.app\/o\/[^\/?#'"()\s\\]+(?:\?[^#'"()\s\\]*)?$/;
@@ -108,7 +174,7 @@
     p.classList.remove("hidden");
   }
 
-  meta.textContent = "Loading";
+  meta.textContent = T("loading", "Loading");
 
   PhuzzlesDB.query({
     from: [{ collectionId: "puzzles" }],
@@ -116,11 +182,11 @@
   }).then(function (rows) {
     var ms = function (v) { return v && v.toMillis ? v.toMillis() : (typeof v === "number" ? v : 0); };
     var docs = rows.slice().sort(function (a, b) { return ms(b.data.sentAt) - ms(a.data.sentAt); });
-    if (!docs.length) { problem("Today's puzzle isn't up yet. A new one arrives every day at 11:00 Eastern."); return; }
+    if (!docs.length) { problem(T("none", "Today's puzzle isn't up yet. A new one arrives every day at 11:00 Eastern.")); return; }
 
     var id = docs[0].id, d = docs[0].data;
     var img = typeof d.imageUrl === "string" && OUR_PHOTOS.test(d.imageUrl) ? d.imageUrl : null;
-    if (!img) { problem("Today's puzzle couldn't be loaded."); return; }
+    if (!img) { problem(T("load", "Today's puzzle couldn't be loaded.")); return; }
 
     // The web solver caps the daily at 4x4: a 6x6 of 40px pieces in a sidebar is not a puzzle, it is a chore.
     var n = Math.min(GRID[d.difficulty || "MEDIUM"] || 4, 4), total = n * n;
@@ -129,7 +195,7 @@
     var cells = ""; for (var i = 0; i < total; i++) cells += "<span></span>";
     board.innerHTML = cells;
 
-    function count(moves, home) { meta.textContent = home + " of " + total + " in place"; }
+    function count(moves, home) { meta.textContent = Tf("place", function (h, t) { return h + " of " + t + " in place"; })(home, total); }
     count(0, 0);
 
     var full = new Image();
@@ -142,25 +208,26 @@
         onSwap: count,
         onSolve: function (r) {
           board.classList.add("solved");
-          meta.textContent = r.moves + " swap" + (r.moves === 1 ? "" : "s")
-            + (r.moves === r.fewest ? ", the fewest possible" : " (fewest: " + r.fewest + ")");
+          meta.textContent = Tf("swaps", function (m, f) {
+            return m + " swap" + (m === 1 ? "" : "s") + (m === f ? ", the fewest possible" : " (fewest: " + f + ")");
+          })(r.moves, r.fewest);
           var msg = d.message && String(d.message).trim();
           if (msg) {
             document.getElementById("msg").textContent = msg;
             document.getElementById("note").classList.remove("hidden");
           }
-          document.getElementById("hint").textContent = "Come back tomorrow for a new one.";
+          document.getElementById("hint").textContent = T("back", "Come back tomorrow for a new one.");
         }
       });
     };
-    full.onerror = function () { problem("Today's puzzle couldn't be loaded."); };
+    full.onerror = function () { problem(T("load", "Today's puzzle couldn't be loaded.")); };
     full.src = img;
   }).catch(function (e) {
     // Many readers behind one address (an office, a campus, a carrier) can trip Firebase's sign-in limit,
     // which is not the reader's connection and should not read as one.
     problem(e && e.code === "auth/too-many-requests"
-      ? "Too many first visits from this network just now. Try again in a few minutes."
-      : "Couldn't reach Phuzzles. Check your connection and try again.");
+      ? T("busy", "Too many first visits from this network just now. Try again in a few minutes.")
+      : T("off", "Couldn't reach Phuzzles. Check your connection and try again."));
   });
 })();
 </script>

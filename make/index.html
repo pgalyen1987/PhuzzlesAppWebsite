@@ -129,14 +129,14 @@ var s=document.createElement('script');s.async=true;s.src='https://www.googletag
 <div class="wrap">
   <header><a class="home" href="/">Phuzzles</a></header>
 
-  <h1>Send a photo they have to put back together</h1>
-  <p class="lede">Pick a picture, write the note that goes under it, and you get a link. Whoever
+  <h1 id="mk-h1">Send a photo they have to put back together</h1>
+  <p class="lede" id="mk-lede">Pick a picture, write the note that goes under it, and you get a link. Whoever
     opens it sees shuffled pieces, not the photo &mdash; and your note only appears once they&rsquo;ve
     finished. They don&rsquo;t need the app, or an account.</p>
 
   <!-- 1. Sign in. The reason is stated, because asking without one is how a form loses people. -->
   <section id="gate">
-    <p style="max-width:52ch">Signing in puts your account behind the photo you upload. That is the only reason it is here:
+    <p style="max-width:52ch" id="mk-gatewhy">Signing in puts your account behind the photo you upload. That is the only reason it is here:
       an unattributed photo upload that makes a public link is the one thing we won&rsquo;t build.</p>
     <div class="row">
       <button class="go" id="signin" style="width:auto">Continue with Google</button>
@@ -158,9 +158,9 @@ var s=document.createElement('script');s.async=true;s.src='https://www.googletag
 
       <div>
         <div class="field">
-          <label class="f" for="note">The note underneath (optional)</label>
+          <label class="f" for="note" id="mk-notelabel">The note underneath (optional)</label>
           <textarea id="note" maxlength="200" placeholder="It&rsquo;s a girl. Due in May."></textarea>
-          <p class="count"><span id="left">200</span> characters left</p>
+          <p class="count"><span id="left">200</span> <span id="mk-chars">characters left</span></p>
         </div>
 
         <div class="field">
@@ -181,8 +181,8 @@ var s=document.createElement('script');s.async=true;s.src='https://www.googletag
 
   <!-- 3. The link. -->
   <section id="done" class="done hidden">
-    <h2 style="font-family:'Archivo',sans-serif;font-size:var(--t-h2);margin:0 0 10px">Here&rsquo;s the link</h2>
-    <p style="color:var(--muted);margin:0 0 16px">Send it to whoever it&rsquo;s for. It opens in any
+    <h2 id="mk-doneh2" style="font-family:'Archivo',sans-serif;font-size:var(--t-h2);margin:0 0 10px">Here&rsquo;s the link</h2>
+    <p id="mk-donelede" style="color:var(--muted);margin:0 0 16px">Send it to whoever it&rsquo;s for. It opens in any
       browser, and it shows the shuffled pieces until they solve it.</p>
     <input class="link" id="out" readonly />
     <div class="row">
@@ -194,19 +194,229 @@ var s=document.createElement('script');s.async=true;s.src='https://www.googletag
   </section>
 
   <ul class="limits">
-    <li>The puzzle is not posted anywhere. The link is the only way to it, and it is not listed on the feed.</li>
-    <li>Photos are checked automatically before a link is made, and some are refused.</li>
+    <li id="mk-l1">The puzzle is not posted anywhere. The link is the only way to it, and it is not listed on the feed.</li>
+    <li id="mk-l2">Photos are checked automatically before a link is made, and some are refused.</li>
     <!-- TRUE AS DEPLOYED, AND COUPLED TO A COMMIT THAT IS NOT. Production still runs main's
          cleanupExpiredPuzzles (30 days): scheduledCleanup was last deployed 2026-10-20, and the
          commit that sets RETAIN_DAYS = null -- puzzles kept for the life of the account, owner's
          call "ok keep them" -- is 5d6a16d, dated 2026-10-29, still undeployed. The DAY that commit
          ships, this line becomes false and must be changed with it. -->
-    <li>Puzzles are deleted after 30 days, so the link stops working then.</li>
-    <li>Up to 20 a day per account.</li>
-    <li>Something wrong with a puzzle? <a href="mailto:support@phuzzles.app">support@phuzzles.app</a>, with its link.</li>
+    <li id="mk-l3">Puzzles are deleted after 30 days, so the link stops working then.</li>
+    <li id="mk-l4">Up to 20 a day per account.</li>
+    <li id="mk-l5">Something wrong with a puzzle? <a href="mailto:support@phuzzles.app">support@phuzzles.app</a>, with its link.</li>
   </ul>
 </div>
 
+<script>
+// i18n for the maker. This is the page a non-English speaker reaches by tapping the localised home
+// page's own button, so leaving it English made that button a dead end. Same shape as 404.html: the
+// browser's language, English kept in the markup as the fallback so it cannot drift, and a missing
+// key falls through to the literal at the call site. The og:/meta tags stay English - a static host
+// cannot know the reader's language before a crawler reads them; /ja/make/ and the rest carry those.
+(function () {
+  var l = ((navigator.languages && navigator.languages[0]) || navigator.language || "en").toLowerCase();
+  var LANG = l === "ja" || l.indexOf("ja-") === 0 ? "ja"
+           : l === "pt" || l.indexOf("pt-") === 0 ? "pt"
+           : l === "es" || l.indexOf("es-") === 0 ? "es"
+           : l === "fr" || l.indexOf("fr-") === 0 ? "fr"
+           : l === "de" || l.indexOf("de-") === 0 ? "de" : "en";
+  var STR = {
+    ja: {
+      h1: "元に戻してもらう写真を送る",
+      lede: "写真を選んで、その下に入れるメモを書くと、リンクができます。開いた人に見えるのはバラバラのピースだけで、メモは解き終えたときに初めて出てきます。アプリもアカウントも必要ありません。",
+      gatewhy: "ログインするのは、アップロードされた写真にアカウントを結びつけるためです。理由はそれだけです。誰のものか分からない写真から公開リンクが作れる仕組みだけは作りません。",
+      signin: "Googleで続行",
+      drophint: "タップして写真を選ぶ<br />正方形に切り取られます",
+      again: "これが相手に見える状態です。タップで写真を差し替えられます。",
+      notelabel: "下に隠すメモ（任意）",
+      noteph: "女の子です。予定日は5月。",
+      chars: "文字あと",
+      cuts: "むずかしさ",
+      dEASY: "かんたん・3×3", dMEDIUM: "ふつう・4×4", dHARD: "むずかしい・5×5", dEXPERT: "最難関・6×6",
+      make: "リンクを作る",
+      doneh2: "リンクができました",
+      donelede: "渡したい相手に送ってください。どのブラウザでも開き、解くまではバラバラのピースのままです。",
+      copy: "リンクをコピー", copied: "コピーしました", share: "共有", open: "開く", another: "もう一つ作る",
+      l1: "このパズルはどこにも公開されません。リンクだけが入り口で、フィードにも載りません。",
+      l2: "リンクを作る前に写真は自動で確認され、一部は受け付けられません。",
+      l3: "パズルは30日後に削除され、リンクはそこで開けなくなります。",
+      l4: "1アカウントにつき1日20個まで。",
+      l5: 'パズルに問題があれば、リンクを添えて <a href="mailto:support@phuzzles.app">support@phuzzles.app</a> までご連絡ください。',
+      previewlabel: "相手に見える状態：シャッフルされた写真",
+      sharetext: "パズルを作りました。解くまで写真は見えません。",
+      ePopup: "ブラウザがログイン画面をブロックしました。phuzzles.app のポップアップを許可してもう一度お試しください。",
+      eSignin: "今はログインできませんでした。少し時間をおいてお試しください。",
+      eNotPhoto: "このファイルは写真として開けませんでした。JPEGかPNGでお試しください。",
+      ePrep: "この写真は準備できませんでした。別の写真でお試しください。",
+      eAuth: "ログインを確認できませんでした。もう一度ログインして作り直してください。",
+      eLarge: "この写真は大きすぎます。別の写真でお試しください。",
+      eSend: "この写真は送信できませんでした。別の写真でお試しください。",
+      eRefused: "この写真からはパズルを作れません。別の写真を選んでください。",
+      eCap: "1つのアカウントが今日作れる数の上限です。明日またお作りいただけます。",
+      eGeneric: "今はパズルを作れませんでした。少し時間をおいてお試しください。"
+    },
+    pt: {
+      h1: "Mande uma foto que a pessoa tem que remontar",
+      lede: "Escolha uma foto, escreva o recado que fica embaixo dela e você recebe um link. Quem abrir vê as peças embaralhadas, não a foto — e o recado só aparece quando a pessoa termina. Ela não precisa do aplicativo nem de conta.",
+      gatewhy: "Entrar liga a sua conta à foto que você envia. É o único motivo de isso estar aqui: envio de foto sem autoria que gera um link público é a única coisa que não vamos construir.",
+      signin: "Continuar com o Google",
+      drophint: "Toque para escolher uma foto<br />Ela é cortada em quadrado",
+      again: "É isso que a pessoa vai ver. Toque para trocar a foto.",
+      notelabel: "O recado embaixo (opcional)",
+      noteph: "É uma menina. Prevista para maio.",
+      chars: "caracteres restantes",
+      cuts: "Dificuldade",
+      dEASY: "Fácil · 3×3", dMEDIUM: "Médio · 4×4", dHARD: "Difícil · 5×5", dEXPERT: "Expert · 6×6",
+      make: "Criar o link",
+      doneh2: "Aqui está o link",
+      donelede: "Mande para quem é. Abre em qualquer navegador e mostra as peças embaralhadas até a pessoa resolver.",
+      copy: "Copiar link", copied: "Copiado", share: "Compartilhar", open: "Abrir", another: "Criar outro",
+      l1: "O quebra-cabeça não é publicado em lugar nenhum. O link é o único caminho até ele, e ele não aparece no feed.",
+      l2: "As fotos passam por uma verificação automática antes de o link ser criado, e algumas são recusadas.",
+      l3: "Os quebra-cabeças são apagados depois de 30 dias, e o link para de funcionar nessa hora.",
+      l4: "Até 20 por dia por conta.",
+      l5: 'Algum problema com um quebra-cabeça? <a href="mailto:support@phuzzles.app">support@phuzzles.app</a>, com o link dele.',
+      previewlabel: "O que a pessoa vai ver: sua foto embaralhada",
+      sharetext: "Fiz um quebra-cabeça para você. Não dá para ver a foto antes de resolver.",
+      ePopup: "Seu navegador bloqueou a janela de login. Permita pop-ups para phuzzles.app e tente de novo.",
+      eSignin: "Não deu para entrar agora. Tente de novo em um minuto.",
+      eNotPhoto: "Não deu para abrir esse arquivo como foto. Tente um JPEG ou PNG.",
+      ePrep: "Não deu para preparar essa foto. Tente outra.",
+      eAuth: "Não deu para confirmar seu login. Entre de novo e refaça.",
+      eLarge: "Essa foto é grande demais. Tente outra.",
+      eSend: "Essa foto não foi enviada. Tente outra.",
+      eRefused: "O Phuzzles não consegue fazer um quebra-cabeça com essa foto. Escolha outra.",
+      eCap: "É o máximo que uma conta pode criar hoje. Amanhã você pode criar mais.",
+      eGeneric: "Não deu para criar seu quebra-cabeça agora. Tente de novo em um minuto."
+    },
+    es: {
+      h1: "Manda una foto que tengan que armar",
+      lede: "Elige una foto, escribe la nota que va debajo y obtienes un enlace. Quien lo abra ve las piezas revueltas, no la foto, y tu nota solo aparece cuando termina. No necesita la app ni una cuenta.",
+      gatewhy: "Iniciar sesión deja tu cuenta detrás de la foto que subes. Esa es la única razón por la que está aquí: subir una foto sin autor y que genere un enlace público es lo único que no vamos a construir.",
+      signin: "Continuar con Google",
+      drophint: "Toca para elegir una foto<br />Se recorta en cuadrado",
+      again: "Eso es lo que va a ver. Tócala para cambiar la foto.",
+      notelabel: "La nota de abajo (opcional)",
+      noteph: "Es niña. Para mayo.",
+      chars: "caracteres restantes",
+      cuts: "Dificultad",
+      dEASY: "Fácil · 3×3", dMEDIUM: "Medio · 4×4", dHARD: "Difícil · 5×5", dEXPERT: "Experto · 6×6",
+      make: "Crear el enlace",
+      doneh2: "Aquí está el enlace",
+      donelede: "Mándaselo a quien va dirigido. Se abre en cualquier navegador y muestra las piezas revueltas hasta que lo resuelva.",
+      copy: "Copiar enlace", copied: "Copiado", share: "Compartir", open: "Abrirlo", another: "Crear otro",
+      l1: "El rompecabezas no se publica en ningún lado. El enlace es la única forma de llegar a él y no aparece en el feed.",
+      l2: "Las fotos se revisan automáticamente antes de crear el enlace, y algunas se rechazan.",
+      l3: "Los rompecabezas se borran a los 30 días, y el enlace deja de funcionar entonces.",
+      l4: "Hasta 20 al día por cuenta.",
+      l5: '¿Algo anda mal con un rompecabezas? <a href="mailto:support@phuzzles.app">support@phuzzles.app</a>, con su enlace.',
+      previewlabel: "Lo que va a ver: tu foto revuelta",
+      sharetext: "Te hice un rompecabezas. No puedes ver la foto hasta resolverlo.",
+      ePopup: "Tu navegador bloqueó la ventana de inicio de sesión. Permite las ventanas emergentes para phuzzles.app e inténtalo de nuevo.",
+      eSignin: "No se pudo iniciar sesión ahora. Inténtalo de nuevo en un minuto.",
+      eNotPhoto: "Ese archivo no se pudo abrir como foto. Prueba con un JPEG o PNG.",
+      ePrep: "Esa foto no se pudo preparar. Prueba con otra.",
+      eAuth: "No se pudo confirmar tu sesión. Inicia sesión otra vez y vuelve a crearlo.",
+      eLarge: "Esa foto es demasiado grande. Prueba con otra.",
+      eSend: "Esa foto no se envió. Prueba con otra.",
+      eRefused: "Phuzzles no puede hacer un rompecabezas con esa foto. Elige otra.",
+      eCap: "Es todo lo que una cuenta puede crear hoy. Mañana puedes crear más.",
+      eGeneric: "No se pudo crear tu rompecabezas ahora. Inténtalo de nuevo en un minuto."
+    },
+    fr: {
+      h1: "Envoyez une photo qu'il faut reconstituer",
+      lede: "Choisissez une photo, écrivez le mot qui se glisse dessous, et vous obtenez un lien. Celui qui l'ouvre voit des pièces mélangées, pas la photo — et votre mot n'apparaît qu'une fois le puzzle fini. Ni appli ni compte de son côté.",
+      gatewhy: "La connexion met votre compte derrière la photo que vous envoyez. C'est la seule raison de sa présence : un envoi de photo sans auteur qui produit un lien public est la seule chose que nous ne construirons pas.",
+      signin: "Continuer avec Google",
+      drophint: "Touchez pour choisir une photo<br />Elle est recadrée en carré",
+      again: "Voilà ce qu'elle verra. Touchez pour changer de photo.",
+      notelabel: "Le mot caché dessous (facultatif)",
+      noteph: "C'est une fille. Pour mai.",
+      chars: "caractères restants",
+      cuts: "Difficulté",
+      dEASY: "Facile · 3×3", dMEDIUM: "Moyen · 4×4", dHARD: "Difficile · 5×5", dEXPERT: "Expert · 6×6",
+      make: "Créer le lien",
+      doneh2: "Voici le lien",
+      donelede: "Envoyez-le à la personne concernée. Il s'ouvre dans n'importe quel navigateur et montre les pièces mélangées jusqu'à ce qu'elle le résolve.",
+      copy: "Copier le lien", copied: "Copié", share: "Partager", open: "L'ouvrir", another: "En créer un autre",
+      l1: "Le puzzle n'est publié nulle part. Le lien est le seul chemin vers lui, et il n'apparaît pas dans le fil.",
+      l2: "Les photos sont vérifiées automatiquement avant la création du lien, et certaines sont refusées.",
+      l3: "Les puzzles sont supprimés au bout de 30 jours, et le lien cesse alors de fonctionner.",
+      l4: "Jusqu'à 20 par jour et par compte.",
+      l5: 'Un problème avec un puzzle ? <a href="mailto:support@phuzzles.app">support@phuzzles.app</a>, avec son lien.',
+      previewlabel: "Ce qu'elle verra : votre photo mélangée",
+      sharetext: "Je t'ai fait un puzzle. Tu ne verras la photo qu'une fois résolu.",
+      ePopup: "Votre navigateur a bloqué la fenêtre de connexion. Autorisez les fenêtres pop-up pour phuzzles.app et réessayez.",
+      eSignin: "Connexion impossible pour le moment. Réessayez dans une minute.",
+      eNotPhoto: "Ce fichier n'a pas pu être ouvert comme photo. Essayez un JPEG ou un PNG.",
+      ePrep: "Cette photo n'a pas pu être préparée. Essayez-en une autre.",
+      eAuth: "Votre connexion n'a pas pu être confirmée. Reconnectez-vous et recommencez.",
+      eLarge: "Cette photo est trop lourde. Essayez-en une autre.",
+      eSend: "Cette photo n'est pas passée. Essayez-en une autre.",
+      eRefused: "Phuzzles ne peut pas faire de puzzle avec cette photo. Choisissez-en une autre.",
+      eCap: "C'est tout ce qu'un compte peut créer aujourd'hui. Vous pourrez en créer d'autres demain.",
+      eGeneric: "Impossible de créer votre puzzle pour l'instant. Réessayez dans une minute."
+    },
+    de: {
+      h1: "Schick ein Foto, das erst zusammengesetzt werden muss",
+      lede: "Such ein Foto aus, schreib die Nachricht, die darunter liegt, und du bekommst einen Link. Wer ihn öffnet, sieht gemischte Teile statt des Fotos — und deine Nachricht erscheint erst, wenn das Puzzle fertig ist. Ohne App, ohne Konto.",
+      gatewhy: "Die Anmeldung stellt dein Konto hinter das Foto, das du hochlädst. Das ist der einzige Grund dafür: ein Foto-Upload ohne Urheber, der einen öffentlichen Link erzeugt, ist das Einzige, was wir nicht bauen.",
+      signin: "Weiter mit Google",
+      drophint: "Tippen, um ein Foto zu wählen<br />Es wird quadratisch zugeschnitten",
+      again: "Das sieht sie. Tippen, um das Foto zu tauschen.",
+      notelabel: "Die Nachricht darunter (optional)",
+      noteph: "Es wird ein Mädchen. Im Mai.",
+      chars: "Zeichen übrig",
+      cuts: "Schwierigkeit",
+      dEASY: "Leicht · 3×3", dMEDIUM: "Mittel · 4×4", dHARD: "Schwer · 5×5", dEXPERT: "Experte · 6×6",
+      make: "Link erstellen",
+      doneh2: "Hier ist der Link",
+      donelede: "Schick ihn an die Person, für die er ist. Er öffnet sich in jedem Browser und zeigt die gemischten Teile, bis sie das Puzzle löst.",
+      copy: "Link kopieren", copied: "Kopiert", share: "Teilen", open: "Öffnen", another: "Noch eins erstellen",
+      l1: "Das Puzzle wird nirgends veröffentlicht. Der Link ist der einzige Weg dorthin, und im Feed steht es nicht.",
+      l2: "Fotos werden automatisch geprüft, bevor ein Link entsteht, und manche werden abgelehnt.",
+      l3: "Puzzles werden nach 30 Tagen gelöscht, dann funktioniert der Link nicht mehr.",
+      l4: "Bis zu 20 pro Tag und Konto.",
+      l5: 'Stimmt etwas mit einem Puzzle nicht? <a href="mailto:support@phuzzles.app">support@phuzzles.app</a>, mit seinem Link.',
+      previewlabel: "Was sie sehen wird: dein Foto, gemischt",
+      sharetext: "Ich habe dir ein Puzzle gemacht. Das Foto siehst du erst, wenn du es gelöst hast.",
+      ePopup: "Dein Browser hat das Anmeldefenster blockiert. Erlaube Pop-ups für phuzzles.app und versuch es noch einmal.",
+      eSignin: "Anmeldung gerade nicht möglich. Versuch es in einer Minute noch einmal.",
+      eNotPhoto: "Diese Datei ließ sich nicht als Foto öffnen. Versuch ein JPEG oder PNG.",
+      ePrep: "Dieses Foto ließ sich nicht vorbereiten. Nimm ein anderes.",
+      eAuth: "Deine Anmeldung ließ sich nicht bestätigen. Melde dich neu an und mach es noch einmal.",
+      eLarge: "Dieses Foto ist zu groß. Nimm ein anderes.",
+      eSend: "Dieses Foto kam nicht durch. Nimm ein anderes.",
+      eRefused: "Phuzzles kann aus diesem Foto kein Puzzle machen. Wähl ein anderes.",
+      eCap: "Mehr kann ein Konto heute nicht erstellen. Morgen geht wieder mehr.",
+      eGeneric: "Dein Puzzle ließ sich gerade nicht erstellen. Versuch es in einer Minute noch einmal."
+    }
+  };
+  var D = STR[LANG] || null;
+  // Exposed because the builder below is a module and cannot see this scope.
+  window.MKT = function (key, en) { var v = D && D[key]; return v == null ? en : v; };
+  if (!D) return;
+  document.documentElement.lang = LANG;
+  var byId = function (id, key, html) {
+    var el = document.getElementById(id), v = D[key];
+    if (!el || v == null) return;
+    if (html) el.innerHTML = v; else el.textContent = v;
+  };
+  byId("mk-h1", "h1"); byId("mk-lede", "lede"); byId("mk-gatewhy", "gatewhy");
+  byId("signin", "signin"); byId("drop-hint", "drophint", true); byId("again", "again");
+  byId("mk-notelabel", "notelabel"); byId("mk-chars", "chars"); byId("cuts-label", "cuts");
+  byId("make", "make"); byId("mk-doneh2", "doneh2"); byId("mk-donelede", "donelede");
+  byId("copy", "copy"); byId("share", "share"); byId("open", "open"); byId("another", "another");
+  byId("mk-l1", "l1"); byId("mk-l2", "l2"); byId("mk-l3", "l3"); byId("mk-l4", "l4");
+  byId("mk-l5", "l5", true);
+  var note = document.getElementById("note"); if (note && D.noteph) note.placeholder = D.noteph;
+  var prev = document.getElementById("preview"); if (prev && D.previewlabel) prev.setAttribute("aria-label", D.previewlabel);
+  var cuts = document.getElementById("cuts");
+  if (cuts) [].forEach.call(cuts.querySelectorAll("button"), function (b) {
+    var v = D["d" + b.getAttribute("data-d")]; if (v) b.textContent = v;
+  });
+})();
+</script>
 <script type="module">
 // The maker. The photo is cropped and re-encoded in the browser (the same steps as the Farcaster mini app,
 // /mini/mini.js), then posted to webCreatePuzzle, which checks it, saves it and hands back the link.
@@ -283,8 +493,8 @@ $("signin").onclick = async () => {
     const code = String(e && e.code || "");
     if (/popup-closed-by-user|cancelled-popup-request/.test(code)) return;
     fail($("gate-err"), /popup-blocked/.test(code)
-      ? "Your browser blocked the sign-in window. Allow pop-ups for phuzzles.app and try again."
-      : "Couldn't sign in just now. Try again in a minute.");
+      ? MKT("ePopup", "Your browser blocked the sign-in window. Allow pop-ups for phuzzles.app and try again.")
+      : MKT("eSignin", "Couldn't sign in just now. Try again in a minute."));
   }
 };
 onAuthStateChanged(auth, (user) => {
@@ -309,7 +519,7 @@ async function squarePhoto(file) {
   try {
     let img;
     try { img = await loadImage(src); }
-    catch (e) { throw new Error("That file couldn't be opened as a photo. Try a JPEG or PNG."); }
+    catch (e) { throw new Error(MKT("eNotPhoto", "That file couldn't be opened as a photo. Try a JPEG or PNG.")); }
     const w = img.naturalWidth, h = img.naturalHeight, s = Math.min(w, h);
     if (s < MIN_SIDE) throw new Error(`That photo is too small to cut into pieces. Pick one at least ${MIN_SIDE} pixels across.`);
     const side = Math.min(SIDE, s);
@@ -321,7 +531,7 @@ async function squarePhoto(file) {
     g.imageSmoothingQuality = "high";
     g.drawImage(img, (w - s) / 2, (h - s) / 2, s, s, 0, 0, side, side);
     const blob = await new Promise((r) => c.toBlob(r, "image/jpeg", 0.85));
-    if (!blob) throw new Error("That photo couldn't be prepared. Try another one.");
+    if (!blob) throw new Error(MKT("ePrep", "That photo couldn't be prepared. Try another one."));
     return { blob, url: URL.createObjectURL(blob) };
   } finally {
     URL.revokeObjectURL(src);
@@ -338,7 +548,7 @@ $("file").addEventListener("change", async (e) => {
   if (photo) URL.revokeObjectURL(photo.url);
   photo = next;
   try { photoImg = await loadImage(photo.url); }
-  catch (err) { fail($("make-err"), "That photo couldn't be prepared. Try another one."); return; }
+  catch (err) { fail($("make-err"), MKT("ePrep", "That photo couldn't be prepared. Try another one.")); return; }
   drawScrambled();
   show($("preview"), true);
   show($("drop-hint"), false);
@@ -373,12 +583,12 @@ function base64(blob) {
 function whyNot(status, said) {
   if (said) return said;              // the function words its own refusals for people; prefer them
   switch (status) {
-    case 401: case 403: return "Your sign-in couldn't be confirmed. Sign in again and remake it.";
-    case 413: return "That photo is too large. Try another one.";
-    case 415: case 400: return "That photo didn't go through. Try another one.";
-    case 422: return "Phuzzles can't make a puzzle from that photo. Pick another one.";
-    case 429: return "That's as many as one account can make today. You can make more tomorrow.";
-    default:  return "Couldn't make your puzzle just now. Try again in a minute.";
+    case 401: case 403: return MKT("eAuth", "Your sign-in couldn't be confirmed. Sign in again and remake it.");
+    case 413: return MKT("eLarge", "That photo is too large. Try another one.");
+    case 415: case 400: return MKT("eSend", "That photo didn't go through. Try another one.");
+    case 422: return MKT("eRefused", "Phuzzles can't make a puzzle from that photo. Pick another one.");
+    case 429: return MKT("eCap", "That's as many as one account can make today. You can make more tomorrow.");
+    default:  return MKT("eGeneric", "Couldn't make your puzzle just now. Try again in a minute.");
   }
 }
 $("make").onclick = async () => {
@@ -409,18 +619,18 @@ $("make").onclick = async () => {
     fail($("make-err"), whyNot(e && e.status, e && e.said));
   } finally {
     b.disabled = !photo;
-    b.textContent = "Make the link";
+    b.textContent = MKT("make", "Make the link");
   }
 };
 
 // ---- the link ----
 $("copy").onclick = async () => {
-  try { await navigator.clipboard.writeText($("out").value); $("copy").textContent = "Copied"; }
+  try { await navigator.clipboard.writeText($("out").value); $("copy").textContent = MKT("copied", "Copied"); }
   catch (e) { $("out").select(); }
   ev("make_copy");
 };
 $("share").onclick = () => {
-  navigator.share({ text: "I made you a puzzle. You can't see the photo until you've solved it.", url: $("out").value })
+  navigator.share({ text: MKT("sharetext", "I made you a puzzle. You can't see the photo until you've solved it."), url: $("out").value })
     .then(() => ev("make_share"), () => {});
 };
 $("another").onclick = () => {
@@ -434,7 +644,7 @@ $("another").onclick = () => {
   $("note").value = "";
   $("left").textContent = String(NOTE_MAX);
   $("make").disabled = true;
-  $("copy").textContent = "Copy link";
+  $("copy").textContent = MKT("copy", "Copy link");
   show($("done"), false);
   show($("builder"), true);
 };
