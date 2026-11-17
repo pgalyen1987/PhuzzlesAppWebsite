@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Make a Phuzzle</title>
+<meta name="description" content="Turn a photo into a puzzle and get a link. Whoever opens it can't see the picture until they've put it back together, and your note appears on the last piece. No app needed." />
+<link rel="canonical" href="https://phuzzles.app/make/" />
+<meta property="og:type" content="website" />
+<meta property="og:url" content="https://phuzzles.app/make/" />
+<meta property="og:title" content="Make a Phuzzle" />
+<meta property="og:description" content="Turn a photo into a puzzle and get a link. They can't see it until they solve it." />
+<meta property="og:image" content="https://phuzzles.app/img/og-card.jpg" />
+<meta name="twitter:card" content="summary_large_image" />
+<link rel="icon" href="/logo-128.png" />
+<link rel="preconnect" href="https://identitytoolkit.googleapis.com" crossorigin />
+<link rel="preconnect" href="https://firebasestorage.googleapis.com" crossorigin />
+<style>
+  /* The site's tokens (index.html). Type steps by the square root of phi (1.272) from 16px. */
+  :root {
+    --ink: #1A1A2E;
+    --panel: #23233E;
+    --line: rgba(245, 243, 239, 0.12);
+    --text: #F5F3EF;
+    --muted: #A9A9C6;
+    --coral: #FF6B6B;
+    --teal: #4ECDC4;
+    --paper: #FFF3E4;
+    --paper-ink: #2A2238;
+    --t-sm: 0.786rem;
+    --t-body: 1.0625rem;
+    --t-lg: 1.272rem;
+    --t-h2: 2.06rem;
+    --t-h1: clamp(2.1rem, 4.6vw, 3.33rem);
+  }
+  @font-face { font-family: 'Archivo'; src: url(/fonts/archivo-var-latin.woff2) format('woff2-variations');
+               font-weight: 100 900; font-display: swap; }
+  @font-face { font-family: 'DM Sans'; src: url(/fonts/dm-sans-var-latin.woff2) format('woff2-variations');
+               font-weight: 100 900; font-display: swap; }
+  @font-face { font-family: 'Gochi Hand'; src: url(/fonts/gochi-hand-400-latin.woff2) format('woff2');
+               font-weight: 400; font-display: swap; }
+  *, *::before, *::after { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body { margin: 0; background: var(--ink); color: var(--text);
+         font: 400 var(--t-body)/1.6 'DM Sans', system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
+  img { max-width: 100%; height: auto; display: block; }
+  a { color: var(--teal); }
+
+  .wrap { max-width: 1000px; margin: 0 auto; padding: 0 16px 72px; }
+  header { padding: 28px 0 0; }
+  .home { color: var(--muted); text-decoration: none; font-size: var(--t-sm); letter-spacing: .04em;
+          text-transform: uppercase; }
+  h1 { font-family: 'Archivo', sans-serif; font-weight: 700; font-size: var(--t-h1); line-height: 1.04;
+       letter-spacing: -0.02em; margin: 26px 0 14px; max-width: 24ch; }
+  .lede { color: var(--muted); font-size: var(--t-lg); max-width: 46ch; margin: 0 0 40px; }
+
+  /* Panel against content at phi: the picker takes 1, the controls 1.618. */
+  .build { display: grid; gap: 34px; grid-template-columns: 1fr 1.618fr; align-items: start; }
+  @media (max-width: 760px) { .build { grid-template-columns: 1fr; gap: 26px; } }
+
+  .drop { border: 1px dashed var(--line); border-radius: 14px; background: var(--panel);
+          aspect-ratio: 1; display: grid; place-items: center; overflow: hidden; position: relative;
+          cursor: pointer; }
+  .drop:focus-visible { outline: 2px solid var(--teal); outline-offset: 3px; }
+  .drop.has canvas { width: 100%; height: 100%; display: block; }
+  .drop p { color: var(--muted); font-size: var(--t-sm); text-align: center; margin: 0; padding: 0 22px; }
+  .drop input { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
+  .again { margin: 10px 0 0; font-size: var(--t-sm); color: var(--muted); }
+
+  label.f { display: block; font-size: var(--t-sm); letter-spacing: .04em; text-transform: uppercase;
+            color: var(--muted); margin: 0 0 8px; }
+  .field { margin: 0 0 26px; }
+  textarea {
+    width: 100%; min-height: 104px; resize: vertical; border-radius: 12px; border: 1px solid var(--line);
+    background: var(--paper); color: var(--paper-ink); padding: 14px 16px;
+    font: 400 1.22rem/1.45 'Gochi Hand', 'Bradley Hand', 'Segoe Print', 'DM Sans', system-ui, sans-serif;
+  }
+  textarea:focus-visible { outline: 2px solid var(--coral); outline-offset: 2px; }
+  .count { font-size: var(--t-sm); color: var(--muted); margin: 6px 0 0; }
+  .cuts { display: flex; flex-wrap: wrap; gap: 8px; }
+  .cuts button {
+    border: 1px solid var(--line); background: transparent; color: var(--text); border-radius: 999px;
+    padding: 9px 17px; font: inherit; font-size: var(--t-sm); cursor: pointer;
+  }
+  .cuts button[aria-pressed="true"] { background: var(--text); color: var(--ink); border-color: var(--text); }
+
+  .go {
+    border: 0; border-radius: 12px; background: var(--coral); color: #26121a; font: inherit; font-weight: 700;
+    padding: 15px 26px; font-size: var(--t-lg); cursor: pointer; width: 100%;
+  }
+  .go[disabled] { background: transparent; color: var(--muted); border: 1px solid var(--line); cursor: default; }
+  .ghost {
+    border: 1px solid var(--line); background: transparent; color: var(--text); border-radius: 12px;
+    padding: 13px 22px; font: inherit; cursor: pointer; text-decoration: none; display: inline-block;
+  }
+  .err { color: var(--coral); margin: 14px 0 0; }
+  .hidden { display: none !important; }
+
+  /* The honest small print: what it does with the photo, and what it will not do. */
+  .limits { margin: 46px 0 0; padding: 22px 0 0; border-top: 1px solid var(--line);
+            color: var(--muted); font-size: var(--t-sm); max-width: 62ch; }
+  .limits li { margin: 0 0 8px; }
+
+  .done { max-width: 56ch; }
+  .link {
+    display: block; width: 100%; border: 1px solid var(--line); background: var(--panel); color: var(--text);
+    border-radius: 12px; padding: 15px 16px; font: inherit; font-size: var(--t-body);
+  }
+  .row { display: flex; flex-wrap: wrap; gap: 10px; margin: 14px 0 0; }
+  .spin { width: 15px; height: 15px; border: 2px solid rgba(0,0,0,.25); border-top-color: #26121a;
+          border-radius: 50%; display: inline-block; margin-right: 9px; vertical-align: -2px;
+          animation: s .7s linear infinite; }
+  @keyframes s { to { transform: rotate(360deg); } }
+  @media (prefers-reduced-motion: reduce) { .spin { animation: none; } }
+</style>
+<!-- Google Analytics: the property shared by Rebel Studios sites (reports split by hostname). Visitors in the
+     EEA, UK and Switzerland default to consent "denied" (cookieless, no cookies); ads storage is never granted. -->
+<script>
+window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}
+if(!/^(localhost|127\.|0\.0\.0\.0)/.test(location.hostname)){
+gtag('consent','default',{ad_storage:'denied',ad_user_data:'denied',ad_personalization:'denied',analytics_storage:'denied',region:['AT','BE','BG','HR','CY','CZ','DK','EE','FI','FR','DE','GR','HU','IE','IT','LV','LT','LU','MT','NL','PL','PT','RO','SK','SI','ES','SE','IS','LI','NO','GB','CH']});
+gtag('consent','default',{ad_storage:'denied',ad_user_data:'denied',ad_personalization:'denied',analytics_storage:'granted'});
+gtag('js',new Date());gtag('config','G-00TNDVMQNM');
+var s=document.createElement('script');s.async=true;s.src='https://www.googletagmanager.com/gtag/js?id=G-00TNDVMQNM';document.head.appendChild(s);
+}
+</script>
+</head>
+<body>
+<div class="wrap">
+  <header><a class="home" href="/">Phuzzles</a></header>
+
+  <h1>Send a photo they have to put back together</h1>
+  <p class="lede">Pick a picture, write the note that goes under it, and you get a link. Whoever
+    opens it sees shuffled pieces, not the photo &mdash; and your note only appears once they&rsquo;ve
+    finished. They don&rsquo;t need the app, or an account.</p>
+
+  <!-- 1. Sign in. The reason is stated, because asking without one is how a form loses people. -->
+  <section id="gate">
+    <p style="max-width:52ch">Signing in puts your account behind the photo you upload. That is the only reason it is here:
+      an unattributed photo upload that makes a public link is the one thing we won&rsquo;t build.</p>
+    <div class="row">
+      <button class="go" id="signin" style="width:auto">Continue with Google</button>
+    </div>
+    <p class="err hidden" id="gate-err"></p>
+  </section>
+
+  <!-- 2. Build it. -->
+  <section id="builder" class="hidden">
+    <div class="build">
+      <div>
+        <div class="drop" id="drop" tabindex="0" role="button" aria-label="Choose a photo">
+          <p id="drop-hint">Tap to choose a photo.<br />It gets cropped square.</p>
+          <canvas id="preview" class="hidden" aria-label="What they will see: your photo shuffled"></canvas>
+          <input type="file" id="file" accept="image/jpeg,image/png,image/webp" />
+        </div>
+        <p class="again hidden" id="again">That&rsquo;s what they&rsquo;ll see. Tap it to swap the photo.</p>
+      </div>
+
+      <div>
+        <div class="field">
+          <label class="f" for="note">The note underneath (optional)</label>
+          <textarea id="note" maxlength="200" placeholder="It&rsquo;s a girl. Due in May."></textarea>
+          <p class="count"><span id="left">200</span> characters left</p>
+        </div>
+
+        <div class="field">
+          <label class="f" id="cuts-label">How hard</label>
+          <div class="cuts" role="group" aria-labelledby="cuts-label" id="cuts">
+            <button type="button" data-d="EASY" aria-pressed="false">Easy &middot; 3&times;3</button>
+            <button type="button" data-d="MEDIUM" aria-pressed="true">Medium &middot; 4&times;4</button>
+            <button type="button" data-d="HARD" aria-pressed="false">Hard &middot; 5&times;5</button>
+            <button type="button" data-d="EXPERT" aria-pressed="false">Expert &middot; 6&times;6</button>
+          </div>
+        </div>
+
+        <button class="go" id="make" disabled>Make the link</button>
+        <p class="err hidden" id="make-err"></p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3. The link. -->
+  <section id="done" class="done hidden">
+    <h2 style="font-family:'Archivo',sans-serif;font-size:var(--t-h2);margin:0 0 10px">Here&rsquo;s the link</h2>
+    <p style="color:var(--muted);margin:0 0 16px">Send it to whoever it&rsquo;s for. It opens in any
+      browser, and it shows the shuffled pieces until they solve it.</p>
+    <input class="link" id="out" readonly />
+    <div class="row">
+      <button class="ghost" id="copy">Copy link</button>
+      <button class="ghost hidden" id="share">Share</button>
+      <a class="ghost" id="open" href="#" target="_blank" rel="noopener">Open it</a>
+      <button class="ghost" id="another">Make another</button>
+    </div>
+  </section>
+
+  <ul class="limits">
+    <li>The puzzle is not posted anywhere. The link is the only way to it, and it is not listed on the feed.</li>
+    <li>Photos are checked automatically before a link is made, and some are refused.</li>
+    <li>Puzzles are deleted after 30 days, so the link stops working then.</li>
+    <li>Up to 20 a day per account.</li>
+    <li>Something wrong with a puzzle? <a href="mailto:support@phuzzles.app">support@phuzzles.app</a>, with its link.</li>
+  </ul>
+</div>
+
+<script type="module">
+// The maker. The photo is cropped and re-encoded in the browser (the same steps as the Farcaster mini app,
+// /mini/mini.js), then posted to webCreatePuzzle, which checks it, saves it and hands back the link.
+// The SDK is loaded for auth only: a Google popup is not worth hand-rolling, and /mini/ already pins 10.12.2.
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged }
+  from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+
+// The web API key names the project and is public by design; the rules and webCreatePuzzle guard the data.
+const app = initializeApp({
+  apiKey: "AIzaSyDPn4eEkZhUBp7x_3mVVcDlaiopfFDJna4",
+  authDomain: "phuzzles.firebaseapp.com",
+  projectId: "phuzzles",
+  storageBucket: "phuzzles.firebasestorage.app",
+});
+const auth = getAuth(app);
+const API = "https://us-central1-phuzzles.cloudfunctions.net";
+
+const SIDE = 1080;        // what the function re-encodes to anyway; sending more is wasted upload
+const MIN_SIDE = 200;     // webmake.ts MIN_SIDE
+const NOTE_MAX = 200;     // webmake.ts MESSAGE_MAX
+const $ = (id) => document.getElementById(id);
+
+let photo = null;          // { blob, url } of the square JPEG
+let photoImg = null;       // the same square photo, decoded, to draw the preview from
+let difficulty = "MEDIUM";
+
+// The grids the solver cuts to, by difficulty.
+const GRID = { EASY: 3, MEDIUM: 4, HARD: 5, EXPERT: 6 };
+
+/**
+ * Draws the photo the way the receiver first sees it: cut into the chosen grid and shuffled. The page said
+ * "they can't see it until they solve it" and then showed the photo intact, which is the one claim a picture
+ * here can actually make. Redrawn when the difficulty changes, so Easy and Expert stop being words.
+ */
+function drawScrambled() {
+  const c = $("preview");
+  if (!photoImg) return;
+  const n = GRID[difficulty] || 4;
+  const side = Math.min(photoImg.naturalWidth, 720);
+  const gap = Math.max(1, Math.round(side / 220));   // grout, so it reads as pieces rather than a glitch
+  c.width = c.height = side;
+  const g = c.getContext("2d");
+  g.fillStyle = "#23233E";
+  g.fillRect(0, 0, side, side);
+  const order = [...Array(n * n).keys()];
+  for (let i = order.length - 1; i > 0; i--) {       // Fisher-Yates
+    const j = Math.floor(Math.random() * (i + 1));
+    [order[i], order[j]] = [order[j], order[i]];
+  }
+  const step = side / n;
+  const tile = step - gap;
+  for (let slot = 0; slot < order.length; slot++) {
+    const from = order[slot];
+    const sx = (from % n) * (photoImg.naturalWidth / n);
+    const sy = Math.floor(from / n) * (photoImg.naturalHeight / n);
+    const dx = (slot % n) * step + gap / 2;
+    const dy = Math.floor(slot / n) * step + gap / 2;
+    g.drawImage(photoImg, sx, sy, photoImg.naturalWidth / n, photoImg.naturalHeight / n, dx, dy, tile, tile);
+  }
+}
+
+function show(el, on) { el.classList.toggle("hidden", !on); }
+function fail(el, text) { el.textContent = text || ""; show(el, !!text); }
+function ev(name, extra) { try { window.gtag && window.gtag("event", name, extra || {}); } catch (e) {} }
+
+// ---- sign in ----
+$("signin").onclick = async () => {
+  fail($("gate-err"), null);
+  try {
+    await signInWithPopup(auth, new GoogleAuthProvider());
+    ev("make_signin");
+  } catch (e) {
+    const code = String(e && e.code || "");
+    if (/popup-closed-by-user|cancelled-popup-request/.test(code)) return;
+    fail($("gate-err"), /popup-blocked/.test(code)
+      ? "Your browser blocked the sign-in window. Allow pop-ups for phuzzles.app and try again."
+      : "Couldn't sign in just now. Try again in a minute.");
+  }
+};
+onAuthStateChanged(auth, (user) => {
+  const inGate = !user;
+  show($("gate"), inGate);
+  show($("builder"), !inGate && $("done").classList.contains("hidden"));
+});
+
+// ---- the photo ----
+function loadImage(src) {
+  return new Promise((resolve, reject) => {
+    const i = new Image();
+    i.onload = () => resolve(i);
+    i.onerror = () => reject(new Error("not an image"));
+    i.src = src;
+  });
+}
+// Centre-cropped to a square and re-encoded as JPEG. A transparent PNG is flattened onto white first, or it
+// would come out black as a JPEG.
+async function squarePhoto(file) {
+  const src = URL.createObjectURL(file);
+  try {
+    let img;
+    try { img = await loadImage(src); }
+    catch (e) { throw new Error("That file couldn't be opened as a photo. Try a JPEG or PNG."); }
+    const w = img.naturalWidth, h = img.naturalHeight, s = Math.min(w, h);
+    if (s < MIN_SIDE) throw new Error(`That photo is too small to cut into pieces. Pick one at least ${MIN_SIDE} pixels across.`);
+    const side = Math.min(SIDE, s);
+    const c = document.createElement("canvas");
+    c.width = c.height = side;
+    const g = c.getContext("2d");
+    g.fillStyle = "#fff";
+    g.fillRect(0, 0, side, side);
+    g.imageSmoothingQuality = "high";
+    g.drawImage(img, (w - s) / 2, (h - s) / 2, s, s, 0, 0, side, side);
+    const blob = await new Promise((r) => c.toBlob(r, "image/jpeg", 0.85));
+    if (!blob) throw new Error("That photo couldn't be prepared. Try another one.");
+    return { blob, url: URL.createObjectURL(blob) };
+  } finally {
+    URL.revokeObjectURL(src);
+  }
+}
+$("file").addEventListener("change", async (e) => {
+  const file = e.target.files && e.target.files[0];
+  e.target.value = "";                 // so choosing the same file again still fires
+  if (!file) return;
+  fail($("make-err"), null);
+  let next;
+  try { next = await squarePhoto(file); }
+  catch (err) { fail($("make-err"), err.message); return; }
+  if (photo) URL.revokeObjectURL(photo.url);
+  photo = next;
+  try { photoImg = await loadImage(photo.url); }
+  catch (err) { fail($("make-err"), "That photo couldn't be prepared. Try another one."); return; }
+  drawScrambled();
+  show($("preview"), true);
+  show($("drop-hint"), false);
+  show($("again"), true);
+  $("drop").classList.add("has");
+  $("make").disabled = false;
+  ev("make_photo_ready", { kb: Math.round(photo.blob.size / 1024) });
+});
+$("drop").addEventListener("keydown", (e) => {
+  if (e.key === "Enter" || e.key === " ") { e.preventDefault(); $("file").click(); }
+});
+
+// ---- the note and the cuts ----
+$("note").addEventListener("input", () => { $("left").textContent = String(NOTE_MAX - $("note").value.length); });
+$("cuts").addEventListener("click", (e) => {
+  const b = e.target.closest("button[data-d]");
+  if (!b) return;
+  difficulty = b.dataset.d;
+  for (const x of $("cuts").querySelectorAll("button")) x.setAttribute("aria-pressed", String(x === b));
+  drawScrambled();
+});
+
+// ---- make it ----
+function base64(blob) {
+  return new Promise((resolve, reject) => {
+    const r = new FileReader();
+    r.onload = () => resolve(String(r.result).replace(/^data:[^,]*,/, ""));
+    r.onerror = () => reject(r.error);
+    r.readAsDataURL(blob);
+  });
+}
+function whyNot(status, said) {
+  if (said) return said;              // the function words its own refusals for people; prefer them
+  switch (status) {
+    case 401: case 403: return "Your sign-in couldn't be confirmed. Sign in again and remake it.";
+    case 413: return "That photo is too large. Try another one.";
+    case 415: case 400: return "That photo didn't go through. Try another one.";
+    case 422: return "Phuzzles can't make a puzzle from that photo. Pick another one.";
+    case 429: return "That's as many as one account can make today. You can make more tomorrow.";
+    default:  return "Couldn't make your puzzle just now. Try again in a minute.";
+  }
+}
+$("make").onclick = async () => {
+  if (!photo) return;
+  const b = $("make");
+  b.disabled = true;
+  b.innerHTML = '<span class="spin" aria-hidden="true"></span>Making it';
+  fail($("make-err"), null);
+  try {
+    const token = await auth.currentUser.getIdToken();
+    const res = await fetch(API + "/webCreatePuzzle", {
+      method: "POST",
+      headers: { Authorization: "Bearer " + token, "Content-Type": "application/json" },
+      body: JSON.stringify({ photo: await base64(photo.blob), difficulty, message: $("note").value.trim() || null }),
+    });
+    let body = {};
+    try { body = await res.json(); } catch (e) { /* not JSON */ }
+    if (!res.ok || !body || typeof body.url !== "string") {
+      throw { status: res.status, said: body && typeof body.message === "string" && body.message.length <= 300 ? body.message : null };
+    }
+    $("out").value = body.url;
+    $("open").href = body.url;
+    show($("builder"), false);
+    show($("done"), true);
+    show($("share"), !!navigator.share);
+    ev("make_created", { difficulty });
+  } catch (e) {
+    fail($("make-err"), whyNot(e && e.status, e && e.said));
+  } finally {
+    b.disabled = !photo;
+    b.textContent = "Make the link";
+  }
+};
+
+// ---- the link ----
+$("copy").onclick = async () => {
+  try { await navigator.clipboard.writeText($("out").value); $("copy").textContent = "Copied"; }
+  catch (e) { $("out").select(); }
+  ev("make_copy");
+};
+$("share").onclick = () => {
+  navigator.share({ text: "I made you a puzzle. You can't see the photo until you've solved it.", url: $("out").value })
+    .then(() => ev("make_share"), () => {});
+};
+$("another").onclick = () => {
+  if (photo) URL.revokeObjectURL(photo.url);
+  photo = null;
+  photoImg = null;
+  show($("preview"), false);
+  show($("drop-hint"), true);
+  show($("again"), false);
+  $("drop").classList.remove("has");
+  $("note").value = "";
+  $("left").textContent = String(NOTE_MAX);
+  $("make").disabled = true;
+  $("copy").textContent = "Copy link";
+  show($("done"), false);
+  show($("builder"), true);
+};
+</script>
+</body>
+</html>
