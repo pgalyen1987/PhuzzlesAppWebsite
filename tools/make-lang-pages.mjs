@@ -33,7 +33,31 @@ const PAGES = [
     descKey: "deck",
     dropJsonLd: true,
     // Keep a reader inside their own language when they tap through to the Plus page.
-    links: (lang) => [['href="/plus"', `href="/${lang}/plus/"`]],
+    // Plus, and the hero's own maker button: a reader who taps it in Japanese should land on the
+    // Japanese maker, not the English one that happens to detect their browser.
+    links: (lang) => [['href="/plus"', `href="/${lang}/plus/"`],
+                      ['href="/make/?utm_source=home&amp;utm_medium=hero"',
+                       `href="/${lang}/make/?utm_source=home&amp;utm_medium=hero"`]],
+  },
+  {
+    // The maker. Its strings carry ids rather than data-i18n, because its own runtime i18n is a
+    // classic script feeding a module (window.MKT) and had no reason to use attributes; keyOf maps
+    // a dictionary key to the id that holds it. The ids that predate the i18n pass keep their own
+    // names, so they are listed rather than derived.
+    src: "make/index.html",
+    out: (lang) => [lang, "make", "index.html"],
+    canonical: "https://phuzzles.app/make/",
+    ogUrl: "https://phuzzles.app/make/",
+    href: (lang) => `https://phuzzles.app/${lang}/make/`,
+    attr: "id",
+    keyOf: (key) => ({ signin: "signin", drophint: "drop-hint", again: "again", cuts: "cuts-label",
+                       make: "make", copy: "copy", share: "share", open: "open", another: "another" })[key]
+                    || `mk-${key}`,
+    // The lede is the sentence the page already leads with in this language, so the search snippet
+    // and the chat preview get that rather than new words.
+    descKey: "lede",
+    dropJsonLd: false,
+    links: (lang) => [['href="/"', `href="/${lang}/"`]],
   },
   {
     src: "plus/index.html",
