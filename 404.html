@@ -683,8 +683,13 @@ var s=document.createElement('script');s.async=true;s.src='https://www.googletag
         cta.insertAdjacentElement("afterend", share);
       }
     }
-    cta.href = IOS ? APPSTORE : playWith(ref);
-    cta.onclick = function(){ ev("store_click", { from: "solved" }); };
+    // "Send one back" promised the one thing this page could not do. Until /make/ shipped (2026-11-17)
+    // the button sent a stranger to an app store ten seconds after a thirty-second puzzle — the 19% that
+    // measured on 11-12 (3 of 16) was the ceiling of that ask. The web maker needs no install and works
+    // on a desktop, so the copy and the destination finally agree. Tracked as make_click, apart from
+    // store_click, so in a week the two asks can be compared rather than argued about.
+    cta.href = "/make/?utm_source=solved&utm_medium=web_solver" + (official ? "&from=potd" : "");
+    cta.onclick = function(){ ev("make_click", { from: "solved" }); };
 
     // MEASURED 2026-11-12 (GA4, 30 days): 16 people solved a puzzle here and 3 clicked a store
     // button. Installing an app is a large ask ten seconds after a thirty-second puzzle, and until
@@ -700,7 +705,10 @@ var s=document.createElement('script');s.async=true;s.src='https://www.googletag
       more.onclick = function(){ ev("archive_click", { from: "solved" }); };
       cta.insertAdjacentElement("afterend", more);
     }
-    if (!PHONE) { cta.classList.add("hidden"); badges("won-stores", playWith(ref), "solved"); }
+    // The app is still the business, so both badges stay — but under the two things a visitor can do
+    // right now, on every device. Hiding the maker on desktop left a desktop solver a phone-app badge
+    // and nothing else, which is the one visitor who certainly cannot act on it.
+    badges("won-stores", playWith(ref), "solved");
     ev("puzzle_solved_web", { swaps: moves, fewest: fewest, pieces: pieces });
     // Tell the sender: a link puzzle has no receiver in the app, so without this nobody would know it
     // was solved. The function only acts on puzzles shared by link and caps pushes per puzzle.
