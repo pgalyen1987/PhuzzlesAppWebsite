@@ -101,6 +101,15 @@
     .copy { grid-area: copy; display: flex; flex-direction: column; }
     .copy p { margin: 0 0 28px; color: var(--muted); max-width: 34ch; }
     .copy p b { color: var(--text); font-weight: 600; }
+    /* The deck two lines above promises "nothing to install", and until /make/ shipped this morning
+       the only thing offered under it was two app-store badges. Coral: this is the page's first action
+       now, and the badges keep their place under it. Padding 13/21, the type scale's own phi steps. */
+    .make {
+      align-self: flex-start; margin: 0 0 24px; padding: 13px 21px; border-radius: 12px;
+      background: var(--coral); color: var(--ink); font-weight: 700; font-size: var(--t-body);
+      line-height: 1; text-decoration: none;
+    }
+    .make:focus-visible { outline: 2px solid var(--teal); outline-offset: 3px; }
     .stores { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
     .stores a { display: block; border-radius: 8px; }
     .stores img { height: 44px; width: auto; max-width: none; }
@@ -249,6 +258,7 @@ window.PHZ = (function () {
   var base = l.split("-")[0];
   var STR = {
     ja: {
+      ctaMake: "ブラウザで作る",
       title: "Phuzzles\uff1a\u89e3\u3044\u3066\u521d\u3081\u3066\u898b\u3089\u308c\u308b\u5199\u771f\u30d1\u30ba\u30eb",
       by: "Rebel Studios \u306e\u30a2\u30d7\u30ea",
       h1: "\u89e3\u3051\u305f\u3089\u898b\u3048\u308b\u5199\u771f\u3092\u9001\u308b\u3002",
@@ -296,6 +306,7 @@ window.PHZ = (function () {
       hintDone: "\u305d\u306e\u30e1\u30c3\u30bb\u30fc\u30b8\u306f\u3001\u305a\u3063\u3068\u30d1\u30ba\u30eb\u306e\u4e0b\u306b\u6298\u308a\u305f\u305f\u307e\u308c\u3066\u3044\u307e\u3057\u305f\u3002"
     },
     fr: {
+      ctaMake: "Créez-en un dans le navigateur",
       title: "Phuzzles : une photo à résoudre pour découvrir votre nouvelle",
       by: "Une app de Rebel Studios",
       h1: "Envoyez une photo qu'il faut résoudre.",
@@ -343,6 +354,7 @@ window.PHZ = (function () {
       hintDone: "Ce message était glissé sous le puzzle depuis le début."
     },
     es: {
+      ctaMake: "Crea uno en el navegador",
       title: "Phuzzles: una foto que resuelven para ver tu noticia",
       by: "Una app de Rebel Studios",
       h1: "Envía una foto que tengan que resolver.",
@@ -390,6 +402,7 @@ window.PHZ = (function () {
       hintDone: "Ese mensaje estuvo doblado debajo todo el tiempo."
     },
     de: {
+      ctaMake: "Im Browser eins erstellen",
       title: "Phuzzles: ein Fotopuzzle, das man lösen muss, um deine Neuigkeit zu sehen",
       by: "Eine App von Rebel Studios",
       h1: "Verschick ein Foto, das man erst lösen muss.",
@@ -437,6 +450,7 @@ window.PHZ = (function () {
       hintDone: "Diese Nachricht lag die ganze Zeit darunter."
     },
     pt: {
+      ctaMake: "Crie um no navegador",
       title: "Phuzzles: uma foto que resolvem para ver a sua novidade",
       by: "Um app da Rebel Studios",
       h1: "Mande uma foto que precisa ser resolvida.",
@@ -552,6 +566,7 @@ window.PHZ = (function () {
 
         <div class="copy">
           <p data-i18n="copy">Phuzzles schneidet dein Foto in Teile und mischt sie. Die andere Person legt sie zurück, und <b>die Nachricht, die du geschrieben hast, erscheint erst, wenn das letzte Teil sitzt.</b></p>
+          <a class="make" href="/make/?utm_source=home&amp;utm_medium=hero" data-i18n="ctaMake">Make one in your browser</a>
           <div class="stores">
             <a href="https://apps.apple.com/app/id6766833614" target="_blank" rel="noopener"><img src="/app-store-badge.svg" data-i18n-alt="altAppStore" alt="Laden im App Store" /></a>
             <a href="https://play.google.com/store/apps/details?id=rebelstudios.phuzzles.app&amp;referrer=utm_source%3Dphuzzles.app%26utm_medium%3Dhome" target="_blank" rel="noopener"><img class="gp" src="/google-play-badge.png" data-i18n-alt="altPlay" alt="Jetzt bei Google Play" /></a>
