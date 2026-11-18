@@ -217,7 +217,14 @@ var s=document.createElement('script');s.async=true;s.src='https://www.googletag
 // key falls through to the literal at the call site. The og:/meta tags stay English - a static host
 // cannot know the reader's language before a crawler reads them; /ja/make/ and the rest carry those.
 (function () {
-  var l = ((navigator.languages && navigator.languages[0]) || navigator.language || "en").toLowerCase();
+  // A generated per-language page names its own language on <html data-lang>, so the copy on the page
+  // and the address it was reached at cannot disagree -- without this, /ja/make/ opened by a
+  // Portuguese browser served a Portuguese page under a Japanese URL, title and canonical, and the
+  // two strings that live in attributes (the note placeholder, the preview's label) stayed English
+  // for every reader whose browser was not already set to the page's language. Same idiom as
+  // index.html, plus/ and daily/. Everywhere else -- /make/ itself -- the browser still decides.
+  var l = (document.documentElement.getAttribute("data-lang") ||
+           (navigator.languages && navigator.languages[0]) || navigator.language || "en").toLowerCase();
   var LANG = l === "ja" || l.indexOf("ja-") === 0 ? "ja"
            : l === "pt" || l.indexOf("pt-") === 0 ? "pt"
            : l === "es" || l.indexOf("es-") === 0 ? "es"
