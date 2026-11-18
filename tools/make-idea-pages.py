@@ -1,16 +1,70 @@
 """Build the 'idea' pages (one per occasion people search for) from index.html's own head, styles,
 analytics and footer, so they look like the homepage and stay in step with it. Re-run after editing
-index.html's head or footer:  python3 tools/make-idea-pages.py"""
+index.html's head or footer:  python3 tools/make-idea-pages.py
+
+HOW TO CHANGE THIS SAFELY (2026-11-17). index.html grew a home-page-only i18n layer and its own
+hreflang cluster, and the idea pages grew per-page share cards, per-page alternates and the /make/
+CTA. For a while this generator had drifted far enough that running it would have undone five
+shipped things at once -- per-page og:image, per-page hreflang, the /make/ CTA, the seven-link
+footer Ideas list (for non-English visitors), and the page's own title and <html lang> on a
+non-English browser. It no longer does, but the only way to know that is to MEASURE it:
+
+    rm -rf /tmp/ideagen && mkdir -p /tmp/ideagen/tools
+    cp index.html /tmp/ideagen/ && cp tools/make-idea-pages.py /tmp/ideagen/tools/
+    cd /tmp/ideagen && python3 tools/make-idea-pages.py
+    for f in pregnancy-announcement-puzzle birthday-puzzle new-puppy-puzzle surprise-trip-puzzle; do
+      diff ~/PhuzzlesAppWebsite/$f.html $f.html; done
+
+Run it in that sandbox FIRST, every time, and read the diff before you let it near the site. As of
+2026-11-17 the only expected diffs are two additions: the unused .make rule (the whole of
+index.html's stylesheet is copied on purpose, so the pages stay in step visually) and a /daily/
+footer link the live pages predate.
+
+COVERAGE GAP: three of the seven live idea pages -- gender-reveal-puzzle, christmas-gift-reveal-puzzle
+and engagement-announcement-puzzle -- are NOT built here. This generator will not touch them, but it
+also will not carry an index.html head change into them. They drift on their own."""
 import re, html, pathlib
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 src = (ROOT / "index.html").read_text()
 head_end = src.index("</head>")
 head = src[:head_end]
+
+# index.html's <head> carries two things that belong to the HOME PAGE alone. Both have to come out
+# before anything is spliced in, or this generator silently un-ships work that has already shipped.
+#
+# (a) The home page's hreflang cluster points at phuzzles.app/ and its /ja/ /fr/ /es/ /de/ /pt/
+#     translations -- translations of the HOME PAGE. Copied onto an idea page it declares that idea
+#     page an alternate of the home page, and it overwrites the page's own cluster. Each idea page
+#     states its real alternates itself, via ALTS below.
+head, n = re.subn(r'  <!-- lang-alternates:.*?  <!-- /lang-alternates -->\n', "{ALTS}", head, flags=re.S)
+assert n == 1, "index.html's lang-alternates block moved or changed shape -- re-read it before running"
+
+# (b) The home page's i18n layer. Its dictionaries are keyed to the home page's element ids, and it
+#     ends with `document.documentElement.lang = lang; document.title = d.title`. On an idea page it
+#     would retitle the page with the HOME PAGE's localised title and rewrite <html lang> for any
+#     visitor whose browser is not English, while canonical and og:url still name this page's
+#     English URL -- content in one language under another language's address. That is exactly the
+#     bug found live on /make/ and fixed on 2026-11-17. Do not re-import it.
+head, n = re.subn(r"<script>\n// i18n\..*?\n</script>\n", "", head, flags=re.S)
+assert n == 1, "index.html's i18n <script> moved or changed shape -- re-read it before running"
+
 style_end = head.index("  </style>")
 header = re.search(r'    <header class="bar">.*?</header>\n', src, re.S).group(0)
 footer = re.search(r'    <footer>.*?</footer>\n', src, re.S).group(0)
-footer = footer.replace("      <p>Puffin photo by Fred Yost, U.S. Fish and Wildlife Service (public domain).</p>\n", "")
+
+# With the i18n script gone the data-i18n* hooks are dead attributes; strip them so the markup says
+# what it does. The footer's "Ideas:" list is the one that matters: as data-i18n="footIdeasList" the
+# script replaces all seven idea links with the home page's two-link localised list, so every
+# non-English visitor loses five of the internal links these pages exist to carry.
+header = re.sub(r' data-i18n(?:-label|-alt|-html)?="[^"]*"', "", header)
+footer = re.sub(r' data-i18n(?:-label|-alt|-html)?="[^"]*"', "", footer)
+footer = footer.replace('<p class="ideas"><span>Ideas:</span> <span>', '<p class="ideas">Ideas: ')
+footer = footer.replace("</span></p>", "</p>")
+# No puffin on an idea page, so no puffin credit. A regex, and a loud assert: as a literal string
+# match this silently stopped working the day index.html added data-i18n="credit" to the line.
+footer, n = re.subn(r"^ *<p>Puffin photo by Fred Yost[^\n]*</p>\n", "", footer, flags=re.M)
+assert n == 1, "the puffin credit line moved or changed wording -- check the footer before running"
 
 EXTRA_CSS = """
     /* idea pages */
@@ -39,7 +93,7 @@ EXTRA_CSS = """
 FROM = {"pregnancy-announcement-puzzle": "pregnancy", "birthday-puzzle": "birthday",
         "new-puppy-puzzle": "puppy", "surprise-trip-puzzle": "trip"}
 
-def page(slug, title, desc, h1, lede, body):
+def page(slug, title, desc, h1, lede, body, og_image, alts=()):
     h = head[:style_end] + EXTRA_CSS + head[style_end:]
     h = re.sub(r"<title>.*?</title>", f"<title>{html.escape(title)}</title>", h)
     h = re.sub(r'<meta name="description" content="[^"]*" />', f'<meta name="description" content="{html.escape(desc)}" />', h)
@@ -47,6 +101,20 @@ def page(slug, title, desc, h1, lede, body):
     h = re.sub(r'<meta property="og:url" content="[^"]*" />', f'<meta property="og:url" content="https://phuzzles.app/{slug}" />', h)
     h = re.sub(r'<meta property="og:title" content="[^"]*" />', f'<meta property="og:title" content="{html.escape(h1)}" />', h)
     h = re.sub(r'<meta property="og:description" content="[^"]*" />', f'<meta property="og:description" content="{html.escape(desc)}" />', h)
+    # Each idea page has its own share card, drawn for its own occasion. The home page's og-card.jpg
+    # is not a stand-in for it: a pregnancy announcement shared to a group chat has to preview as one.
+    h = re.sub(r'<meta property="og:image" content="[^"]*" />',
+               f'<meta property="og:image" content="https://phuzzles.app/img/{og_image}" />', h)
+    # This page's own alternates, in the slot the home page's cluster was removed from. A page with
+    # no translation yet declares none -- an hreflang pointing nowhere is worse than its absence.
+    if alts:
+        rows = [f'  <link rel="alternate" hreflang="en" href="https://phuzzles.app/{slug}" />']
+        rows += [f'  <link rel="alternate" hreflang="{lg}" href="https://phuzzles.app/{path}" />'
+                 for lg, path in alts]
+        rows.append(f'  <link rel="alternate" hreflang="x-default" href="https://phuzzles.app/{slug}" />')
+        h = h.replace("{ALTS}", "\n".join(rows) + "\n")
+    else:
+        h = h.replace("{ALTS}", "")
     h = h.replace('  <link rel="preload" as="image" href="/img/puffin-960.jpg" />\n', "")
     # A per-page breadcrumb so the intent pages show "Phuzzles › <page>" in search,
     # not a bare URL. The crumb is the slug read as words; nothing invented.
@@ -67,12 +135,27 @@ def page(slug, title, desc, h1, lede, body):
 """.replace("{slug}", slug)
     try_block = """      <div class="try">
         <a href="/today/?from={from}">Solve today's puzzle</a>
+        <a href="/make/?from={from}">Make one now</a>
         <p>Try one before you send one. It works like the one you would send, and there is nothing
           to install.</p>
       </div>
 """.replace("{from}", FROM[slug])
     doc = (h + "</head>\n<body>\n  <div class=\"wrap\">\n" + header + "\n    <main class=\"idea\">\n"
            f"      <h1>{h1}</h1>\n      <p class=\"lede\">{lede}</p>\n{try_block}{body}{stores}    </main>\n\n" + footer + "  </div>\n" + FORWARD.replace("{slug}", slug) + "</body>\n</html>\n")
+    # Name the floor: these four are what going wrong looks like, so check them rather than trust the
+    # strips above. Cheaper to fail here than to find it live.
+    for bad, why in (("window.PHZ", "home page i18n layer leaked in"),
+                     ("data-i18n", "dead i18n hook leaked in"),
+                     ("{ALTS}", "hreflang placeholder was never filled"),
+                     ):
+        assert bad not in doc, f"{slug}: {why}"
+    # og:image only. The JSON-LD below it keeps og-card.jpg on purpose: that block describes the
+    # APP, at phuzzles.app/, not this page, so the app's own card is the right image there.
+    # Caught by mutation-testing this check: asserting only that og_image was applied still passes
+    # if og_image IS the home page's generic card, which is the failure being guarded against.
+    assert og_image != "og-card.jpg", f"{slug}: needs its own share card, not the home page's"
+    assert f'<meta property="og:image" content="https://phuzzles.app/img/{og_image}" />' in doc, slug
+    assert doc.count('rel="canonical"') == 1 and f'rel="canonical" href="https://phuzzles.app/{slug}"' in doc
     (ROOT / f"{slug}.html").write_text(doc)
     print("wrote", slug + ".html", len(doc), "bytes")
 
@@ -111,7 +194,9 @@ page("pregnancy-announcement-puzzle",
         <li><b>Write the message.</b> Up to 200 characters, hidden until the puzzle is solved. &ldquo;Due in May&rdquo; is enough.</li>
 """ + SEND + """      </ol>
       <p class="tip">Sending it to grandparents who won't install anything? Send it as a link. It opens in their browser and they solve it there, with nothing to install.</p>
-""" + KEPT)
+""" + KEPT,
+     og_image="og-pregnancy.jpg",
+     alts=(("fr", "fr/annonce-de-grossesse-puzzle"), ("ja", "ja/ninshin-houkoku-puzzle")))
 
 page("birthday-puzzle",
      "A birthday message they have to solve | Phuzzles",
@@ -125,7 +210,7 @@ page("birthday-puzzle",
         <li><b>Pick the size.</b> 3&times;3 for a quick smile; 6&times;6 if you want them busy for a while.</li>
 """ + SEND + """      </ol>
       <p class="tip">Giving something you can't wrap, like tickets or a trip? Put a picture of it in the puzzle and the details in the message &mdash; there's <a href="/surprise-trip-puzzle">a whole page on doing that</a>.</p>
-""" + KEPT)
+""" + KEPT, og_image="og-birthday.jpg")
 page("new-puppy-puzzle",
      "A new puppy they have to solve | Phuzzles",
      "Send a photo of your new puppy as a puzzle. The people you send it to put it back together and meet the newest member of the family only when the last piece lands. Free on iPhone and Android.",
@@ -138,7 +223,7 @@ page("new-puppy-puzzle",
         <li><b>Write the message.</b> Up to 200 characters, hidden until the puzzle is solved. &ldquo;Meet Biscuit&rdquo; is enough.</li>
 """ + SEND + """      </ol>
       <p class="tip">Sending it to grandparents who won't install anything? Send it as a link. It opens in their browser and they solve it there, with nothing to install.</p>
-""" + KEPT)
+""" + KEPT, og_image="og-puppy.jpg")
 
 page("surprise-trip-puzzle",
      "A surprise trip they have to solve | Phuzzles",
@@ -154,4 +239,4 @@ page("surprise-trip-puzzle",
       <p class="tip">Telling a whole family at once? Send it to a group. Everyone gets the same puzzle at the same time, so nobody hears it secondhand.</p>
       <h2>What it won't do</h2>
       <p>There is no scheduled send and no timer: a puzzle goes the moment you send it. If it has to land on a particular morning, send it that morning.</p>
-""" + KEPT)
+""" + KEPT, og_image="og-trip.jpg")
