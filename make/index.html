@@ -203,12 +203,21 @@ var s=document.createElement('script');s.async=true;s.src='https://www.googletag
   <ul class="limits">
     <li id="mk-l1">The puzzle is not posted anywhere. The link is the only way to it, and it is not listed on the feed.</li>
     <li id="mk-l2">Photos are checked automatically before a link is made, and some are refused.</li>
-    <!-- TRUE AS DEPLOYED, AND COUPLED TO A COMMIT THAT IS NOT. Production still runs main's
-         cleanupExpiredPuzzles (30 days): scheduledCleanup was last deployed 2026-10-20, and the
-         commit that sets RETAIN_DAYS = null -- puzzles kept for the life of the account, owner's
-         call "ok keep them" -- is 5d6a16d, dated 2026-10-29, still undeployed. The DAY that commit
-         ships, this line becomes false and must be changed with it. -->
-    <li id="mk-l3">Puzzles are deleted after 30 days, so the link stops working then.</li>
+    <!-- MEASURED AGAINST PRODUCTION 2026-11-18, not read off the repo. The comment that used to
+         sit here said the 30-day cleanup was still deployed and the keep-them-forever commit was
+         not. Both halves were wrong, and this line was false on a live page for weeks.
+           - scheduledCleanup's own logs say "cleanupExpiredPuzzles: retention is account-lifetime;
+             nothing deleted by age" on every run readable between 2026-10-26 and 2026-11-10, with
+             puzzlesDeleted:0 each time (firebase functions:log --only scheduledCleanup).
+           - webCreatePuzzle writes expiresAt: null (functions/src/webmake.ts:229), and nothing in
+             the app or the functions ever writes a non-null expiresAt. So expirePuzzles has no row
+             to match: "No puzzles to expire" on every run, zero "Expired N" lines in the logs.
+           - The Play listing already says the true thing ("stays up for the life of your account;
+             it does not expire after a set time"). This page was the surface still lying.
+         If age-based expiry ever returns -- RETAIN_DAYS back to a number in cleanupExpiredPuzzles,
+         or any writer setting expiresAt -- this line must change back WITH it, in all six
+         languages, and the Play listing and privacy.html section 4 must change too. -->
+    <li id="mk-l3">The link does not expire. Nothing deletes the puzzle after 30 days, or after any other deadline.</li>
     <li id="mk-l4">Up to 20 a day per account.</li>
     <li id="mk-l5">Something wrong with a puzzle? <a href="mailto:support@phuzzles.app">support@phuzzles.app</a>, with its link.</li>
   </ul>
@@ -254,7 +263,7 @@ var s=document.createElement('script');s.async=true;s.src='https://www.googletag
       copy: "リンクをコピー", copied: "コピーしました", share: "共有", open: "開く", another: "もう一つ作る",
       l1: "このパズルはどこにも公開されません。リンクだけが入り口で、フィードにも載りません。",
       l2: "リンクを作る前に写真は自動で確認され、一部は受け付けられません。",
-      l3: "パズルは30日後に削除され、リンクはそこで開けなくなります。",
+      l3: "リンクに期限はありません。30日などの期限でパズルが削除されることはありません。",
       l4: "1アカウントにつき1日20個まで。",
       l5: 'パズルに問題があれば、リンクを添えて <a href="mailto:support@phuzzles.app">support@phuzzles.app</a> までご連絡ください。',
       previewlabel: "相手に見える状態：シャッフルされた写真",
@@ -289,7 +298,7 @@ var s=document.createElement('script');s.async=true;s.src='https://www.googletag
       copy: "Copiar link", copied: "Copiado", share: "Compartilhar", open: "Abrir", another: "Criar outro",
       l1: "O quebra-cabeça não é publicado em lugar nenhum. O link é o único caminho até ele, e ele não aparece no feed.",
       l2: "As fotos passam por uma verificação automática antes de o link ser criado, e algumas são recusadas.",
-      l3: "Os quebra-cabeças são apagados depois de 30 dias, e o link para de funcionar nessa hora.",
+      l3: "O link não expira. Nada apaga o quebra-cabeça depois de 30 dias, nem depois de qualquer outro prazo.",
       l4: "Até 20 por dia por conta.",
       l5: 'Algum problema com um quebra-cabeça? <a href="mailto:support@phuzzles.app">support@phuzzles.app</a>, com o link dele.',
       previewlabel: "O que a pessoa vai ver: sua foto embaralhada",
@@ -324,7 +333,7 @@ var s=document.createElement('script');s.async=true;s.src='https://www.googletag
       copy: "Copiar enlace", copied: "Copiado", share: "Compartir", open: "Abrirlo", another: "Crear otro",
       l1: "El rompecabezas no se publica en ningún lado. El enlace es la única forma de llegar a él y no aparece en el feed.",
       l2: "Las fotos se revisan automáticamente antes de crear el enlace, y algunas se rechazan.",
-      l3: "Los rompecabezas se borran a los 30 días, y el enlace deja de funcionar entonces.",
+      l3: "El enlace no caduca. Nada borra el rompecabezas a los 30 días ni en ningún otro plazo.",
       l4: "Hasta 20 al día por cuenta.",
       l5: '¿Algo anda mal con un rompecabezas? <a href="mailto:support@phuzzles.app">support@phuzzles.app</a>, con su enlace.',
       previewlabel: "Lo que va a ver: tu foto revuelta",
@@ -359,7 +368,7 @@ var s=document.createElement('script');s.async=true;s.src='https://www.googletag
       copy: "Copier le lien", copied: "Copié", share: "Partager", open: "L'ouvrir", another: "En créer un autre",
       l1: "Le puzzle n'est publié nulle part. Le lien est le seul chemin vers lui, et il n'apparaît pas dans le fil.",
       l2: "Les photos sont vérifiées automatiquement avant la création du lien, et certaines sont refusées.",
-      l3: "Les puzzles sont supprimés au bout de 30 jours, et le lien cesse alors de fonctionner.",
+      l3: "Le lien n'expire pas. Rien ne supprime le puzzle au bout de 30 jours, ni au bout d'aucun autre délai.",
       l4: "Jusqu'à 20 par jour et par compte.",
       l5: 'Un problème avec un puzzle ? <a href="mailto:support@phuzzles.app">support@phuzzles.app</a>, avec son lien.',
       previewlabel: "Ce qu'elle verra : votre photo mélangée",
@@ -394,7 +403,7 @@ var s=document.createElement('script');s.async=true;s.src='https://www.googletag
       copy: "Link kopieren", copied: "Kopiert", share: "Teilen", open: "Öffnen", another: "Noch eins erstellen",
       l1: "Das Puzzle wird nirgends veröffentlicht. Der Link ist der einzige Weg dorthin, und im Feed steht es nicht.",
       l2: "Fotos werden automatisch geprüft, bevor ein Link entsteht, und manche werden abgelehnt.",
-      l3: "Puzzles werden nach 30 Tagen gelöscht, dann funktioniert der Link nicht mehr.",
+      l3: "Der Link läuft nicht ab. Nichts löscht das Puzzle nach 30 Tagen oder nach einer anderen Frist.",
       l4: "Bis zu 20 pro Tag und Konto.",
       l5: 'Stimmt etwas mit einem Puzzle nicht? <a href="mailto:support@phuzzles.app">support@phuzzles.app</a>, mit seinem Link.',
       previewlabel: "Was sie sehen wird: dein Foto, gemischt",
