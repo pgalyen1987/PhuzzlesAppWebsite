@@ -92,6 +92,15 @@
     .copy { grid-area: copy; display: flex; flex-direction: column; }
     .copy p { margin: 0 0 28px; color: var(--muted); max-width: 34ch; }
     .copy p b { color: var(--text); font-weight: 600; }
+    /* The deck two lines above promises "nothing to install", and until /make/ shipped this morning
+       the only thing offered under it was two app-store badges. Coral: this is the page's first action
+       now, and the badges keep their place under it. Padding 13/21, the type scale's own phi steps. */
+    .make {
+      align-self: flex-start; margin: 0 0 24px; padding: 13px 21px; border-radius: 12px;
+      background: var(--coral); color: var(--ink); font-weight: 700; font-size: var(--t-body);
+      line-height: 1; text-decoration: none;
+    }
+    .make:focus-visible { outline: 2px solid var(--teal); outline-offset: 3px; }
     .stores { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
     .stores a { display: block; border-radius: 8px; }
     .stores img { height: 44px; width: auto; max-width: none; }
@@ -288,6 +297,7 @@ var s=document.createElement('script');s.async=true;s.src='https://www.googletag
       <p>Phuzzles is made by Rebel Studios. Questions, bugs or a puzzle that won't open: <a href="mailto:support@phuzzles.app">support@phuzzles.app</a></p>
       <p class="ideas">Ideas: <a href="/pregnancy-announcement-puzzle">a pregnancy announcement</a> &middot; <a href="/gender-reveal-puzzle">a gender reveal</a> &middot; <a href="/birthday-puzzle">a birthday</a> &middot; <a href="/new-puppy-puzzle">a new puppy</a> &middot; <a href="/surprise-trip-puzzle">a surprise trip</a> &middot; <a href="/christmas-gift-reveal-puzzle">a Christmas present</a> &middot; <a href="/engagement-announcement-puzzle">an engagement</a></p>
       <nav aria-label="More from Phuzzles">
+        <a href="/daily/">Every daily puzzle</a>
         <a href="/plus">Phuzzles Plus</a>
         <a href="/press">Press kit</a>
         <a href="/widget/">Daily widget</a>
