@@ -63,7 +63,9 @@ const PAGES = [
     src: "plus/index.html",
     out: (lang) => [lang, "plus", "index.html"],
     canonical: "https://phuzzles.app/plus/",
-    ogUrl: "https://phuzzles.app/plus",
+    ogUrl: "https://phuzzles.app/plus/",   // trailing slash MUST match plus/index.html byte for
+    // byte: this constant is the needle for a plain String.replace, so a missing slash is a
+    // SILENT no-op that leaves every locale page claiming the English og:url.
     href: (lang) => `https://phuzzles.app/${lang}/plus/`,
     descKey: "lede",
     dropJsonLd: false,
