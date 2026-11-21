@@ -35,7 +35,11 @@ const PAGES = [
     // Keep a reader inside their own language when they tap through to the Plus page.
     // Plus, and the hero's own maker button: a reader who taps it in Japanese should land on the
     // Japanese maker, not the English one that happens to detect their browser.
+    // The archive was the one nav link that stayed English: until 2026-11-21 no anchor anywhere on
+    // the site pointed at /fr/daily/ and its four siblings, only the hreflang block, so the three
+    // pages holding our only measured search demand had no inbound link at all.
     links: (lang) => [['href="/plus"', `href="/${lang}/plus/"`],
+                      ['href="/daily/"', `href="/${lang}/daily/"`],
                       ['href="/make/?utm_source=home&amp;utm_medium=hero"',
                        `href="/${lang}/make/?utm_source=home&amp;utm_medium=hero"`]],
   },
