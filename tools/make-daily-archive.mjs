@@ -75,6 +75,15 @@ const cards = rows.map(r => {
     </li>`;
 }).join("\n");
 
+// Each puzzle also has its own page at /daily/<date>/, written by tools/make-daily-pages.mjs:
+// the caption, the piece count, and the photograph's credit, licence and source. Until this list
+// existed nothing linked to them, so they were 48 pages a crawler had no way to reach. Dates are
+// the only words here, and this page already keeps them in a neutral long form, so the list needs
+// no dictionary entry and reads the same in all six languages.
+const byDate = rows
+  .map(r => `<a href="/daily/${r.date}/">${esc(fmt(r.date))}</a>`)
+  .join(" &middot; ");
+
 const jsonld = {
   "@context": "https://schema.org", "@type": "ItemList",
   name: "Every Phuzzle of the Day",
@@ -142,6 +151,10 @@ ul{list-style:none;display:grid;gap:22px;margin-top:40px;grid-template-columns:r
 .cap{display:block;padding:6px 14px 15px;color:var(--muted);font-size:13.5px}
 footer{margin-top:60px;color:var(--muted);font-size:14px}
 footer a{color:var(--teal)}
+/* A reference list, deliberately quiet: the cards above are the way in, this is for finding one. */
+.bydate{margin-top:34px;color:var(--muted);font-size:13.5px;line-height:2;max-width:76ch}
+.bydate a{color:var(--muted);text-decoration:none;border-bottom:1px solid #32324f}
+.bydate a:hover,.bydate a:focus-visible{color:var(--teal);border-bottom-color:var(--teal)}
 /* The exit this page did not have. Proportions step by phi off the h1's 55px cap. */
 .send{margin-top:97px;max-width:655px;background:var(--panel);border-radius:14px;padding:clamp(21px,5vw,34px)}
 .send h2{font-family:'Archivo',sans-serif;font-weight:800;font-size:clamp(26px,4vw,34px);line-height:1.12;letter-spacing:-.015em}
@@ -166,6 +179,9 @@ footer a{color:var(--teal)}
   <ul>
 ${cards}
   </ul>
+  <nav class="bydate" aria-label="Every daily puzzle by date, with its photo credit">
+${byDate}
+  </nav>
   <section class="send">
     <h2 id="t-sh2">Send one of your own</h2>
     <p id="t-sp1">These ${rows.length} are ours. They work the way the one you send works: a photo in pieces, and a note
