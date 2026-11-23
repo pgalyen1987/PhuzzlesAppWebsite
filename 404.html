@@ -100,6 +100,9 @@
   /* A note the sender chose to leave unlocked sits above the board instead of under the photo. */
   #game-reveal{margin:0 7% 16px}
   .pitch{margin:26px auto 0;max-width:34ch;color:var(--muted);font-size:15px;line-height:1.5}
+.streak{margin:18px auto 0;max-width:34ch;font-size:15px;line-height:1.5;color:var(--text)}
+.streak b{color:var(--accent)}
+.streak .missed{display:block;margin-top:6px;font-size:13px;color:var(--muted)}
   .pitch b{color:var(--text);font-weight:600}
   .stores{display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:12px;margin-top:18px}
   .stores a{display:block;border-radius:8px}
@@ -168,6 +171,7 @@ var s=document.createElement('script');s.async=true;s.src='https://www.googletag
       <div class="reveal" id="won-reveal">
         <p class="msg" id="won-msg"></p>
       </div>
+      <p class="streak hidden" id="won-streak"></p>
       <p class="pitch"><b>Phuzzles</b> turns a photo into a puzzle you send. They solve it to see the picture and your message.</p>
       <a class="btn" id="cta-make" href="#">Send one back</a>
       <div class="stores hidden" id="won-stores"></div>
@@ -664,47 +668,88 @@ var s=document.createElement('script');s.async=true;s.src='https://www.googletag
       cta.textContent = T("ctaMakeOfficial","Make one from your own photo");
       // Somewhere to come back to: /today always opens the current daily.
       document.getElementById("won-foot").innerHTML = T("wonFootOfficial", 'There\'s a new one every day at 11:00 Eastern: <a href="/today/">phuzzles.app/today</a><br>The app is free on iPhone and Android, with ads.');
+      // The Eastern day key for this daily, used by BOTH the streak and the share link.
+      var isToday = potdIsToday(d, Date.now());
+      var at = d.potdAt || d.sentAt;
+      var atMs = at && at.toMillis ? at.toMillis() : 0;
+      var edt = function (ms) { return new Intl.DateTimeFormat("en-CA", { timeZone: "America/New_York" }).format(new Date(ms)); };
+      var pretty = function (key) { return new Intl.DateTimeFormat("en-US", { month: "long", day: "numeric", timeZone: "UTC" }).format(new Date(key + "T12:00:00Z")); };
+      // No timestamp means no archive address can be derived, so show nothing rather than link to a 404.
+      // Verified 2026-11-23 against 4 archive pages spanning the whole range: this key reproduces the
+      // page's own date exactly, because both are the Eastern date the daily went up.
+      var dayKey = atMs ? edt(atMs) : "";
+
+      // RETURN MECHANIC. A daily puzzle with nothing that brings anyone back is just 50 pages.
+      // Deliberately small, and honest about what it counts:
+      //   * only TODAY's daily counts. Solving the archive is welcome but it is not coming back,
+      //     and a streak that counted it would be a flattering lie.
+      //   * no account, so it lives in localStorage, which can throw or come back empty in a
+      //     private window. Every read and write is wrapped; the line simply does not appear.
+      //   * no pressure. It says what you did. It never warns you about losing it.
+      var run = 0, missedDay = "";
+      if (isToday) {
+        try {
+          var KEY = "phz:potd";
+          var dayBefore = function (k) { var t = new Date(k + "T12:00:00Z"); t.setUTCDate(t.getUTCDate() - 1); return t.toISOString().slice(0, 10); };
+          var rec = {};
+          try { rec = JSON.parse(localStorage.getItem(KEY)) || {}; } catch (e) { rec = {}; }
+          var todayKey = edt(Date.now());
+          if (rec.last !== todayKey) {
+            if (rec.last && rec.last !== dayBefore(todayKey)) missedDay = dayBefore(todayKey);
+            rec.run = (rec.last === dayBefore(todayKey)) ? (rec.run || 0) + 1 : 1;
+            rec.total = (rec.total || 0) + 1;
+            rec.last = todayKey;
+            try { localStorage.setItem(KEY, JSON.stringify(rec)); } catch (e) {}
+          }
+          run = rec.run || 0;
+        } catch (e) {}
+      }
+      var sEl = document.getElementById("won-streak");
+      if (sEl) {
+        var bits = "";
+        if (run >= 2) bits = Tf("streakRun", function (n) { return "<b>" + n + " days in a row.</b>"; })(run);
+        if (missedDay) {
+          bits += '<span class="missed">' +
+            Tf("streakMissed", function (when, href) {
+              return 'You missed <a href="' + href + '">' + when + "</a>. It is still playable.";
+            })(pretty(missedDay), "/daily/" + missedDay + "/?utm_source=streak&utm_medium=web_solver") +
+            "</span>";
+        }
+        if (bits) { sEl.innerHTML = bits; sEl.classList.remove("hidden"); }
+      }
+
       // Today's daily is the one puzzle anyone can pass on: /today opens it in any browser and unfurls with a card.
       // SINCE 2026-11-22 A PAST DAILY HAS ITS OWN PERMANENT PAGE TOO -- /daily/<date>/, with its own og card --
-      // so it can be passed on exactly the same way. That address did not exist when this button was written,
-      // which is why sharing was reserved for today's. The consequence was that the archive, which is now our
-      // main search surface (50 pages, one more each day), had NO share path at all: every visitor arriving from
-      // a search landed on a past daily, solved it, and was offered nothing to pass on. Measured 2026-11-23:
-      // potd_share had never fired once in 90 days.
-      if (!document.getElementById("share-today")) {
-        var isToday = potdIsToday(d, Date.now());
-        var at = d.potdAt || d.sentAt;
-        var atMs = at && at.toMillis ? at.toMillis() : 0;
-        // No timestamp means no archive address can be derived, so show nothing rather than link to a 404.
-        // Verified 2026-11-23 against 4 archive pages spanning the whole range: this key reproduces the
-        // page's own date exactly, because both are the Eastern date the daily went up.
-        var dayKey = atMs ? new Intl.DateTimeFormat("en-CA", { timeZone: "America/New_York" }).format(new Date(atMs)) : "";
-        if (isToday || dayKey) {
-          var pretty = atMs ? new Intl.DateTimeFormat("en-US", { month: "long", day: "numeric", timeZone: "America/New_York" }).format(new Date(atMs)) : "";
-          var brag = isToday
-            ? Tf("brag", function(moves,fewest){ return "I solved today's Phuzzle in " + moves + " swap" + (moves === 1 ? "" : "s") + (moves === fewest ? ", the fewest possible." : " (the fewest possible is " + fewest + ").") + " Your turn."; })(moves, fewest)
-            : Tf("bragDated", function(moves,fewest,when){ return "I solved the Phuzzle from " + when + " in " + moves + " swap" + (moves === 1 ? "" : "s") + (moves === fewest ? ", the fewest possible." : " (the fewest possible is " + fewest + ").") + " Your turn."; })(moves, fewest, pretty);
-          var link = isToday
-            ? "https://phuzzles.app/today/?utm_source=potd-share&utm_medium=share"
-            : "https://phuzzles.app/daily/" + dayKey + "/?utm_source=potd-share&utm_medium=share";
-          var share = document.createElement("button");
-          share.type = "button"; share.id = "share-today"; share.className = "btn ghost";
-          share.textContent = isToday ? T("shareToday","Share today's puzzle") : T("sharePuzzle","Share this puzzle");
-          // `from` rather than a new parameter name: it is already a registered custom dimension, so the
-          // today-vs-archive split is queryable in GA4 instead of being silently discarded.
-          var whence = isToday ? "potd_today" : "potd_archive";
-          share.onclick = function(){
-            if (navigator.share) {
-              navigator.share({ text: brag, url: link })
-                .then(function(){ ev("potd_share", { method: "sheet", from: whence }); }, function(){});
-              return;
-            }
-            (navigator.clipboard ? navigator.clipboard.writeText(brag + " " + link) : Promise.reject())
-              .then(function(){ share.textContent = T("linkCopied","Link copied"); ev("potd_share", { method: "copy", from: whence }); },
-                    function(){ share.textContent = link.replace(/^https:\/\//, "").split("?")[0]; });
-          };
-          cta.insertAdjacentElement("afterend", share);
-        }
+      // so it can be passed on the same way. That address did not exist when this button was written, which is
+      // why sharing was reserved for today's. The cost: the archive is now our main search surface, so every
+      // visitor arriving from a search lands on a PAST daily, solved it, and was offered nothing to pass on.
+      // Measured 2026-11-23: potd_share had never fired once in 90 days.
+      if (!document.getElementById("share-today") && (isToday || dayKey)) {
+        var runTail = run >= 2 ? Tf("streakTail", function (n) { return " " + n + " days running."; })(run) : "";
+        var brag = (isToday
+          ? Tf("brag", function (moves, fewest) { return "I solved today's Phuzzle in " + moves + " swap" + (moves === 1 ? "" : "s") + (moves === fewest ? ", the fewest possible." : " (the fewest possible is " + fewest + ")."); })(moves, fewest)
+          : Tf("bragDated", function (moves, fewest, when) { return "I solved the Phuzzle from " + when + " in " + moves + " swap" + (moves === 1 ? "" : "s") + (moves === fewest ? ", the fewest possible." : " (the fewest possible is " + fewest + ")."); })(moves, fewest, pretty(dayKey))
+        ) + runTail + " Your turn.";
+        var link = isToday
+          ? "https://phuzzles.app/today/?utm_source=potd-share&utm_medium=share"
+          : "https://phuzzles.app/daily/" + dayKey + "/?utm_source=potd-share&utm_medium=share";
+        var share = document.createElement("button");
+        share.type = "button"; share.id = "share-today"; share.className = "btn ghost";
+        share.textContent = isToday ? T("shareToday","Share today's puzzle") : T("sharePuzzle","Share this puzzle");
+        // `from` rather than a new parameter name: it is already a registered custom dimension, so the
+        // today-vs-archive split is queryable in GA4 instead of being silently discarded.
+        var whence = isToday ? "potd_today" : "potd_archive";
+        share.onclick = function(){
+          if (navigator.share) {
+            navigator.share({ text: brag, url: link })
+              .then(function(){ ev("potd_share", { method: "sheet", from: whence }); }, function(){});
+            return;
+          }
+          (navigator.clipboard ? navigator.clipboard.writeText(brag + " " + link) : Promise.reject())
+            .then(function(){ share.textContent = T("linkCopied","Link copied"); ev("potd_share", { method: "copy", from: whence }); },
+                  function(){ share.textContent = link.replace(/^https:\/\//, "").split("?")[0]; });
+        };
+        cta.insertAdjacentElement("afterend", share);
       }
     }
     // "Send one back" promised the one thing this page could not do. Until /make/ shipped (2026-11-17)
