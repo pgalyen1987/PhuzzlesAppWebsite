@@ -245,7 +245,13 @@ var s=document.createElement('script');s.async=true;s.src='https://www.googletag
       wonFootOfficial: "毎日アメリカ東部時間11:00に新作が出ます：<a href=\"/today/\">phuzzles.app/today</a><br>アプリはiPhoneとAndroidで無料、広告つき。",
       shareToday: "今日のパズルをシェア",
       linkCopied: "リンクをコピーしました",
-      brag: function(m,f){ return "今日のPhuzzleを" + m + "回の入れ替えで解きました（最小手数は" + f + "）。次はあなたの番。"; },
+      brag: function(m,f){ return "今日のPhuzzleを" + m + "回の入れ替えで解きました" + (m === f ? "。最小手数です。" : "（最小手数は" + f + "）。"); },
+      bragDated: function(m,f,w){ return w + "のPhuzzleを" + m + "回の入れ替えで解きました" + (m === f ? "。最小手数です。" : "（最小手数は" + f + "）。"); },
+      yourTurn: "次はあなたの番。",
+      sharePuzzle: "このパズルをシェア",
+      streakRun: function(n){ return "<b>" + n + "日連続。</b>"; },
+      streakTail: function(n){ return n + "日連続。"; },
+      streakMissed: function(w,href){ return '<a href="' + href + '">' + w + "</a>の分を逃しました。まだ解けます。"; },
       instGot: "<em>Phuzzle</em>が届きました！",
       instSender: function(x){ return escapeHtml(x) + "さんから<em>Phuzzle</em>が届きました！"; },
       instSub: "アプリを入手して解くと、隠されたメッセージが現れます。",
@@ -282,7 +288,13 @@ var s=document.createElement('script');s.async=true;s.src='https://www.googletag
       wonFootOfficial: "Un nouveau chaque jour à 11h00 (heure de l'Est des États-Unis) : <a href=\"/today/\">phuzzles.app/today</a><br>L'appli est gratuite sur iPhone et Android, avec publicités.",
       shareToday: "Partager le puzzle du jour",
       linkCopied: "Lien copié",
-      brag: function(m,f){ return "J'ai résolu le Phuzzle du jour en " + m + (m === 1 ? " échange" : " échanges") + " (le minimum possible est " + f + "). À ton tour."; },
+      brag: function(m,f){ return "J'ai résolu le Phuzzle du jour en " + m + (m === 1 ? " échange" : " échanges") + (m === f ? ", le minimum possible." : " (le minimum possible est " + f + ")."); },
+      bragDated: function(m,f,w){ return "J'ai résolu le Phuzzle du " + w + " en " + m + (m === 1 ? " échange" : " échanges") + (m === f ? ", le minimum possible." : " (le minimum possible est " + f + ")."); },
+      yourTurn: "À ton tour.",
+      sharePuzzle: "Partager ce puzzle",
+      streakRun: function(n){ return "<b>" + n + " jours d'affilée.</b>"; },
+      streakTail: function(n){ return n + " jours d'affilée."; },
+      streakMissed: function(w,href){ return 'Tu as manqué celui du <a href="' + href + '">' + w + "</a>. Il est toujours jouable."; },
       instGot: "Vous avez reçu un <em>Phuzzle</em> !",
       instSender: function(x){ return escapeHtml(x) + " vous a envoyé un <em>Phuzzle</em> !"; },
       instSub: "Téléchargez l'appli pour le résoudre et dévoiler le message caché.",
@@ -319,7 +331,13 @@ var s=document.createElement('script');s.async=true;s.src='https://www.googletag
       wonFootOfficial: "Uno nuevo cada día a las 11:00 (hora del Este de EE. UU.): <a href=\"/today/\">phuzzles.app/today</a><br>La app es gratis en iPhone y Android, con anuncios.",
       shareToday: "Comparte el rompecabezas de hoy",
       linkCopied: "Enlace copiado",
-      brag: function(m,f){ return "Resolví el Phuzzle de hoy en " + m + (m === 1 ? " intercambio" : " intercambios") + " (el mínimo posible es " + f + "). Te toca."; },
+      brag: function(m,f){ return "Resolví el Phuzzle de hoy en " + m + (m === 1 ? " intercambio" : " intercambios") + (m === f ? ", el mínimo posible." : " (el mínimo posible es " + f + ")."); },
+      bragDated: function(m,f,w){ return "Resolví el Phuzzle del " + w + " en " + m + (m === 1 ? " intercambio" : " intercambios") + (m === f ? ", el mínimo posible." : " (el mínimo posible es " + f + ")."); },
+      yourTurn: "Te toca.",
+      sharePuzzle: "Compartir este rompecabezas",
+      streakRun: function(n){ return "<b>" + n + " días seguidos.</b>"; },
+      streakTail: function(n){ return n + " días seguidos."; },
+      streakMissed: function(w,href){ return 'Te perdiste el del <a href="' + href + '">' + w + "</a>. Todavía se puede jugar."; },
       instGot: "¡Has recibido un <em>Phuzzle</em>!",
       instSender: function(x){ return "¡" + escapeHtml(x) + " te ha enviado un <em>Phuzzle</em>!"; },
       instSub: "Descarga la app para resolverlo y descubrir el mensaje oculto.",
@@ -356,7 +374,13 @@ var s=document.createElement('script');s.async=true;s.src='https://www.googletag
       wonFootOfficial: "Jeden Tag ein neues um 11:00 Uhr (US-Ostküstenzeit): <a href=\"/today/\">phuzzles.app/today</a><br>Die App ist kostenlos für iPhone und Android, mit Werbung.",
       shareToday: "Das heutige Puzzle teilen",
       linkCopied: "Link kopiert",
-      brag: function(m,f){ return "Ich habe das heutige Phuzzle in " + m + (m === 1 ? " Tausch" : " Tauschen") + " gelöst (das mögliche Minimum ist " + f + "). Du bist dran."; },
+      brag: function(m,f){ return "Ich habe das heutige Phuzzle in " + m + (m === 1 ? " Tausch" : " Tauschen") + (m === f ? " gelöst, dem möglichen Minimum." : " gelöst (das mögliche Minimum ist " + f + ")."); },
+      bragDated: function(m,f,w){ return "Ich habe das Phuzzle vom " + w + " in " + m + (m === 1 ? " Tausch" : " Tauschen") + (m === f ? " gelöst, dem möglichen Minimum." : " gelöst (das mögliche Minimum ist " + f + ")."); },
+      yourTurn: "Du bist dran.",
+      sharePuzzle: "Dieses Puzzle teilen",
+      streakRun: function(n){ return "<b>" + n + " Tage in Folge.</b>"; },
+      streakTail: function(n){ return n + " Tage in Folge."; },
+      streakMissed: function(w,href){ return 'Du hast das vom <a href="' + href + '">' + w + "</a> verpasst. Es lässt sich immer noch spielen."; },
       instGot: "Du hast ein <em>Phuzzle</em> bekommen!",
       instSender: function(x){ return escapeHtml(x) + " hat dir ein <em>Phuzzle</em> geschickt!"; },
       instSub: "Lade die App, um es zu lösen und die versteckte Nachricht zu sehen.",
@@ -393,7 +417,13 @@ var s=document.createElement('script');s.async=true;s.src='https://www.googletag
       wonFootOfficial: "Um novo todo dia às 11:00 (horário do leste dos EUA): <a href=\"/today/\">phuzzles.app/today</a><br>O app é grátis no iPhone e no Android, com anúncios.",
       shareToday: "Compartilhar o quebra-cabeça de hoje",
       linkCopied: "Link copiado",
-      brag: function(m,f){ return "Resolvi o Phuzzle de hoje em " + m + (m === 1 ? " troca" : " trocas") + " (o mínimo possível é " + f + "). Agora é a sua vez."; },
+      brag: function(m,f){ return "Resolvi o Phuzzle de hoje em " + m + (m === 1 ? " troca" : " trocas") + (m === f ? ", o mínimo possível." : " (o mínimo possível é " + f + ")."); },
+      bragDated: function(m,f,w){ return "Resolvi o Phuzzle de " + w + " em " + m + (m === 1 ? " troca" : " trocas") + (m === f ? ", o mínimo possível." : " (o mínimo possível é " + f + ")."); },
+      yourTurn: "Agora é a sua vez.",
+      sharePuzzle: "Compartilhar este quebra-cabeça",
+      streakRun: function(n){ return "<b>" + n + " dias seguidos.</b>"; },
+      streakTail: function(n){ return n + " dias seguidos."; },
+      streakMissed: function(w,href){ return 'Você perdeu o de <a href="' + href + '">' + w + "</a>. Ainda dá para jogar."; },
       instGot: "Você recebeu um <em>Phuzzle</em>!",
       instSender: function(x){ return escapeHtml(x) + " te mandou um <em>Phuzzle</em>!"; },
       instSub: "Baixe o app para resolver e ver a mensagem escondida.",
@@ -673,7 +703,7 @@ var s=document.createElement('script');s.async=true;s.src='https://www.googletag
       var at = d.potdAt || d.sentAt;
       var atMs = at && at.toMillis ? at.toMillis() : 0;
       var edt = function (ms) { return new Intl.DateTimeFormat("en-CA", { timeZone: "America/New_York" }).format(new Date(ms)); };
-      var pretty = function (key) { return new Intl.DateTimeFormat("en-US", { month: "long", day: "numeric", timeZone: "UTC" }).format(new Date(key + "T12:00:00Z")); };
+      var pretty = function (key) { return new Intl.DateTimeFormat(LANG === "en" ? "en-US" : LANG, { month: "long", day: "numeric", timeZone: "UTC" }).format(new Date(key + "T12:00:00Z")); };
       // No timestamp means no archive address can be derived, so show nothing rather than link to a 404.
       // Verified 2026-11-23 against 4 archive pages spanning the whole range: this key reproduces the
       // page's own date exactly, because both are the Eastern date the daily went up.
@@ -725,11 +755,12 @@ var s=document.createElement('script');s.async=true;s.src='https://www.googletag
       // visitor arriving from a search lands on a PAST daily, solved it, and was offered nothing to pass on.
       // Measured 2026-11-23: potd_share had never fired once in 90 days.
       if (!document.getElementById("share-today") && (isToday || dayKey)) {
-        var runTail = run >= 2 ? Tf("streakTail", function (n) { return " " + n + " days running."; })(run) : "";
+        var sep = LANG === "ja" ? "" : " ";
+        var runTail = run >= 2 ? Tf("streakTail", function (n) { return n + " days running."; })(run) : "";
         var brag = (isToday
           ? Tf("brag", function (moves, fewest) { return "I solved today's Phuzzle in " + moves + " swap" + (moves === 1 ? "" : "s") + (moves === fewest ? ", the fewest possible." : " (the fewest possible is " + fewest + ")."); })(moves, fewest)
           : Tf("bragDated", function (moves, fewest, when) { return "I solved the Phuzzle from " + when + " in " + moves + " swap" + (moves === 1 ? "" : "s") + (moves === fewest ? ", the fewest possible." : " (the fewest possible is " + fewest + ")."); })(moves, fewest, pretty(dayKey))
-        ) + runTail + " Your turn.";
+        ) + (runTail ? sep + runTail : "") + sep + T("yourTurn", "Your turn.");
         var link = isToday
           ? "https://phuzzles.app/today/?utm_source=potd-share&utm_medium=share"
           : "https://phuzzles.app/daily/" + dayKey + "/?utm_source=potd-share&utm_medium=share";
