@@ -97,7 +97,15 @@ for (const d of days) {
   // line 0 is "Puzzle of the Day for <weekday>, <month> <day>." The caption is what follows, and
   // the credit is split off so it can be presented as a credit rather than as prose.
   const body = lines.slice(1).join(" ");
-  const caption = body.split(/\s(?:Photo|Image|Credit):/)[0].trim();
+  // The credit clause is split off the caption so it renders as a credit rather than as prose --
+  // and so it does not ride into the meta description, where it reads as a licence notice in a
+  // search result. The old list was Photo|Image|Credit only, which missed every non-photographic
+  // medium: "Woodblock print: Katsushika Hokusai (public domain)" stayed in the caption and shipped
+  // to Google that way on 2026-11-24. Any new medium word belongs in this list.
+  const caption = body
+    .split(/\s(?:Photo|Photograph|Image|Credit|Painting|Illustration|Drawing|Engraving|Etching|Lithograph|Woodblock print|Woodcut|Print|Artwork|Poster|Map|Scan):/)[0]
+    .replace(/\s*\((?:cc0[^)]*|public domain|no known copyright[^)]*)\)\s*$/i, "")
+    .trim();
   const entry = byMessage.get(norm(caption));
   rows.push({
     date: d.id,
@@ -160,12 +168,19 @@ const page = (r, prev, next) => {
       : {}),
   };
 
-  const provenance = (r.credit || r.licence || r.source)
+  // The licence is machine-readable provenance, not reading matter. It stays in the JSON-LD above
+  // (where Google and any republisher can read it) and comes OFF the visible page: owner, 2026-11-25,
+  // "on the daily puzzles you don't need to mention it is cc0 -- most regular users aren't concerned
+  // about that". Nothing here is load-bearing legally: CC0 and public-domain works require no
+  // attribution at all, so naming the photographer is a courtesy we keep and the licence label is
+  // noise we drop. A licence that DOES compel a credit line (NASA/JPL and friends) carries that
+  // requirement inside the credit string itself, which is still printed in full.
+  const visibleCredit = (r.credit || "").replace(/\s*\((?:cc0[^)]*|public domain|no known copyright[^)]*)\)\s*$/i, "").trim();
+  const provenance = (visibleCredit || r.source)
     ? `
     <section class="prov">
       <h2>The photograph</h2>
-      ${r.credit ? `<p class="credit">${esc(r.credit)}</p>` : ""}
-      ${r.licence ? `<p>${esc(r.licence)}</p>` : ""}
+      ${visibleCredit ? `<p class="credit">${esc(visibleCredit)}</p>` : ""}
       ${r.source ? `<p><a href="${esc(r.source)}" rel="noopener nofollow">Where this picture came from</a></p>` : ""}
     </section>`
     : "";
