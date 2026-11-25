@@ -258,7 +258,7 @@ window.PHZ = (function () {
   var base = l.split("-")[0];
   var STR = {
     ja: {
-      footIdeasList: '<a href="/ja/ninshin-houkoku-puzzle">妊娠報告</a> &middot; <a href="/ja/christmas-present-puzzle">クリスマスプレゼント</a>',
+      footIdeasList: '<a href="/ja/ninshin-houkoku-puzzle">妊娠報告</a> &middot; <a href="/ja/seibetsu-happyou-puzzle">性別発表</a> &middot; <a href="/ja/tanjoubi-puzzle">誕生日</a> &middot; <a href="/ja/koinu-okaeri-puzzle">子犬のお迎え</a> &middot; <a href="/ja/surprise-ryokou-puzzle">サプライズ旅行</a> &middot; <a href="/ja/christmas-present-puzzle">クリスマスプレゼント</a> &middot; <a href="/ja/konyaku-houkoku-puzzle">婚約報告</a>',
       navWidget: "毎日のウィジェット",
       ctaMake: "ブラウザで作る",
       title: "Phuzzles\uff1a\u89e3\u3044\u3066\u521d\u3081\u3066\u898b\u3089\u308c\u308b\u5199\u771f\u30d1\u30ba\u30eb",
@@ -292,7 +292,7 @@ window.PHZ = (function () {
       dtPrice: "\u6599\u91d1",
       ddPrice: "\u5e83\u544a\u3064\u304d\u3067\u7121\u6599\u3002<a href=\"/de/plus/\">Phuzzles Plus</a> \u306f\u6708\u984d\u306e\u30b5\u30d6\u30b9\u30af\u30ea\u30d7\u30b7\u30e7\u30f3\u3067\u3001\u5e83\u544a\u304c\u306a\u304f\u306a\u308a\u3001\u30d5\u30a3\u30fc\u30c9\u306e1\u65e5\u306e\u4e0a\u9650\u3082\u306a\u304f\u306a\u308a\u307e\u3059\u3002\u4fa1\u683c\u306f App Store \u3068 Google Play \u306b\u8868\u793a\u3055\u308c\u307e\u3059\u3002",
       footContact: "Phuzzles \u306f Rebel Studios \u304c\u4f5c\u3063\u3066\u3044\u307e\u3059\u3002\u8cea\u554f\u3001\u4e0d\u5177\u5408\u3001\u958b\u304b\u306a\u3044\u30d1\u30ba\u30eb\u306f <a href=\"mailto:support@phuzzles.app\">support@phuzzles.app</a> \u3078\uff08\u82f1\u8a9e\u3067\u304a\u9001\u308a\u304f\u3060\u3055\u3044\uff09\u3002",
-      footIdeas: "\u4f7f\u3044\u304b\u305f\uff08\u30ea\u30f3\u30af\u5148\u306f\u82f1\u8a9e\u30d8\u309a\u30fc\u30b8\uff09\uff1a",
+      footIdeas: "\u4f7f\u3044\u304b\u305f\uff1a",
       navLabel: "Phuzzles \u306e\u4ed6\u306e\u30da\u30fc\u30b8",
       navDaily: "これまでの Phuzzle of the Day",
       navPress: "\u30d7\u30ec\u30b9\u30ad\u30c3\u30c8",
@@ -666,7 +666,58 @@ window.PHZ = (function () {
         tiles.forEach(function (t) { t.disabled = true; t.removeAttribute('aria-pressed'); });
         hint.textContent = D.hintDone || 'That note was folded under it the whole time.';
         again.hidden = false;
+        pow();
         if (window.gtag) gtag('event', 'demo_solved', { swaps: swaps });
+      }
+      // A short, bright "ta-da": a bespoke ascending major arpeggio, synthesised so there is no audio
+      // file to load and it is ours, not a stock sting. Fires inside the solving tap, so iOS allows it.
+      function winSound() {
+        try {
+          var AC = window.AudioContext || window.webkitAudioContext; if (!AC) return;
+          var ctx = new AC(); if (ctx.state === 'suspended') ctx.resume();
+          var now = ctx.currentTime, notes = [523.25, 659.25, 783.99, 1046.50];
+          notes.forEach(function (f, i) {
+            var t = now + i * 0.085, o = ctx.createOscillator(), g = ctx.createGain();
+            o.type = 'triangle'; o.frequency.value = f;
+            g.gain.setValueAtTime(0.0001, t);
+            g.gain.exponentialRampToValueAtTime(0.2, t + 0.015);
+            g.gain.exponentialRampToValueAtTime(0.0001, t + 0.45);
+            o.connect(g).connect(ctx.destination); o.start(t); o.stop(t + 0.5);
+          });
+          setTimeout(function () { try { ctx.close(); } catch (e) {} }, 900);
+        } catch (e) {}
+      }
+      // A little "you did it": a buzz, a chime, a pop of the board, and a burst from where the photo closed up.
+      function pow() {
+        try { if (navigator.vibrate) navigator.vibrate([0, 30, 40, 80]); } catch (e) {}
+        winSound();
+        if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+        var r = board.getBoundingClientRect();
+        if (board.animate) board.animate(
+          [{ transform: 'scale(1)' }, { transform: 'scale(1.05)' }, { transform: 'scale(1)' }],
+          { duration: 420, easing: 'cubic-bezier(.2,.8,.2,1.3)' });
+        var c = document.createElement('canvas');
+        c.style.cssText = 'position:fixed;inset:0;pointer-events:none;z-index:50';
+        document.body.appendChild(c);
+        var x = c.getContext('2d'), DPR = Math.min(2, window.devicePixelRatio || 1);
+        c.width = innerWidth * DPR; c.height = innerHeight * DPR; x.scale(DPR, DPR);
+        var ox = r.left + r.width / 2, oy = r.top + r.height / 2;
+        var cols = ['#ff6b35', '#ffb347', '#4ECDC4', '#FF6B6B', '#9b6bff', '#fff'], P = [];
+        for (var i = 0; i < 150; i++) {
+          var ang = Math.random() * Math.PI * 2, sp = 4 + Math.random() * 12;
+          P.push({ x: ox, y: oy, vx: Math.cos(ang) * sp, vy: Math.sin(ang) * sp - 7,
+            s: 5 + Math.random() * 7, col: cols[i % cols.length], a: Math.random() * 6, va: (Math.random() - .5) * .5 });
+        }
+        var start = Date.now(), DUR = 1500;
+        (function loop() {
+          var t = Date.now() - start; x.clearRect(0, 0, innerWidth, innerHeight);
+          P.forEach(function (p) {
+            p.vy += 0.3; p.vx *= 0.99; p.x += p.vx; p.y += p.vy; p.a += p.va;
+            x.save(); x.globalAlpha = Math.max(0, 1 - t / DUR); x.translate(p.x, p.y); x.rotate(p.a);
+            x.fillStyle = p.col; x.fillRect(-p.s / 2, -p.s / 2, p.s, p.s * 0.62); x.restore();
+          });
+          if (t < DUR) requestAnimationFrame(loop); else c.remove();
+        })();
       }
       for (var s = 0; s < N * N; s++) {
         var b = document.createElement('button');
