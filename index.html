@@ -670,9 +670,28 @@ window.PHZ = (function () {
         pow();
         if (window.gtag) gtag('event', 'demo_solved', { swaps: swaps });
       }
-      // A little "you did it": a buzz, a pop of the board, and a burst from where the photo just closed up.
+      // A short, bright "ta-da": a bespoke ascending major arpeggio, synthesised so there is no audio
+      // file to load and it is ours, not a stock sting. Fires inside the solving tap, so iOS allows it.
+      function winSound() {
+        try {
+          var AC = window.AudioContext || window.webkitAudioContext; if (!AC) return;
+          var ctx = new AC(); if (ctx.state === 'suspended') ctx.resume();
+          var now = ctx.currentTime, notes = [523.25, 659.25, 783.99, 1046.50];
+          notes.forEach(function (f, i) {
+            var t = now + i * 0.085, o = ctx.createOscillator(), g = ctx.createGain();
+            o.type = 'triangle'; o.frequency.value = f;
+            g.gain.setValueAtTime(0.0001, t);
+            g.gain.exponentialRampToValueAtTime(0.2, t + 0.015);
+            g.gain.exponentialRampToValueAtTime(0.0001, t + 0.45);
+            o.connect(g).connect(ctx.destination); o.start(t); o.stop(t + 0.5);
+          });
+          setTimeout(function () { try { ctx.close(); } catch (e) {} }, 900);
+        } catch (e) {}
+      }
+      // A little "you did it": a buzz, a chime, a pop of the board, and a burst from where the photo closed up.
       function pow() {
         try { if (navigator.vibrate) navigator.vibrate([0, 30, 40, 80]); } catch (e) {}
+        winSound();
         if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
         var r = board.getBoundingClientRect();
         if (board.animate) board.animate(

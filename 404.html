@@ -829,6 +829,7 @@ var s=document.createElement('script');s.async=true;s.src='https://www.googletag
     var _r = _bd ? _bd.getBoundingClientRect() : null;
     show("won");
     try { if (navigator.vibrate) navigator.vibrate([0, 30, 40, 80]); } catch (e) {}
+    winSound();
     burst(_r ? _r.left + _r.width / 2 : innerWidth / 2, _r ? _r.top + _r.height / 2 : innerHeight * 0.4);
   }
 
@@ -845,6 +846,24 @@ var s=document.createElement('script');s.async=true;s.src='https://www.googletag
   addEventListener("pagehide", leaving);
   addEventListener("visibilitychange", function(){ if (document.visibilityState === "hidden") leaving(); });
 
+  // A short, bright "ta-da": a bespoke ascending major arpeggio, synthesised so there is no audio file
+  // to load and it is ours, not a stock sting. Fires inside the solving tap, so iOS allows it.
+  function winSound(){
+    try {
+      var AC=window.AudioContext||window.webkitAudioContext; if(!AC) return;
+      var ctx=new AC(); if(ctx.state==="suspended") ctx.resume();
+      var now=ctx.currentTime, notes=[523.25,659.25,783.99,1046.50];
+      notes.forEach(function(f,i){
+        var t=now+i*0.085, o=ctx.createOscillator(), g=ctx.createGain();
+        o.type="triangle"; o.frequency.value=f;
+        g.gain.setValueAtTime(0.0001,t);
+        g.gain.exponentialRampToValueAtTime(0.2,t+0.015);
+        g.gain.exponentialRampToValueAtTime(0.0001,t+0.45);
+        o.connect(g).connect(ctx.destination); o.start(t); o.stop(t+0.5);
+      });
+      setTimeout(function(){ try{ctx.close();}catch(e){} },900);
+    } catch(e){}
+  }
   // The win burst: an explosive pop from the finished board, biased upward, then gravity and a fade.
   // Not a top-down drizzle -- the particles fly OUT from where the photo just came together, so it
   // reads as "pow", not weather.
