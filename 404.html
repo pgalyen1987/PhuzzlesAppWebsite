@@ -116,9 +116,15 @@
   .foot{margin-top:16px;color:var(--muted);font-size:12px}
   .foot a{color:var(--muted)}
   .confetti{position:fixed;inset:0;pointer-events:none;z-index:5}
+  /* The win beat: the photo blooms up and "Solved." springs in as the board flips to the reveal. */
+  @keyframes bloom{0%{transform:scale(.82);opacity:0}60%{transform:scale(1.03)}100%{transform:scale(1);opacity:1}}
+  @keyframes popin{0%{transform:scale(.5);opacity:0}55%{transform:scale(1.12)}100%{transform:scale(1);opacity:1}}
+  #won:not(.hidden) #won-img{animation:bloom .55s cubic-bezier(.2,.8,.2,1.2) both}
+  #won:not(.hidden) h1{animation:popin .5s .04s cubic-bezier(.2,.9,.3,1.4) both}
   @media (prefers-reduced-motion:reduce){
     .tile,#peek{transition:none}
     .tile.pop,.spin{animation:none}
+    #won #won-img,#won h1{animation:none}
   }
 </style>
 <!-- Google Analytics: the property shared by Rebel Studios sites (reports split by hostname). Visitors in the
@@ -819,8 +825,11 @@ var s=document.createElement('script');s.async=true;s.src='https://www.googletag
           body: JSON.stringify({ id: puzzleId, ms: window._solveStart ? Date.now() - window._solveStart : 0 }) }).catch(function(){});
       } catch (e) {}
     }
+    var _bd = document.getElementById("board");
+    var _r = _bd ? _bd.getBoundingClientRect() : null;
     show("won");
-    burst();
+    try { if (navigator.vibrate) navigator.vibrate([0, 30, 40, 80]); } catch (e) {}
+    burst(_r ? _r.left + _r.width / 2 : innerWidth / 2, _r ? _r.top + _r.height / 2 : innerHeight * 0.4);
   }
 
   // Six events said what happened on this page and none said what didn't, so a board someone gave up on and
@@ -836,18 +845,25 @@ var s=document.createElement('script');s.async=true;s.src='https://www.googletag
   addEventListener("pagehide", leaving);
   addEventListener("visibilitychange", function(){ if (document.visibilityState === "hidden") leaving(); });
 
-  function burst(){
+  // The win burst: an explosive pop from the finished board, biased upward, then gravity and a fade.
+  // Not a top-down drizzle -- the particles fly OUT from where the photo just came together, so it
+  // reads as "pow", not weather.
+  function burst(ox, oy){
     if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
     var c=document.createElement("canvas"); c.className="confetti"; document.body.appendChild(c);
-    var x=c.getContext("2d"); c.width=innerWidth; c.height=innerHeight;
-    var cols=["#ff6b35","#ffb347","#4ECDC4","#FF6B6B","#fff"], P=[];
-    for(var i=0;i<120;i++)P.push({x:Math.random()*c.width,y:-20-Math.random()*c.height,
-      s:4+Math.random()*6,v:2+Math.random()*4,col:cols[i%cols.length],a:Math.random()*6});
-    var end=Date.now()+2500;
-    (function loop(){ x.clearRect(0,0,c.width,c.height);
-      P.forEach(function(p){ p.y+=p.v; p.a+=.1; x.save(); x.translate(p.x,p.y); x.rotate(p.a);
-        x.fillStyle=p.col; x.fillRect(-p.s/2,-p.s/2,p.s,p.s); x.restore(); });
-      if(Date.now()<end) requestAnimationFrame(loop); else c.remove();
+    var x=c.getContext("2d"), DPR=Math.min(2, window.devicePixelRatio||1);
+    c.width=innerWidth*DPR; c.height=innerHeight*DPR; x.scale(DPR,DPR);
+    if(ox==null)ox=innerWidth/2; if(oy==null)oy=innerHeight*0.4;
+    var cols=["#ff6b35","#ffb347","#4ECDC4","#FF6B6B","#9b6bff","#fff"], P=[];
+    for(var i=0;i<150;i++){ var ang=Math.random()*Math.PI*2, sp=4+Math.random()*12;
+      P.push({x:ox,y:oy,vx:Math.cos(ang)*sp,vy:Math.sin(ang)*sp-7,
+        s:5+Math.random()*7,col:cols[i%cols.length],a:Math.random()*6,va:(Math.random()-.5)*.5}); }
+    var start=Date.now(), DUR=1500;
+    (function loop(){ var t=Date.now()-start; x.clearRect(0,0,innerWidth,innerHeight);
+      P.forEach(function(p){ p.vy+=0.3; p.vx*=0.99; p.x+=p.vx; p.y+=p.vy; p.a+=p.va;
+        x.save(); x.globalAlpha=Math.max(0,1-t/DUR); x.translate(p.x,p.y); x.rotate(p.a);
+        x.fillStyle=p.col; x.fillRect(-p.s/2,-p.s/2,p.s,p.s*0.62); x.restore(); });
+      if(t<DUR) requestAnimationFrame(loop); else c.remove();
     })();
   }
 })();
