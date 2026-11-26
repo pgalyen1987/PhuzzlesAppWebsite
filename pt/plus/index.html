@@ -61,6 +61,21 @@
   footer{border-top:1px solid #ffffff1a; padding-top:20px; color:var(--muted); font-size:13.5px; display:flex; flex-wrap:wrap; gap:8px 18px; align-items:center}
   footer a{color:var(--muted)}
 </style>
+<!-- Google Analytics, same property and same consent defaults as every other page here. This page had no tag
+     at all until 2026-11-26 — nor did its five translations, which are generated from this file — so the only
+     page on the site that names a price had never appeared in analytics: 0 GA4 pageviews for any /plus/ path
+     over 90 days, against 594 for "/", which links straight to it. Search does find it (27 impressions and 0
+     clicks over 90 days across four of the six addresses, median position 6.0), so "nobody wants the price"
+     and "nobody ever got here" were indistinguishable. -->
+<script>
+window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}
+if(!/^(localhost|127\.|0\.0\.0\.0)/.test(location.hostname)){
+gtag('consent','default',{ad_storage:'denied',ad_user_data:'denied',ad_personalization:'denied',analytics_storage:'denied',region:['AT','BE','BG','HR','CY','CZ','DK','EE','FI','FR','DE','GR','HU','IE','IT','LV','LT','LU','MT','NL','PL','PT','RO','SK','SI','ES','SE','IS','LI','NO','GB','CH']});
+gtag('consent','default',{ad_storage:'denied',ad_user_data:'denied',ad_personalization:'denied',analytics_storage:'granted'});
+gtag('js',new Date());gtag('config','G-00TNDVMQNM');
+var s=document.createElement('script');s.async=true;s.src='https://www.googletagmanager.com/gtag/js?id=G-00TNDVMQNM';document.head.appendChild(s);
+}
+</script>
 </head>
 <body>
 <div class="wrap">
@@ -105,7 +120,10 @@
     <h2 data-i18n="getAppH">Baixe o app</h2>
     <p data-i18n="getAppP">O Plus é comprado dentro do app, na tela do Plus. O app é grátis e as telas são só em inglês.</p>
     <div class="stores">
-      <a href="https://apps.apple.com/app/id6766833614"><img src="/app-store-badge.svg" data-i18n-alt="altAppStore" alt="Baixe o Phuzzles na App Store" /></a>
+      <!-- App Store Connect attributes on `ct` alone and reads none of the Play referrer on the badge below, so
+           this was the one install path off this page that arrived unattributed. `ct` matches that link's
+           utm_campaign, so the two stores can be compared. Same form as /get (commit 901cb1d). -->
+      <a href="https://apps.apple.com/app/id6766833614?ct=plus&amp;mt=8"><img src="/app-store-badge.svg" data-i18n-alt="altAppStore" alt="Baixe o Phuzzles na App Store" /></a>
       <a href="https://play.google.com/store/apps/details?id=rebelstudios.phuzzles.app&amp;referrer=utm_source%3Dphuzzles.app%26utm_medium%3Dplus_page%26utm_campaign%3Dplus"><img src="/google-play-badge.png" data-i18n-alt="altPlay" alt="Baixe o Phuzzles no Google Play" /></a>
     </div>
     <p class="foot" style="margin-top:14px" data-i18n="solveNote">Ou resolva primeiro <a href="/today/">o quebra-cabeça de hoje</a> no navegador: sem instalar, sem conta.</p>
