@@ -75,6 +75,15 @@ var s=document.createElement('script');s.async=true;s.src='https://www.googletag
   var PLAY = "https://play.google.com/store/apps/details?id=rebelstudios.phuzzles.app" +
     (utm.length ? "&referrer=" + encodeURIComponent(utm.join("&")) : "");
   document.getElementById("play").href = PLAY;
+  // APPLE NEEDS ITS OWN TOKEN. The Play referrer above carries the utm tags, but App Store Connect
+  // reads NONE of that -- it attributes on `ct` (campaign token) only, so every iOS install from a
+  // tagged link was landing in App Analytics as unattributed. Prefer utm_content (the per-clip
+  // field, e.g. "puppy") and fall back to the campaign, then the source, so a link that tags
+  // anything at all is attributable. `ct` is capped at 40 chars by Apple and must not be empty.
+  var ct = (q.get("utm_content") || q.get("utm_campaign") || q.get("utm_source") || "").slice(0, 40);
+  if (ct) {
+    IOS_URL += (IOS_URL.indexOf("?") === -1 ? "?" : "&") + "ct=" + encodeURIComponent(ct) + "&mt=8";
+  }
   if (isAndroid) {
     leave(PLAY);
   } else if (isIOS) {
