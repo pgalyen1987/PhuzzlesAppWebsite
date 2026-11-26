@@ -723,13 +723,18 @@ var s=document.createElement('script');s.async=true;s.src='https://www.googletag
       //     private window. Every read and write is wrapped; the line simply does not appear.
       //   * no pressure. It says what you did. It never warns you about losing it.
       var run = 0, missedDay = "";
-      if (isToday) {
+      if (isToday && dayKey) {
         try {
           var KEY = "phz:potd";
           var dayBefore = function (k) { var t = new Date(k + "T12:00:00Z"); t.setUTCDate(t.getUTCDate() - 1); return t.toISOString().slice(0, 10); };
           var rec = {};
           try { rec = JSON.parse(localStorage.getItem(KEY)) || {}; } catch (e) { rec = {}; }
-          var todayKey = edt(Date.now());
+          // The PUZZLE's day, not the reader's clock. A daily stays current until 11:00 Eastern the next
+          // morning, so keying off Date.now() would count one puzzle as two days for anyone who solved it
+          // in the afternoon and opened it again the next morning -- exactly the flattering lie this
+          // mechanic is written not to tell. dayKey is that same Eastern date (a daily goes up at 11:00,
+          // so its shifted day and its calendar day are the one date the archive page is filed under).
+          var todayKey = dayKey;
           if (rec.last !== todayKey) {
             if (rec.last && rec.last !== dayBefore(todayKey)) missedDay = dayBefore(todayKey);
             rec.run = (rec.last === dayBefore(todayKey)) ? (rec.run || 0) + 1 : 1;

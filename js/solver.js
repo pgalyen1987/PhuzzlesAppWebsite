@@ -43,14 +43,37 @@
     }
   }
 
-  // A daily stays isPotd until the next one goes up at 11:00 Eastern, so from midnight to 11:00 it is still
-  // yesterday's. It is today's only on the Eastern date it went up (potdAt; sentAt on older dailies).
+  // The Phuzzle day runs 11:00 Eastern to 11:00 Eastern: createPuzzleOfTheDay moves isPotd onto the new
+  // daily at 11:00 and clears the one before, so exactly one puzzle is ever current. Comparing calendar
+  // dates instead called that current puzzle "Yesterday's Phuzzle" from midnight to 11:00 -- 11 hours of
+  // every day, and the whole waking day for anyone in Europe -- on /today/, which is the address on the
+  // posters, the QR codes, the bio and every Short. Measured 2026-11-26 03:12 EST: the one isPotd puzzle
+  // went up 2026-11-25 11:00:14 EST and this returned false.
+  // So both sides are mapped to the Phuzzle day they fall in -- the Eastern date, rolled back one if it
+  // is before 11:00 -- and the comparison keeps doing its real job: noticing a daily that has gone STALE
+  // because the 11:00 job did not run, without lying for half of each day.
+  // This READS the Eastern wall clock rather than subtracting 11 hours of absolute time. Subtracting was
+  // the first cut and it was wrong twice a year: spring-forward day is 23 hours long, so 11:00 EDT minus
+  // 11h lands at 23:00 the evening before and the whole of 2026-03-08 would have read "Yesterday's",
+  // while a genuinely stale daily would have read as current. Asking the formatter for the hour has no
+  // such arithmetic in it.
+  var POTD_HOUR = 11;
+  function phuzzleDay(t) {
+    var parts = new Intl.DateTimeFormat("en-CA", { timeZone: "America/New_York", hour12: false,
+      year: "numeric", month: "2-digit", day: "2-digit", hour: "2-digit" }).formatToParts(new Date(t));
+    var g = {};
+    for (var i = 0; i < parts.length; i++) g[parts[i].type] = parts[i].value;
+    var date = g.year + "-" + g.month + "-" + g.day;
+    if (+g.hour % 24 >= POTD_HOUR) return date;          // "24" is midnight in some ICU builds
+    var prev = new Date(date + "T12:00:00Z");            // midday UTC: no date can slip a day
+    prev.setUTCDate(prev.getUTCDate() - 1);
+    return prev.toISOString().slice(0, 10);
+  }
   function isTodaysDaily(d, now) {
     if (!d.isPotd) return false;
     var at = d.potdAt || d.sentAt, ms = at && at.toMillis ? at.toMillis() : 0;
     if (!ms) return true;
-    var day = function (t) { return new Intl.DateTimeFormat("en-CA", { timeZone: "America/New_York" }).format(new Date(t)); };
-    return day(ms) === day(now);
+    return phuzzleDay(ms) === phuzzleDay(now);
   }
 
   /**
