@@ -67,8 +67,25 @@ var s=document.createElement('script');s.async=true;s.src='https://www.googletag
   var isIOS = /iPhone|iPad|iPod/i.test(ua) || (/Macintosh/.test(ua) && navigator.maxTouchPoints > 1);
   var show = function (id) { document.getElementById(id).classList.remove("hidden"); };
   var hide = function (id) { document.getElementById(id).classList.add("hidden"); };
-  // A beat before leaving, so the scan is counted (the poster's whole point is knowing it worked).
-  var leave = function (url) { setTimeout(function () { location.replace(url); }, 250); };
+  // DON'T GUESS THE BEAT -- WAIT FOR THE HIT. The old blind 250ms was a race with no margin.
+  // Measured 2026-11-26 on this page's own snippet, cold cache -- which is EVERY first visit,
+  // because Chrome partitions the HTTP cache per top-level site, so gtag.js is never already
+  // there: gtag.js finishes loading at 165-227ms and the pageview only reaches the wire at
+  // 245-301ms (4 samples, wired desktop), i.e. at or after the instant the old code replaced
+  // the document. Warm cache was 188ms, inside. Delivery did NOT visibly fail here -- 6 of 6
+  // loads of the old page still reached GA4, because once gtag.js is loaded its unload beacon
+  // rescues the hit -- so this is a race removed, not a loss recovered. It is worth removing
+  // because every real visitor arrives on a slower mobile path than the one measured, and this
+  // page is where every video link, every poster QR and every store install begins.
+  // So: hand off when GA4 acknowledges a hit (normally ~300ms), and cap the wait so nobody is
+  // ever trapped here if gtag.js is blocked or absent. The `handoff` event also records WHERE
+  // they went -- play, appstore or site -- which nothing else on the site can tell us.
+  var gone = false;
+  var go = function (url) { if (!gone) { gone = true; location.replace(url); } };
+  var leave = function (url, to) {
+    gtag("event", "handoff", { to: to, event_callback: function () { go(url); }, event_timeout: 1000 });
+    setTimeout(function () { go(url); }, 1000);
+  };
   // The post's utm tags ride along to Play as the install referrer, as the homepage's badge does.
   var q = new URLSearchParams(location.search), utm = [];
   ["utm_source", "utm_medium", "utm_campaign", "utm_content"].forEach(function (k) { if (q.get(k)) utm.push(k + "=" + q.get(k)); });
@@ -85,14 +102,14 @@ var s=document.createElement('script');s.async=true;s.src='https://www.googletag
     IOS_URL += (IOS_URL.indexOf("?") === -1 ? "?" : "&") + "ct=" + encodeURIComponent(ct) + "&mt=8";
   }
   if (isAndroid) {
-    leave(PLAY);
+    leave(PLAY, "play");
   } else if (isIOS) {
-    if (IOS_URL) { leave(IOS_URL); }
+    if (IOS_URL) { leave(IOS_URL, "appstore"); }
     else { hide("android"); show("ios"); }
   } else {
     // Laptops can't install either app, and the homepage has a puzzle with a message under it
     // plus both badges, so that's where they go. The query string comes too, for analytics.
-    leave("/" + location.search);
+    leave("/" + location.search, "site");
   }
 </script>
 </body>
