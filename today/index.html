@@ -193,6 +193,13 @@ var PhuzzlesT = (function(){
       var ms = function(v){ return v && v.toMillis ? v.toMillis() : (typeof v === "number" ? v : 0); };
       var docs = rows.slice().sort(function(a, b){ return ms(b.data.sentAt) - ms(a.data.sentAt); });
       if (!docs.length) { none(); return; }
+      // Same hand-off as /solve/?p= and /puzzle/?id=: this forward would make phuzzles.app the board's
+      // referrer, so whoever actually sent the visit (the TikTok bio link included) would be lost to the
+      // self-referral described in the tag above. The tag on THIS page records it too, but that beacon can
+      // be cancelled by the navigation on the next line, and this cannot.
+      try { var fwdRef = document.referrer;
+            if (fwdRef && new URL(fwdRef).origin !== location.origin) sessionStorage.setItem("phz_ref", fwdRef); }
+      catch (e) {}
       location.replace("/solve/" + encodeURIComponent(docs[0].id) + location.search);
     })
     // Firebase stops signing in new visitors from one address after a burst of them (auth/too-many-requests; a day

@@ -137,8 +137,18 @@ gtag('consent','default',{ad_storage:'denied',ad_user_data:'denied',ad_personali
 // A puzzle's address is the only key to a puzzle shared as a link, so Analytics gets the page without the id:
 // /puzzle/ or /solve/ with ?p= dropped, and the campaign tags kept. The studio's puzzles are public; their
 // events carry puzzle_id (ev() below).
-gtag('js',new Date());gtag('config','G-00TNDVMQNM',{page_location:(function(){
-  var u=new URL(location.href.replace(/\/(puzzle|solve)\/[^\/?#]+/i,'/$1/'));u.searchParams.delete('p');u.hash='';return u.href;})()});
+var gaCfg={page_location:(function(){
+  var u=new URL(location.href.replace(/\/(puzzle|solve)\/[^\/?#]+/i,'/$1/'));u.searchParams.delete('p');u.hash='';return u.href;})()};
+// /solve/?p=, /puzzle/?id= and /today/ all forward here, and a forward makes phuzzles.app this page's
+// referrer. GA4 ignores a self-referral, so until 2026-11-26 every shared puzzle link and every visit from
+// the TikTok bio was filed as (direct)/(none) -- the source was destroyed one hop before it was recorded.
+// The forwarder leaves the real referrer in sessionStorage for exactly one hop. Take it only when ours IS
+// the self-referral it is there to replace (so a genuine referrer always wins), and clear it either way, so
+// a later page in the same tab cannot inherit a referrer that was not its own.
+try{var gaHop=sessionStorage.getItem('phz_ref');
+    if(gaHop){sessionStorage.removeItem('phz_ref');
+      if(!document.referrer||new URL(document.referrer).origin===location.origin)gaCfg.page_referrer=gaHop;}}catch(e){}
+gtag('js',new Date());gtag('config','G-00TNDVMQNM',gaCfg);
 // 181 kB of tag manager used to compete with the puzzle for the connection. It goes after the first paint.
 requestAnimationFrame(function(){setTimeout(function(){
 var s=document.createElement('script');s.async=true;s.src='https://www.googletagmanager.com/gtag/js?id=G-00TNDVMQNM';document.head.appendChild(s);},0);});

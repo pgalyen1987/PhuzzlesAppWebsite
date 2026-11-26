@@ -72,6 +72,14 @@
   // id is in the path from here on.
   var q = "";
   try { var u = new URLSearchParams(location.search); u.delete("p"); q = u.toString(); } catch (e) {}
+  // The campaign tags above cover a link we tagged ourselves. A link someone pasted into a chat, or a
+  // search result, carries only a referrer -- and this forward destroys it: the board arrives with
+  // phuzzles.app as its referrer, GA4 ignores a self-referral, and the visit is filed as (direct)/(none).
+  // This line is the last moment the real referrer exists, so hand it on. sessionStorage, not a query
+  // param, because a param would end up in page_location; 404.html reads it once and clears it.
+  try { var fwdRef = document.referrer;
+        if (fwdRef && new URL(fwdRef).origin !== location.origin) sessionStorage.setItem("phz_ref", fwdRef); }
+  catch (e) {}
   location.replace("/solve/" + encodeURIComponent(id) + (q ? "?" + q : ""));
 })();
 </script>
