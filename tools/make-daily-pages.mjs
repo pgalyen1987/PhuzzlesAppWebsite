@@ -239,6 +239,20 @@ h1{font-family:'Archivo',sans-serif;font-weight:800;font-size:clamp(30px,5vw,47p
 .pager a:hover{text-decoration:underline}
 footer{margin-top:34px;color:var(--muted);font-size:14px}
 footer a{color:var(--teal)}
+/* THE STORE LINKS. Added 2026-11-27 after an audit found 75 of 121 pages had no route to either
+   store at all -- including every daily page and /today/, which is the URL in every TikTok and
+   YouTube caption we post. The measured consequence was in the logs the whole time: ten clips,
+   178 views, one click, ZERO store_clicks. Zero because there was nothing to click. */
+.getapp{margin-top:55px;padding-top:26px;border-top:1px solid var(--rule,#2a2a2a)}
+.getapp p{margin:0 0 14px;font-size:15px;color:var(--muted)}
+.getapp b{color:var(--text)}   /* NOT var(--ink): on this template --ink is the BACKGROUND
+                                  (body{background:var(--ink)}), so that painted the bold line
+                                  in the background colour and it vanished. The same name means
+                                  text in the other stylesheet here. Check what a variable IS. */
+.stores{display:flex;flex-wrap:wrap;align-items:center;gap:12px}
+.stores a{display:block;border-radius:8px}
+.stores img{height:44px;width:auto;max-width:none}
+.stores .gp{height:64px;margin:-10px -8px}
 </style>
 </head>
 <body>
@@ -252,6 +266,13 @@ footer a{color:var(--teal)}
   <p><a class="play" href="/solve/?p=${esc(r.id)}">Solve this puzzle</a></p>
 ${provenance}
 ${nav}
+  <div class="getapp">
+    <p>You can solve these here. <b>Making one and sending it to someone needs the app</b> &mdash; your photo, your message, hidden until they put the last piece in.</p>
+    <div class="stores">
+      <a href="https://apps.apple.com/app/id6766833614?ct=daily" target="_blank" rel="noopener"><img src="/app-store-badge.svg" alt="Download on the App Store"></a>
+      <a href="https://play.google.com/store/apps/details?id=rebelstudios.phuzzles.app&amp;referrer=utm_source%3Dphuzzles.app%26utm_medium%3Ddaily" target="_blank" rel="noopener"><img class="gp" src="/google-play-badge.png" alt="Get it on Google Play"></a>
+    </div>
+  </div>
   <footer><a href="/daily/">All ${rows.length} daily puzzles</a> &middot; <a href="/">What Phuzzles is</a></footer>
 </div>
 </body>

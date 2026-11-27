@@ -22,7 +22,18 @@ window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);
 if(!/^(localhost|127\.|0\.0\.0\.0)/.test(location.hostname)){
 gtag('consent','default',{ad_storage:'denied',ad_user_data:'denied',ad_personalization:'denied',analytics_storage:'denied',region:['AT','BE','BG','HR','CY','CZ','DK','EE','FI','FR','DE','GR','HU','IE','IT','LV','LT','LU','MT','NL','PL','PT','RO','SK','SI','ES','SE','IS','LI','NO','GB','CH']});
 gtag('consent','default',{ad_storage:'denied',ad_user_data:'denied',ad_personalization:'denied',analytics_storage:'granted'});
-gtag('js',new Date());gtag('config','G-00TNDVMQNM');
+// /get/'s desktop branch and /p/poster/ both forward HERE, and a forward makes phuzzles.app this page's
+// referrer. GA4 ignores a self-referral, so those visits were filed as (direct)/(none). b5563fc taught
+// /solve/, /puzzle/ and /today/ to stash the real referrer for one hop and 404.html to read it -- the
+// homepage is the OTHER page those forwards land on and it had no reader at all, so the stash that the
+// /get/ hop now writes would have gone nowhere. Take it only when ours IS the self-referral it is there
+// to replace (a genuine referrer always wins), and clear it either way, so a later page in the same tab
+// cannot inherit a referrer that was not its own.
+var gaCfg={};
+try{var gaHop=sessionStorage.getItem('phz_ref');
+    if(gaHop){sessionStorage.removeItem('phz_ref');
+      if(!document.referrer||new URL(document.referrer).origin===location.origin)gaCfg.page_referrer=gaHop;}}catch(e){}
+gtag('js',new Date());gtag('config','G-00TNDVMQNM',gaCfg);
 var s=document.createElement('script');s.async=true;s.src='https://www.googletagmanager.com/gtag/js?id=G-00TNDVMQNM';document.head.appendChild(s);
 }
 </script>
@@ -54,6 +65,20 @@ h1{font-family:'Archivo',sans-serif;font-weight:800;font-size:clamp(30px,5vw,47p
 .pager a:hover{text-decoration:underline}
 footer{margin-top:34px;color:var(--muted);font-size:14px}
 footer a{color:var(--teal)}
+/* THE STORE LINKS. Added 2026-11-27 after an audit found 75 of 121 pages had no route to either
+   store at all -- including every daily page and /today/, which is the URL in every TikTok and
+   YouTube caption we post. The measured consequence was in the logs the whole time: ten clips,
+   178 views, one click, ZERO store_clicks. Zero because there was nothing to click. */
+.getapp{margin-top:55px;padding-top:26px;border-top:1px solid var(--rule,#2a2a2a)}
+.getapp p{margin:0 0 14px;font-size:15px;color:var(--muted)}
+.getapp b{color:var(--text)}   /* NOT var(--ink): on this template --ink is the BACKGROUND
+                                  (body{background:var(--ink)}), so that painted the bold line
+                                  in the background colour and it vanished. The same name means
+                                  text in the other stylesheet here. Check what a variable IS. */
+.stores{display:flex;flex-wrap:wrap;align-items:center;gap:12px}
+.stores a{display:block;border-radius:8px}
+.stores img{height:44px;width:auto;max-width:none}
+.stores .gp{height:64px;margin:-10px -8px}
 </style>
 </head>
 <body>
@@ -76,6 +101,13 @@ footer a{color:var(--teal)}
       <a href="/daily/2026-10-08/" rel="next">Newer: 8 October 2026</a>
       <a href="/daily/2026-10-06/" rel="prev">Older: 6 October 2026</a>
     </nav>
+  <div class="getapp">
+    <p>You can solve these here. <b>Making one and sending it to someone needs the app</b> &mdash; your photo, your message, hidden until they put the last piece in.</p>
+    <div class="stores">
+      <a href="https://apps.apple.com/app/id6766833614?ct=daily" target="_blank" rel="noopener"><img src="/app-store-badge.svg" alt="Download on the App Store"></a>
+      <a href="https://play.google.com/store/apps/details?id=rebelstudios.phuzzles.app&amp;referrer=utm_source%3Dphuzzles.app%26utm_medium%3Ddaily" target="_blank" rel="noopener"><img class="gp" src="/google-play-badge.png" alt="Get it on Google Play"></a>
+    </div>
+  </div>
   <footer><a href="/daily/">All 53 daily puzzles</a> &middot; <a href="/">What Phuzzles is</a></footer>
 </div>
 </body>
