@@ -20,7 +20,13 @@
   whose puzzle has a note. To go back to a real puzzle, send one WITH a message, pin it, and put
   "/solve/<id>" back below.
 -->
-<meta http-equiv="refresh" content="1; url=/" />
+<!-- The no-JS fallback, and nothing else: it cannot carry location.search, so a scan it forwards
+     loses its utm tags. That is survivable (with JS off there is no gtag and no badge-referrer
+     upgrade to read them anyway) but only if it never wins the race, and at 1s it could: the JS
+     below caps at 1000ms measured from when the body script runs, which waits on the stylesheet
+     in this head. 4s leaves ~3s of slack for that fetch, and the tap-through link is on screen
+     from the first paint, so nobody with JS off is stuck looking at a dead page meanwhile. -->
+<meta http-equiv="refresh" content="4; url=/" />
 <link rel="stylesheet" href="/fonts/fonts.css" />
 <link rel="icon" href="/logo-128.png" />
 <style>
@@ -45,7 +51,18 @@ var s=document.createElement('script');s.async=true;s.src='https://www.googletag
   // session as the poster's and the Play badge passes them on as the install referrer.
   var PUZZLE = "/" + location.search;
   document.getElementById("go").setAttribute("href", PUZZLE);
-  setTimeout(function () { location.replace(PUZZLE); }, 250);   // a beat, so the scan is counted
+  // DON'T GUESS THE BEAT -- WAIT FOR THE HIT. /get/ got this same fix on 2026-11-26; this page kept
+  // the blind timer. Measured there on the page's own snippet, cold cache: gtag.js finishes loading
+  // at 165-227ms and the pageview only reaches the wire at 245-301ms on WIRED desktop -- so 250ms
+  // replaced the document at or before the instant the hit left. /get/ survived it anyway because
+  // once gtag.js is loaded its unload beacon rescues the hit; a QR scan on cellular is the case
+  // where gtag.js has NOT arrived yet, and then there is no beacon and the scan is simply not
+  // counted. So hand off when GA4 acknowledges (normally ~300ms) and cap the wait, so a blocked or
+  // absent gtag.js never traps anyone here.
+  var gone = false;
+  var go = function () { if (!gone) { gone = true; location.replace(PUZZLE); } };
+  gtag("event", "handoff", { to: "site", event_callback: go, event_timeout: 1000 });
+  setTimeout(go, 1000);
 </script>
 </body>
 </html>

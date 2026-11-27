@@ -109,6 +109,15 @@ var s=document.createElement('script');s.async=true;s.src='https://www.googletag
   } else {
     // Laptops can't install either app, and the homepage has a puzzle with a message under it
     // plus both badges, so that's where they go. The query string comes too, for analytics.
+    // This is also the last moment the real referrer exists. The forward makes phuzzles.app the
+    // homepage's referrer, GA4 drops the self-referral, and an UNTAGGED desktop click -- a pasted
+    // link, a chat, a search result -- was filed as (direct)/(none). A tagged link was never
+    // affected: utm beats referrer. So hand it on for one hop exactly as /solve/, /puzzle/ and
+    // /today/ do; index.html reads it once and clears it. Only this branch needs it -- the store
+    // branches leave our origin, where no reader of ours could ever run.
+    try { var fwdRef = document.referrer;
+          if (fwdRef && new URL(fwdRef).origin !== location.origin) sessionStorage.setItem("phz_ref", fwdRef); }
+    catch (e) {}
     leave("/" + location.search, "site");
   }
 </script>
